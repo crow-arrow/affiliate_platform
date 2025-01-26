@@ -2,32 +2,23 @@ import User from '../models/User.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
-const { sign } = jwt;
 //Register user
 export const signUp = async (req, res) => {
     try {
-        const { username, email, firstName, lastName, password } = req.body
+        const { email, firstName, lastName, password } = req.body
 
-        const isUsed = await User.findOne({ username })
+        const isUsed = await User.findOne({ email })
 
         if(isUsed) {
             return res.status(409).json({
-                message: 'Username already exists',
+                message: 'Email already exists',
             })
         }
-
-        // const emailUsed = await User.findOne({ email }) // Проверка на существующий email
-        // if (emailUsed) {
-        //     return res.status(409).json({
-        //         message: 'Email already exists',
-        //     })
-        // }
 
         const salt = bcrypt.genSaltSync(10)
         const hash = bcrypt.hashSync(password, salt)
 
         const newUser = new User({
-            username,
             email,
             firstName,
             lastName,
@@ -36,7 +27,7 @@ export const signUp = async (req, res) => {
 
         await newUser.save()
 
-        const token = sign(
+        const token = jwt.sign(
             {
                 id: newUser._id,
             },
@@ -46,11 +37,11 @@ export const signUp = async (req, res) => {
         
         res.status(201).json({
             user: {
-                id: newUser ._id,
-                username: newUser .username,
+                id: newUser._id,
+                email: newUser.email,
             },
             token,
-            message: 'Account successfully created. Login now!',
+            message: 'Account successfully created',
         })
     } catch (error) {
         console.error('Error during user creation:', error); // Логирование ошибки для отладки
@@ -74,11 +65,11 @@ export const login = async (req, res) => {
 
         if (!isPasswordCorrect) {
             return res.status(401).json({
-                message: 'Incorrect password',
+                message: 'Invalid email or password',
             })
         }
 
-        const token = sign(
+        const token = jwt.sign(
             {
                 id: user._id,
             },
@@ -110,7 +101,7 @@ export const getMe = async (req, res) => {
             })
         }
 
-        const token = sign(
+        const token = jwt.sign(
             {
                 id: user._id,
             },

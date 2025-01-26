@@ -1,8 +1,40 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import logo from '../assets/logo.png';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux'
+import { loginUser, checkIsAuth } from '../redux/features/auth/authSlice'
+import { toast } from 'react-toastify'
 
 export const LoginPage = () => {
+
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+
+  const { status } = useSelector((state) => state.auth)
+  const isAuth = useSelector(checkIsAuth)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (status) toast(status)
+    if (isAuth) navigate('/my-account')
+  }, [status, isAuth, navigate])
+
+  const handleSubmit = async (e) => {
+
+    e.preventDefault()
+
+    try {
+      await dispatch(loginUser({
+        username,
+        password,
+      }))
+    } catch (error) {
+      console.error('Error during login:', error.response?.data || error.message)
+      alert("Login failed. Please try again.")
+    }
+  }
+
   return (
     <div className="flex h-screen flex-1 flex-col justify-center px-6 mx-auto lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -17,18 +49,23 @@ export const LoginPage = () => {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form action="#" method="POST" className="space-y-6">
+        <form 
+          onSubmit={handleSubmit}
+          method="POST" 
+          className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
-              Email address
+            <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
+              Username
             </label>
             <div className="mt-2">
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="username"
+                name="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
-                autoComplete="email"
+                autoComplete="username"
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
@@ -50,6 +87,8 @@ export const LoginPage = () => {
                 id="password"
                 name="password"
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"

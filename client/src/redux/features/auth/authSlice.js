@@ -5,15 +5,15 @@ const initialState = {
     user: null,
     token: null,
     isLoading: false,
-    status: null,
+    status: '',
 }
+
 
 export const registerUser = createAsyncThunk(
     'auth/registerUser', 
-    async ({ username, email, firstName, lastName, password }) => {
+    async ({ email, firstName, lastName, password }, { rejectWithValue }) => {
         try {
             const { data } = await axios.post('/auth/signup', {
-                username,
                 email,
                 firstName,
                 lastName, 
@@ -24,16 +24,58 @@ export const registerUser = createAsyncThunk(
                 return data
             }
         } catch (error) {
-            return rejectWithValue(error.response?.data || 'Server error')
+            return rejectWithValue(
+                error.response?.data?.message || error.response?.data || 'Server error'
+            )
         }
-    })
+    }
+)
+
+export const loginUser = createAsyncThunk(
+    'auth/loginUser', 
+    async ({ username, password }, { rejectWithValue }) => {
+        try {
+            const { data } = await axios.post('/auth/login', {
+                username, 
+                password,
+            })
+            if (data.token) {
+                window.localStorage.setItem('token', data.token)
+                return data
+            }
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || error.response?.data || 'Server error'
+            )
+        }
+    }
+)
+
+export const getMe = createAsyncThunk('auth/getMe', async () => {
+    try {
+        const { data } = await axios.get('/auth/me')
+            return data
+    } catch (error) {
+        return rejectWithValue(
+            error.response?.data?.message || error.response?.data || 'Server error'
+        )
+    }
+})
 
 const authSlice = createSlice({
     name: 'auth',
     initialState,
-    reducers: {},
+    reducers: {
+        logout: (state) => {
+            state.user = null
+            state.token = null
+            state.isLoading = false
+            state.status = ''
+        },
+    },
     extraReducers: (builder) => {
         builder
+            // Register
             .addCase(registerUser.pending, (state) => {
                 state.isLoading = true
                 state.status = null
@@ -46,9 +88,52 @@ const authSlice = createSlice({
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.isLoading = false
-                state.status = action.payload?.message || 'Ошибка регистрации';
+                state.status = action.payload
+            })
+            // Login
+            .addCase(loginUser.pending, (state) => {
+                state.isLoading = true
+                state.status = null
+            })
+            .addCase(loginUser.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.status = action.payload.message
+                state.user = action.payload.user
+                state.token = action.payload.token
+            })
+            .addCase(loginUser.rejected, (state, action) => {
+                state.isLoading = false
+                state.status = action.payload.message
+            })
+            // Check authorization
+            .addCase(getMe.pending, (state) => {
+                state.isLoading = true
+                state.status = null
+            })
+            .addCase(getMe.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.status = null
+                state.user = action.payload?.user
+                state.token = action.payload?.token
+            })
+            .addCase(getMe.rejected, (state, action) => {
+                state.isLoading = false
+                state.status = action.payload
+                state.user = null
+                state.token = null
+                window.localStorage.removeItem('token') // Удаляем токен при ошибке
+            })
+            .addCase('@init', (state) => {
+                const token = window.localStorage.getItem('token')
+                if (token) {
+                    state.token = token
+                }
             })
     },
 })
+
+export const checkIsAuth = (state) => Boolean(state.auth.token)
+
+export const {logout} = authSlice.actions
 
 export default authSlice.reducer

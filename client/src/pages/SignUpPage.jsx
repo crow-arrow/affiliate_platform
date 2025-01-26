@@ -1,16 +1,29 @@
 import React, { useState, useEffect } from 'react'
-import logo from '../assets/logo.png';
-import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux'
-import { registerUser } from '../redux/features/auth/authSlice';
+import logo from '../assets/logo.png'
+import { Link, useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { registerUser, checkIsAuth } from '../redux/features/auth/authSlice'
+import { toast } from 'react-toastify'
 
 export const SignUpPage = () => {
+
   const [email, setEmail] = useState('')
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+
+  const { status } = useSelector((state) => state.auth)
+  const isAuth = useSelector(checkIsAuth)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (status) {
+      toast(status)
+    }
+    if (isAuth) navigate('/my-account')
+  }, [status, isAuth, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -20,18 +33,18 @@ export const SignUpPage = () => {
     }
 
     try {
-      await dispatch(registerUser ({ 
-        username: email,
+      await dispatch(registerUser({
         email,
+        username: email,
         firstName,
         lastName,
         password,
       }))
-      setEmail('');
-      setFirstName('');
-      setLastName('');
-      setPassword('');
-      setConfirmPassword('');
+      setEmail('')
+      setFirstName('')
+      setLastName('')
+      setPassword('')
+      setConfirmPassword('')
     } catch (error) {
       console.error('Error during registration:', error.response?.data || error.message)
       alert("Registration failed. Please try again.")
