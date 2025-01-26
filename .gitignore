@@ -1,5 +1,7 @@
 # Node.js dependencies
 /node_modules/
+server/node_modules/
+client/node_modules/
 
 # dotenv environment variables file
 .env
@@ -36,3 +38,6 @@ yarn.lock
 
 # React
 /build
+
+# Gitignore
+.gitignore
