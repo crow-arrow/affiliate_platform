@@ -17,3 +17,4 @@ router.post('/login', login)
 router.get('/me', checkAuth, getMe)
 
 export default router
+

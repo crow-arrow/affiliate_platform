@@ -43,7 +43,7 @@ export const Navbar = () => {
                 </NavLink>
               </li>
               <li className='flex'>
-                <NavLink to="../pages/trips" 
+                <NavLink to="../trips" 
                   className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent ${isActive && 'bg-slate-100 text-accent'}`}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2.5V4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -56,7 +56,7 @@ export const Navbar = () => {
                 </NavLink>
               </li>
               <li className='flex'>
-                <NavLink to="../pages/calender" 
+                <NavLink to="../calender" 
                   className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent ${isActive && 'bg-slate-100 text-accent'}`}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M3 10C3 8.11438 3 7.17157 3.58579 6.58579C4.17157 6 5.11438 6 7 6H17C18.8856 6 19.8284 6 20.4142 6.58579C21 7.17157 21 8.11438 21 10V11H3V10Z" stroke="currentColor" strokeOpacity="0.25" strokeWidth="1.5"/>
@@ -68,7 +68,7 @@ export const Navbar = () => {
                 </NavLink>
               </li>
               <li className='flex'>
-                <NavLink to="../pages/documents" 
+                <NavLink to="../documents" 
                   className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent ${isActive && 'bg-slate-100 text-accent'}`}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M3.5 14.5V9.9C3.5 9.05992 3.5 8.63988 3.66349 8.31901C3.8073 8.03677 4.03677 7.8073 4.31901 7.66349C4.63988 7.5 5.05992 7.5 5.9 7.5H8.31332C8.74409 7.5 8.95947 7.5 9.14963 7.56559C9.31778 7.62359 9.47094 7.71825 9.59801 7.84272C9.74171 7.98347 9.83803 8.17612 10.0307 8.56142L10.9693 10.439C11.162 10.8243 11.2583 11.0169 11.402 11.1577C11.5291 11.2821 11.6822 11.3768 11.8504 11.4348C12.0405 11.5004 12.2559 11.5004 12.6867 11.5004H18.1C18.9401 11.5004 19.3601 11.5004 19.681 11.6639C19.9632 11.8077 20.1927 12.0372 20.3365 12.3194C20.5 12.6403 20.5 13.0603 20.5 13.9004V18.1004C20.5 18.9405 20.5 19.3605 20.3365 19.6814C20.1927 19.9636 19.9632 20.1931 19.681 20.3369C19.3601 20.5004 18.9401 20.5004 18.1 20.5004H5.9C5.05992 20.5004 4.63988 20.5004 4.31901 20.3369C4.03677 20.1931 3.8073 19.9636 3.66349 19.6814C3.5 19.3605 3.5 18.9405 3.5 18.1004V17.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -80,7 +80,7 @@ export const Navbar = () => {
             </ul>
           </li>
           <li className='flex mt-auto'>
-            <NavLink to="../pages/settings" 
+            <NavLink to="../settings" 
               className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent ${isActive && 'bg-slate-100 text-accent'}`}>
               <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"></path>

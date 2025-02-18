@@ -24,6 +24,20 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        couponCode: {
+            type: String,
+            unique: true,
+        },
+        role: {
+            type: String,
+            enum: ['Genie', 'Admin'],
+            default: 'Genie',
+        },
+        status: {
+            type: String,
+            enum: ['Bronze', 'Silver', 'Gold'],
+            default: 'Bronze',
+        },
         trips: [
             {
                 type: mongoose.Schema.Types.ObjectId,

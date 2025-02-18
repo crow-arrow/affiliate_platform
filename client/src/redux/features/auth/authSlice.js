@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from '../../../utils/axios'
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
+import axios from "../../../utils/axios"
 
 const initialState = {
     user: null,
@@ -25,7 +25,7 @@ export const registerUser = createAsyncThunk(
             }
         } catch (error) {
             return rejectWithValue(
-                error.response?.data?.message || error.response?.data || 'Server error'
+                error.response?.data?.message || error.response?.data || 'The service is temporarily unavailable. Please try again later'
             )
         }
     }
@@ -45,7 +45,7 @@ export const loginUser = createAsyncThunk(
             }
         } catch (error) {
             return rejectWithValue(
-                error.response?.data?.message || error.response?.data || 'Server error'
+                error.response?.data?.message || error.response?.data || 'The service is temporarily unavailable. Please try again later'
             )
         }
     }
@@ -57,7 +57,7 @@ export const getMe = createAsyncThunk('auth/getMe', async () => {
             return data
     } catch (error) {
         return rejectWithValue(
-            error.response?.data?.message || error.response?.data || 'Server error'
+            error.response?.data?.message || error.response?.data || 'The service is temporarily unavailable. Please try again later'
         )
     }
 })

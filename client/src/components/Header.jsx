@@ -19,7 +19,7 @@ export const Header = () => {
 
     return (
         <div>
-            {isAuth && <div className="fixed right-0 top-0 inline-flex w-full pl-60 h-20 justify-between">
+            {isAuth && <div className="fixed right-0 top-0 inline-flex w-full pl-60 h-20 justify-between bg-white">
                 <header className="flex w-full border-b justify-between items-center py-4 px-4 gap-x-8">
                 <label className="relative block w-full">
                     <span className="sr-only">Search</span>
