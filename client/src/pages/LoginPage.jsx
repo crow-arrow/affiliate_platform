@@ -10,15 +10,27 @@ export const LoginPage = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const { status } = useSelector((state) => state.auth)
+  const { status, user } = useSelector((state) => state.auth)
   const isAuth = useSelector(checkIsAuth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (status) toast(status)
-    if (isAuth) navigate('/my-account')
-  }, [status, isAuth, navigate])
+    console.log('Status:', status);
+    console.log('Is Auth:', isAuth);
+    console.log('User :', user);
+
+    if (status) toast(status);
+    
+    if (isAuth && user) {
+        console.log('User  role:', user?.role);
+        if (user.role === 'Admin') {
+            navigate('/admin/dashboard');
+        } else {
+            navigate('/my-account');
+        }
+    }
+  }, [status, isAuth, user, navigate]);
 
   const handleSubmit = async (e) => {
 

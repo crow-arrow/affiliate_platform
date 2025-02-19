@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import axios from "../../../utils/axios"
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import axios from '../../../utils/axios'
 
 const initialState = {
     user: null,
@@ -21,6 +21,7 @@ export const registerUser = createAsyncThunk(
             })
             if (data.token) {
                 window.localStorage.setItem('token', data.token)
+
                 return data
             }
         } catch (error) {
@@ -41,7 +42,7 @@ export const loginUser = createAsyncThunk(
             })
             if (data.token) {
                 window.localStorage.setItem('token', data.token)
-                return data
+                return { user: data.user, token: data.token }
             }
         } catch (error) {
             return rejectWithValue(
@@ -133,6 +134,11 @@ const authSlice = createSlice({
 })
 
 export const checkIsAuth = (state) => Boolean(state.auth.token)
+
+export const checkRole = (state) => {
+    const role = state.auth.user?.role
+    return role
+}
 
 export const {logout} = authSlice.actions
 

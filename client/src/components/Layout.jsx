@@ -1,8 +1,9 @@
 import React from 'react'
+import { Outlet } from 'react-router-dom'
 import { Navbar } from './Navbar.jsx'
 import { Header } from './Header.jsx'
 
-export const Layout = ({ children }) => {
+export const Layout = () => {
   return (
     <React.Fragment>
       <div className="flex flex-col min-h-screen">
@@ -19,7 +20,7 @@ export const Layout = ({ children }) => {
 
           {/* Основной контент */}
           <main className="flex-1 p-4 overflow-auto">
-            {children}
+            <Outlet />
           </main>
         </div>
       </div>

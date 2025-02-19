@@ -23,6 +23,7 @@ export const signUp = async (req, res) => {
             firstName,
             lastName,
             password: hash,
+            role: 'Genie',
         })
 
         await newUser.save()
@@ -30,7 +31,7 @@ export const signUp = async (req, res) => {
         const token = jwt.sign(
             {
                 id: newUser._id,
-                role: user.role,
+                role: newUser.role,
             },
             process.env.JWT_SECRET,
             { expiresIn: '30d' },
@@ -96,6 +97,7 @@ export const login = async (req, res) => {
 export const getMe = async (req, res) => {
     try {
         const user = await User.findById(req.userId)
+        console.log(user.role); // Логируем роль
 
         if (!user) {
             return res.status(404).json({

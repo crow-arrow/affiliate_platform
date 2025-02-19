@@ -1,12 +1,14 @@
 import React from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { checkIsAuth } from '../redux/features/auth/authSlice'
+import { checkIsAuth, checkRole } from '../redux/features/auth/authSlice'
 
 
 export const Navbar = () => {
 
   const isAuth = useSelector(checkIsAuth)
+  const userRole = useSelector(checkRole)
+  const firstName = useSelector((state) => state.auth.user?.firstName)
 
   return (
     <div>
@@ -16,6 +18,24 @@ export const Navbar = () => {
           <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" className="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
         </Link>
       </div>
+      <button
+        className="flex w-full px-2 py-2 my-2 rounded-md text-white hover: bg-stone-200"
+      >
+          <img 
+              src="https://api.dicebear.com/9.x/notionists/svg" 
+              alt="Avatar"
+              className="size-8 rounded shrink-0 shadow"
+          />
+        <div className="text-start">
+          <span className="text-m block text-stone-500">
+            {userRole}
+          </span>
+          <span className="text-xs text-black block">
+            Hi, {firstName}
+          </span>
+        </div>
+        
+      </button>
       <nav className='flex flex-1'>
         
         <ul className='flex flex-1 flex-col justify-between gap-y-7'>
@@ -23,7 +43,7 @@ export const Navbar = () => {
             <ul className="flex flex-col gap-y-2">
               <li className='flex'>
                 <NavLink to="../my-account" 
-                  className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent ${isActive && 'bg-slate-100 text-accent'}`}>
+                  className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent transition-colors ${isActive && 'bg-slate-100 text-accent'}`}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M5 12.7596C5 11.4019 5 10.723 5.27446 10.1262C5.54892 9.52949 6.06437 9.08769 7.09525 8.20407L8.09525 7.34693C9.95857 5.7498 10.8902 4.95123 12 4.95123C13.1098 4.95123 14.0414 5.7498 15.9047 7.34693L16.9047 8.20407C17.9356 9.08769 18.4511 9.52949 18.7255 10.1262C19 10.723 19 11.4019 19 12.7596V17C19 18.8856 19 19.8284 18.4142 20.4142C17.8284 21 16.8856 21 15 21H9C7.11438 21 6.17157 21 5.58579 20.4142C5 19.8284 5 18.8856 5 17V12.7596Z" stroke="currentColor" strokeWidth="1.5"/>
                       <path d="M14.5 21V16C14.5 15.4477 14.0523 15 13.5 15H10.5C9.94772 15 9.5 15.4477 9.5 16V21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -32,19 +52,8 @@ export const Navbar = () => {
                 </NavLink>
               </li>
               <li className='flex'>
-                <NavLink to="../my-admin" 
-                  className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent ${isActive && 'bg-slate-100 text-accent'}`}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="7.5" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M14.5 12C14.5 14.1651 14.1701 16.1029 13.6532 17.4813C13.394 18.1723 13.0975 18.6969 12.7936 19.0396C12.4892 19.383 12.2199 19.5 12 19.5C11.7801 19.5 11.5108 19.383 11.2064 19.0396C10.9025 18.6969 10.606 18.1723 10.3468 17.4813C9.82994 16.1029 9.5 14.1651 9.5 12C9.5 9.83494 9.82994 7.89713 10.3468 6.51871C10.606 5.82765 10.9025 5.30314 11.2064 4.96038C11.5108 4.61704 11.7801 4.5 12 4.5C12.2199 4.5 12.4892 4.61704 12.7936 4.96038C13.0975 5.30314 13.394 5.82765 13.6532 6.51871C14.1701 7.89713 14.5 9.83494 14.5 12Z" stroke="currentColor" strokeWidth="1.5"/>
-                    <path d="M4.5 12H19.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                  Admin
-                </NavLink>
-              </li>
-              <li className='flex'>
                 <NavLink to="../trips" 
-                  className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent ${isActive && 'bg-slate-100 text-accent'}`}>
+                  className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent transition-colors ${isActive && 'bg-slate-100 text-accent'}`}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2.5V4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                     <path d="M12 9.5V11.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -57,7 +66,7 @@ export const Navbar = () => {
               </li>
               <li className='flex'>
                 <NavLink to="../calender" 
-                  className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent ${isActive && 'bg-slate-100 text-accent'}`}>
+                  className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent transition-colors ${isActive && 'bg-slate-100 text-accent'}`}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M3 10C3 8.11438 3 7.17157 3.58579 6.58579C4.17157 6 5.11438 6 7 6H17C18.8856 6 19.8284 6 20.4142 6.58579C21 7.17157 21 8.11438 21 10V11H3V10Z" stroke="currentColor" strokeOpacity="0.25" strokeWidth="1.5"/>
                       <rect x="3" y="6" width="18" height="15" rx="2" stroke="currentColor" strokeWidth="1.5"/>
@@ -69,7 +78,7 @@ export const Navbar = () => {
               </li>
               <li className='flex'>
                 <NavLink to="../documents" 
-                  className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent ${isActive && 'bg-slate-100 text-accent'}`}>
+                  className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent transition-colors ${isActive && 'bg-slate-100 text-accent'}`}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M3.5 14.5V9.9C3.5 9.05992 3.5 8.63988 3.66349 8.31901C3.8073 8.03677 4.03677 7.8073 4.31901 7.66349C4.63988 7.5 5.05992 7.5 5.9 7.5H8.31332C8.74409 7.5 8.95947 7.5 9.14963 7.56559C9.31778 7.62359 9.47094 7.71825 9.59801 7.84272C9.74171 7.98347 9.83803 8.17612 10.0307 8.56142L10.9693 10.439C11.162 10.8243 11.2583 11.0169 11.402 11.1577C11.5291 11.2821 11.6822 11.3768 11.8504 11.4348C12.0405 11.5004 12.2559 11.5004 12.6867 11.5004H18.1C18.9401 11.5004 19.3601 11.5004 19.681 11.6639C19.9632 11.8077 20.1927 12.0372 20.3365 12.3194C20.5 12.6403 20.5 13.0603 20.5 13.9004V18.1004C20.5 18.9405 20.5 19.3605 20.3365 19.6814C20.1927 19.9636 19.9632 20.1931 19.681 20.3369C19.3601 20.5004 18.9401 20.5004 18.1 20.5004H5.9C5.05992 20.5004 4.63988 20.5004 4.31901 20.3369C4.03677 20.1931 3.8073 19.9636 3.66349 19.6814C3.5 19.3605 3.5 18.9405 3.5 18.1004V17.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                       <path d="M17.5 11V9.5M6.5 7.5V5.9C6.5 5.05992 6.5 4.63988 6.66349 4.31901C6.8073 4.03677 7.03677 3.8073 7.31901 3.66349C7.63988 3.5 8.05992 3.5 8.9 3.5H15.1C15.9401 3.5 16.3601 3.5 16.681 3.66349C16.9632 3.8073 17.1927 4.03677 17.3365 4.31901C17.5 4.63988 17.5 5.05992 17.5 5.9V6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -81,7 +90,7 @@ export const Navbar = () => {
           </li>
           <li className='flex mt-auto'>
             <NavLink to="../settings" 
-              className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent ${isActive && 'bg-slate-100 text-accent'}`}>
+              className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-slate-100 hover:text-accent transition-colors ${isActive && 'bg-slate-100 text-accent'}`}>
               <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"></path>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
