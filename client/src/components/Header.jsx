@@ -10,11 +10,14 @@ export const Header = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const logoutHandler = () => {
+    const logoutHandler = async () => {
+        
         dispatch(logout())
         window.localStorage.removeItem('token')
-        toast('You are out')
-        navigate('/login')
+        toast('You are out');
+        
+        await new Promise(resolve => setTimeout(resolve, 0))
+        navigate('/login');
     }
 
     return (

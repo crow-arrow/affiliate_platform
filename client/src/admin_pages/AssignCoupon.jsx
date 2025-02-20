@@ -31,7 +31,7 @@ export const AssignCoupon = () => {
             className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
         />
         <button 
-            onClick={handleAssignCoupon} // Используем переименованную функцию
+            onClick={handleAssignCoupon}
             disabled={status === "loading"}
             className="flex w-full justify-center rounded-md bg-accent px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-accentDark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-50"
         >

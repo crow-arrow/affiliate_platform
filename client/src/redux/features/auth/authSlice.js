@@ -32,25 +32,26 @@ export const registerUser = createAsyncThunk(
     }
 )
 
-export const loginUser = createAsyncThunk(
-    'auth/loginUser', 
+export const loginUser  = createAsyncThunk(
+    'auth/loginUser ', 
     async ({ username, password }, { rejectWithValue }) => {
         try {
             const { data } = await axios.post('/auth/login', {
                 username, 
                 password,
-            })
+            });
+            console.log('User  data:', data); // Логируем данные пользователя
             if (data.token) {
-                window.localStorage.setItem('token', data.token)
-                return { user: data.user, token: data.token }
+                window.localStorage.setItem('token', data.token);
+                return { user: data.user, token: data.token };
             }
         } catch (error) {
             return rejectWithValue(
                 error.response?.data?.message || error.response?.data || 'The service is temporarily unavailable. Please try again later'
-            )
+            );
         }
     }
-)
+);
 
 export const getMe = createAsyncThunk('auth/getMe', async () => {
     try {
@@ -71,7 +72,7 @@ const authSlice = createSlice({
             state.user = null
             state.token = null
             state.isLoading = false
-            state.status = ''
+            state.status = null
         },
     },
     extraReducers: (builder) => {

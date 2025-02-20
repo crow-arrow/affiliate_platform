@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react'
 import { DataGrid } from '@mui/x-data-grid'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchUsers } from '../redux/features/users/userSlice' // Экшен для всех пользователей
+import { fetchUsers } from '../redux/features/users/userSlice'
 
 export const Team = () => {
     const dispatch = useDispatch()
-    const { users, status, error } = useSelector((state) => state.user) // ✅ Исправлено
+    const { users, status, error } = useSelector((state) => state.user)
 
     useEffect(() => {
-        dispatch(fetchUsers()) // Загружаем всех пользователей при монтировании
+        dispatch(fetchUsers())
     }, [dispatch])
 
     const columns = [
@@ -21,8 +21,8 @@ export const Team = () => {
         { field: 'couponCode', headerName: 'Coupon', width: 100 },
     ];
 
-    if (status === 'loading') return <p>Загрузка...</p>
-    if (error) return <p>Ошибка: {error}</p>
+    if (status === 'loading') return <p>Loading...</p>
+    if (error) return <p>Error: {error}</p>
 
     return (
         <div style={{ height: 400, width: '100%' }}>

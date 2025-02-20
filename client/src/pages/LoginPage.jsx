@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import logo from '../assets/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
-import { loginUser, checkIsAuth } from '../redux/features/auth/authSlice'
+import { loginUser } from '../redux/features/auth/authSlice'
 import { toast } from 'react-toastify'
 
 export const LoginPage = () => {
@@ -11,26 +11,23 @@ export const LoginPage = () => {
   const [password, setPassword] = useState('')
 
   const { status, user } = useSelector((state) => state.auth)
-  const isAuth = useSelector(checkIsAuth)
+  const role = user?.role
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log('Status:', status);
-    console.log('Is Auth:', isAuth);
-    console.log('User :', user);
 
-    if (status) toast(status);
+    if (status) toast(status)
     
-    if (isAuth && user) {
-        console.log('User  role:', user?.role);
-        if (user.role === 'Admin') {
-            navigate('/admin/dashboard');
+    if (user) {
+        console.log('User role:', role)
+        if (role === 'Admin') {
+            navigate('/admin/dashboard')
         } else {
-            navigate('/my-account');
+            navigate('/my-account')
         }
     }
-  }, [status, isAuth, user, navigate]);
+  }, [status, user, navigate])
 
   const handleSubmit = async (e) => {
 
