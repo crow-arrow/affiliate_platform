@@ -5,12 +5,12 @@ export const getAllUsers = async (req, res) => {
         const users = await User.find().select('-password') // Загружаем всех без паролей
 
         if (!users.length) {
-            return res.status(404).json({ message: 'Пользователи не найдены' })
+            return res.status(404).json({ message: 'Users not' })
         }
 
         res.json(users)
     } catch (error) {
-        console.error('Ошибка загрузки пользователей:', error)
-        res.status(500).json({ message: 'Ошибка загрузки пользователей' })
+        console.error('Error users loading:', error)
+        res.status(500).json({ message: 'Error users loading' })
     }
 }

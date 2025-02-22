@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react'
 import logo from '../assets/logo.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { registerUser, checkIsAuth } from '../redux/features/auth/authSlice'
+import { registerUser, getMe, checkIsAuth } from '../redux/features/auth/authSlice'
 import { toast } from 'react-toastify'
 
 export const SignUpPage = () => {
 
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  const { status } = useSelector((state) => state.auth)
+  const { status, user } = useSelector((state) => state.auth)
   const isAuth = useSelector(checkIsAuth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -22,8 +23,10 @@ export const SignUpPage = () => {
     if (status) {
       toast(status)
     }
-    if (isAuth) navigate('/my-account')
-  }, [status, isAuth, navigate])
+    if (isAuth && user?.role) {  // Убедитесь, что у user есть role
+      navigate('/my-account')
+    }
+  }, [status, isAuth, user, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -36,11 +39,14 @@ export const SignUpPage = () => {
       await dispatch(registerUser({
         email,
         username: email,
+        phone,
         firstName,
         lastName,
         password,
       }))
+      await dispatch(getMe())
       setEmail('')
+      setPhone('')
       setFirstName('')
       setLastName('')
       setPassword('')
@@ -83,6 +89,23 @@ export const SignUpPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
+                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+              />
+            </div>
+          </div>
+          <div>
+            <label htmlFor="phone" className="block text-sm/6 font-medium text-gray-900">
+              Phone Number
+            </label>
+            <div className="mt-2">
+              <input
+                id="phone"
+                name="phone"
+                type="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+                autoComplete="phone"
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>

@@ -6,7 +6,6 @@ import { checkIsAuth } from '../../redux/features/auth/authSlice'
 
 
 const UsersProtectedRoute = ({ element, ...rest }) => {
-  const { user } = useSelector(state => state.auth)
   const isAuth = useSelector(checkIsAuth)
   
 

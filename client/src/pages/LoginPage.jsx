@@ -20,7 +20,6 @@ export const LoginPage = () => {
     if (status) toast(status)
     
     if (user) {
-        console.log('User role:', role)
         if (role === 'Admin') {
             navigate('/admin/dashboard')
         } else {

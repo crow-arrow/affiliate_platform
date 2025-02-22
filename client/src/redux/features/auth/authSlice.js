@@ -11,10 +11,11 @@ const initialState = {
 
 export const registerUser = createAsyncThunk(
     'auth/registerUser', 
-    async ({ email, firstName, lastName, password }, { rejectWithValue }) => {
+    async ({ email, phone, firstName, lastName, password }, { rejectWithValue }) => {
         try {
             const { data } = await axios.post('/auth/signup', {
                 email,
+                phone,
                 firstName,
                 lastName, 
                 password,
@@ -39,11 +40,10 @@ export const loginUser  = createAsyncThunk(
             const { data } = await axios.post('/auth/login', {
                 username, 
                 password,
-            });
-            console.log('User  data:', data); // Логируем данные пользователя
+            })
             if (data.token) {
-                window.localStorage.setItem('token', data.token);
-                return { user: data.user, token: data.token };
+                window.localStorage.setItem('token', data.token)
+                return { user: data.user, token: data.token }
             }
         } catch (error) {
             return rejectWithValue(

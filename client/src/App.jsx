@@ -5,7 +5,8 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { AdminDashboard } from './admin_pages/AdminDashboard.jsx'
 import { Team } from './admin_pages/Team.jsx'
 import { AssignCoupon } from './admin_pages/AssignCoupon.jsx'
-import { AssignStatus } from './admin_pages/AssignStatus.jsx'
+import { AssignLevel } from './admin_pages/AssignLevel.jsx'
+import { Invoices } from './admin_pages/Invoices.jsx'
 
 import { Dashboard } from './pages/Dashboard'
 import { Trips } from './pages/Trips.jsx'
@@ -27,8 +28,6 @@ import { getMe } from './redux/features/auth/authSlice.js'
 
 function App() {
   const dispatch = useDispatch()
-  const { user, loading } = useSelector((state) => state.auth)
-  const role = user?.role
 
   const [isLoaded, setIsLoaded] = useState(false)
 
@@ -43,7 +42,13 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        {/* Публичные страницы */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+
+        <Route path="/" element={<AdminProtectedRoute allowedRoles={['Admin', 'Genie']}>
+          <Layout />
+        </AdminProtectedRoute>}>
           <Route index element={<Dashboard />} />
           <Route path="my-account" element={<Dashboard />} />
           <Route path="trips" element={<Trips />} />
@@ -62,9 +67,9 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="team" element={<Team />} />
           <Route path="assign-coupon" element={<AssignCoupon />} />
-          <Route path="assign-status" element={<AssignStatus />} />
+          <Route path="assign-level" element={<AssignLevel />} />
           <Route path="calender" element={<Calender />} />
-          <Route path="documents" element={<Documents />} />
+          <Route path="invoices" element={<Invoices />} />
           <Route path="settings" element={<Settings />} />
         </Route>
 

@@ -20,20 +20,25 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        phone: {
+            type: String,
+            required: true,
+            match: [/^\+?[1-9]\d{1,14}$/, 'Please enter a valid phone number'],
+        },
         password: {
             type: String,
             required: true,
         },
         couponCode: {
             type: String,
-            unique: true,
+            default: '',
         },
         role: {
             type: String,
             enum: ['Genie', 'Admin'],
             default: 'Genie',
         },
-        status: {
+        level: {
             type: String,
             enum: ['Bronze', 'Silver', 'Gold'],
             default: 'Bronze',
