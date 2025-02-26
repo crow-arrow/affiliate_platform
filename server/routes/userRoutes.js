@@ -5,7 +5,8 @@ import { checkAuth } from '../utils/checkAuth.js'
 
 const router = new Router()
 
-router.get('/users', getAllUsers) // ✅ Все пользователи
-router.get('/users/:id', checkAuth, getUserById) // ✅ Один пользователь
+// http://localhost:3002/api/users
+router.get('/get-users', getAllUsers) // Все пользователи
+router.get('get-user/:id', checkAuth, getUserById) // Один пользователь
 
 export default router

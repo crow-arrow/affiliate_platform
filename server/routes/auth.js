@@ -1,8 +1,8 @@
-import { Router } from 'express'
+import express from "express"
 import { signUp, login, getMe } from '../controllers/auth.js'
 import { checkAuth } from '../utils/checkAuth.js'
 
-const router = new Router()
+const router = express.Router()
 
 //Register
 // http://localhost:3002/api/auth/signup

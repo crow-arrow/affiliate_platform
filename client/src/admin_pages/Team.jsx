@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 import { Box, Typography } from '@mui/material'
-import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';import { useDispatch, useSelector } from 'react-redux'
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import { useDispatch, useSelector } from 'react-redux'
 import { fetchUsers } from '../redux/features/users/userSlice'
-import axios from '../utils/axios'
 
 export const Team = () => {
     const dispatch = useDispatch()
-    const { users, status, error } = useSelector((state) => state.user)
+    const { users, status, error } = useSelector((state) => state.user || [])
 
     useEffect(() => {
         dispatch(fetchUsers())
@@ -30,7 +30,7 @@ export const Team = () => {
                 const truncatedId = id.length > 5 ? id.slice(0, 5) + '...' : id
                             
                 return (
-                    <Box className="flex items-center justify-between">
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
                         <Typography>{truncatedId}</Typography>
                         <button 
                             onClick={() => handleCopy(params.value)}
@@ -69,6 +69,26 @@ export const Team = () => {
             }
         },
         { field: 'couponCode', headerName: 'Coupon', editable: true, flex: 1 },
+        {
+            field: 'affiliateId',
+            headerName: 'Ref Link',
+            renderCell: (params) => {
+                if (!params.value) return null;
+                const ref = params.value.toString()
+                const truncatedId = ref.length > 5 ? ref.slice(0, 5) + '...' : ref
+                            
+                return (
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                        <Typography>{truncatedId}</Typography>
+                        <button 
+                            onClick={() => handleCopy(params.value)}
+                        >
+                            <ContentCopyRoundedIcon />
+                        </button>
+                    </Box>
+                )
+            }
+        },
     ];
 
     if (status === 'loading') return <p>Loading...</p>

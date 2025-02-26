@@ -1,10 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from '../../../utils/axios'
 
-// Асинхронный запрос всех пользователей
 export const fetchUsers = createAsyncThunk('user/fetchUsers', async (_, { rejectWithValue }) => {
     try {
-        const { data } = await axios.get('/users') // Загружаем всех пользователей
+        const { data } = await axios.get('/users/get-users') // Загружаем всех пользователей
         return data
     } catch (error) {
         return rejectWithValue(error.response?.data || { message: 'Ошибка загрузки пользователей' })

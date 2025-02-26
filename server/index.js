@@ -4,10 +4,9 @@ import dotenv from "dotenv"
 import cors from "cors"
 
 import authRoutes from "./routes/auth.js"
-import tripsRoutes from "./routes/tripsRoutes.js"
-import userTripsRoutes from "./routes/userTripsRoutes.js"
-import assignCouponRoute from "./routes/assignCouponRoute.js"
 import userRoutes from './routes/userRoutes.js'
+import tripsRoutes from "./routes/tripsRoutes.js"
+import assignCouponRoute from "./routes/assignCouponRoute.js"
 
 dotenv.config()
 
@@ -26,10 +25,9 @@ app.use(express.json())
 
 // Routes
 app.use("/api/auth", authRoutes)
+app.use('/api/users', userRoutes)
 app.use("/api/trips", tripsRoutes)
-app.use("/api/user-trips", userTripsRoutes)
 app.use("/api/assign-coupon", assignCouponRoute)
-app.use('/api', userRoutes)
 
 // Start Server
 async function start() {

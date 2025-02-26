@@ -3,14 +3,14 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 import { Box, Typography } from '@mui/material'
 // import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import { useDispatch, useSelector } from "react-redux"
-import { fetchTrips } from "../redux/features/trips/tripSlice"
+import { getAllTrips } from "../redux/features/trips/tripSlice"
 
-export const Trips = () => {
+export const AllOrders = () => {
   const dispatch = useDispatch()
-  const { trips, status, error } = useSelector((state) => state.trips)
+  const { trips, status, error } = useSelector((state) => state.trips || [])
 
   useEffect(() => {
-    dispatch(fetchTrips())
+    dispatch(getAllTrips())
   }, [dispatch])
 
   // const handleCopy = (id) => {

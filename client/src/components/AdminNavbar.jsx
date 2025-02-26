@@ -59,6 +59,13 @@ export const AdminNavbar = () => {
                                 </NavLink>
                             </li>
                             <li className='flex'>
+                                <NavLink to="../admin/orders" 
+                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-white text-accent'}`}>
+                                    <Groups3OutlinedIcon />
+                                    Orders
+                                </NavLink>
+                            </li>
+                            <li className='flex'>
                                 <NavLink to="../admin/calender" 
                                 className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-white text-accent'}`}>
                                     <CalendarTodayOutlinedIcon />

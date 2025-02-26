@@ -33,6 +33,10 @@ const UserSchema = new mongoose.Schema(
             type: String,
             default: '',
         },
+        affiliateId: { 
+            type: String, 
+            required: false 
+        },
         role: {
             type: String,
             enum: ['Genie', 'Admin'],

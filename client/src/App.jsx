@@ -7,6 +7,7 @@ import { Team } from './admin_pages/Team.jsx'
 import { AssignCoupon } from './admin_pages/AssignCoupon.jsx'
 import { AssignLevel } from './admin_pages/AssignLevel.jsx'
 import { Invoices } from './admin_pages/Invoices.jsx'
+import { AllOrders } from './admin_pages/AllOrders.jsx'
 
 import { Dashboard } from './pages/Dashboard'
 import { Trips } from './pages/Trips.jsx'
@@ -18,17 +19,16 @@ import { LoginPage } from './pages/LoginPage'
 import { SignUpPage } from './pages/SignUpPage'
 import { NotFound } from './pages/NotFound.jsx'
 import AdminProtectedRoute from './components/protected-routes/AdminProtectedRoute'
-import UsersProtectedRoute from './components/protected-routes/UsersProtectedRoute'
 
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
-import { getMe } from './redux/features/auth/authSlice.js'
+import { getMe, checkIsAuth } from './redux/features/auth/authSlice.js'
 
 function App() {
   const dispatch = useDispatch()
-
+  const isAuth = useSelector(checkIsAuth)
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
@@ -46,9 +46,10 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
 
-        <Route path="/" element={<AdminProtectedRoute allowedRoles={['Admin', 'Genie']}>
+        <Route path="/" element={isAuth ? (<AdminProtectedRoute allowedRoles={['Admin', 'Genie']}>
           <Layout />
-        </AdminProtectedRoute>}>
+        </AdminProtectedRoute>
+        ) : <Navigate to='/login' /> }>
           <Route index element={<Dashboard />} />
           <Route path="my-account" element={<Dashboard />} />
           <Route path="trips" element={<Trips />} />
@@ -66,6 +67,7 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="team" element={<Team />} />
+          <Route path="orders" element={<AllOrders />} />
           <Route path="assign-coupon" element={<AssignCoupon />} />
           <Route path="assign-level" element={<AssignLevel />} />
           <Route path="calender" element={<Calender />} />

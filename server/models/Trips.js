@@ -13,7 +13,10 @@ const TripsSchema = new mongoose.Schema({
         required: true 
     },
     coupon_code: { 
-        type: String 
+        type: String
+    },
+    affiliate_id: { 
+        type: String
     },
     order_status: { 
         type: String, 
@@ -25,6 +28,10 @@ const TripsSchema = new mongoose.Schema({
     },
     currency: { 
         type: String 
+    },
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
     },
 }, { timestamps: true })
 
