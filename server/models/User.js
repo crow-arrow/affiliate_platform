@@ -31,11 +31,11 @@ const UserSchema = new mongoose.Schema(
         },
         couponCode: {
             type: String,
-            default: '',
+            required: false,
         },
         affiliateId: { 
             type: String, 
-            required: false 
+            required: false,
         },
         role: {
             type: String,

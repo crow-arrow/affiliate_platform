@@ -4,6 +4,7 @@ const TripsSchema = new mongoose.Schema({
     order_id: {
         type: Number,
         required: true,
+        unique: true
     },
     travel_date: { 
         type: Date 

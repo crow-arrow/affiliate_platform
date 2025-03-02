@@ -1,18 +1,21 @@
-import Trips from "../models/Trips.js";
-import User from "../models/User.js";
+import Trips from "../models/Trips.js"
+import User from "../models/User.js"
 
 // Get All Trips
 export const getAllTrips = async (req, res) => {
     try {
         const trips = await Trips.find().sort('order_id')
-        if (!trips) {
-            res.json({message: 'No trips found'})
+
+        if (trips.length === 0) {
+            return res.status(404).json({ message: "No trips found" })
         }
+
         res.json(trips)
     } catch (error) {
-        res.json({message: 'Error get Trips'})
+        console.error(error)
+        res.status(500).json({ message: "Server error", error: error.message })
     }
-}
+};
 
 // Get User Trips
 export const getUserTrips = async (req, res) => {
@@ -29,24 +32,35 @@ export const getUserTrips = async (req, res) => {
             return res.status(400).json({ message: "No data available for filtering" })
         }
 
+        console.log('affiliateId:', affiliateId)
+        console.log('couponCode:', couponCode)
+
         const trips = await Trips.find({
             $or: [
-                { affiliate_id: { $regex: new RegExp(`^${affiliateId}$`) } },
-                { coupon_code: { $regex: new RegExp(`^${couponCode}$`) } }
+                { affiliate_id: affiliateId },
+                { coupon_code: couponCode }
             ]
         })
 
+        console.log('Trips found:', trips.length)
+
         if (trips.length === 0) {
-            return res.status(404).json({ message: "No tours found for this user" });
+            return res.status(404).json({ message: "No tours found for this user" })
         }
 
-        await User.findByIdAndUpdate(req.userId, {
-            $push: { trips: trips },
-        });
+        // Исключаем дубликаты
+        const existingTrips = new Set(user.trips.map(trip => trip._id.toString()))
+        const newTrips = trips.filter(trip => !existingTrips.has(trip._id.toString()))
+
+        if (newTrips.length > 0) {
+            await User.findByIdAndUpdate(req.userId, {
+                $addToSet: { trips: { $each: newTrips } },
+            })
+        }
 
         res.json(trips);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
+        console.error(error)
+        res.status(500).json({ message: "Server error", error: error.message })
     }
 }
