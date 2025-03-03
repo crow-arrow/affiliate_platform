@@ -1,66 +1,74 @@
 import Trips from "../models/Trips.js"
 import User from "../models/User.js"
+import { Op } from "sequelize";
 
 // Get All Trips
 export const getAllTrips = async (req, res) => {
     try {
-        const trips = await Trips.find().sort('order_id')
+        const trips = await Trips.findAll({
+            order: [['id', 'ASC']]
+        });
 
         if (trips.length === 0) {
-            return res.status(404).json({ message: "No trips found" })
+            return res.status(404).json({ message: "No trips found" });
         }
 
-        res.json(trips)
+        res.json(trips);
     } catch (error) {
-        console.error(error)
-        res.status(500).json({ message: "Server error", error: error.message })
+        console.error(error);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 
 // Get User Trips
 export const getUserTrips = async (req, res) => {
     try {
-        const user = await User.findById(req.userId)
+        const user = await User.findByPk(req.userId);
 
         if (!user) {
-            return res.status(404).json({ message: "User not found" })
+            return res.status(404).json({ message: "User not found" });
         }
 
-        const { affiliateId, couponCode } = user
+        const { affiliate_id, coupon_code } = user;
 
-        if (!affiliateId || !couponCode) {
-            return res.status(400).json({ message: "No data available for filtering" })
+        const filterCriteria = {
+            where: {
+                [Op.or]: []
+            }
+        };
+
+        if (affiliate_id !== null) {
+            filterCriteria.where[Op.or].push({ affiliate_id: affiliate_id });
         }
 
-        console.log('affiliateId:', affiliateId)
-        console.log('couponCode:', couponCode)
+        if (coupon_code !== null) {
+            filterCriteria.where[Op.or].push({ coupon_code: coupon_code });
+        }
 
-        const trips = await Trips.find({
-            $or: [
-                { affiliate_id: affiliateId },
-                { coupon_code: couponCode }
-            ]
-        })
+        // Если оба значения равны NULL, фильтрация будет пустой, и вернутся все туры.
+        if (filterCriteria.where[Op.or].length === 0) {
+            return res.status(400).json({ message: "User has no valid affiliate_id or coupon_code" });
+        }
 
-        console.log('Trips found:', trips.length)
+        const trips = await Trips.findAll(filterCriteria);
 
         if (trips.length === 0) {
-            return res.status(404).json({ message: "No tours found for this user" })
+            return res.status(404).json({ message: "No tours found for this user" });
         }
 
-        // Исключаем дубликаты
-        const existingTrips = new Set(user.trips.map(trip => trip._id.toString()))
-        const newTrips = trips.filter(trip => !existingTrips.has(trip._id.toString()))
+        const bookedTripsCount = trips.length;
 
-        if (newTrips.length > 0) {
-            await User.findByIdAndUpdate(req.userId, {
-                $addToSet: { trips: { $each: newTrips } },
-            })
-        }
-
-        res.json(trips);
+        await User.update(
+            { booked_trips_count: bookedTripsCount },
+            { where: { id: req.userId } }
+        );
+        
+        res.json({
+            bookedTripsCount,
+            trips
+        });
     } catch (error) {
-        console.error(error)
-        res.status(500).json({ message: "Server error", error: error.message })
+        console.error(error);
+        res.status(500).json({ message: "Server error", error: error.message });
     }
-}
+};

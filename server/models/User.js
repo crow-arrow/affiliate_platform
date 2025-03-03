@@ -1,67 +1,54 @@
-import mongoose from "mongoose";
+import { DataTypes } from 'sequelize'
+import sequelize from '../config/database.js'
 
-const UserSchema = new mongoose.Schema(
-    {
-        email: {
-            type: String,
-            required: true,
-            unique: true,
-            match: [/.+@.+\..+/, 'Please enter a valid email address'],
-        },
-        username: {
-            type: String,
-            unique: true,
-        },
-        firstName: {
-            type: String,
-            required: true,
-        },
-        lastName: {
-            type: String,
-            required: true,
-        },
-        phone: {
-            type: String,
-            required: true,
-            match: [/^\+?[1-9]\d{1,14}$/, 'Please enter a valid phone number'],
-        },
-        password: {
-            type: String,
-            required: true,
-        },
-        couponCode: {
-            type: String,
-            required: false,
-        },
-        affiliateId: { 
-            type: String, 
-            required: false,
-        },
-        role: {
-            type: String,
-            enum: ['Genie', 'Admin'],
-            default: 'Genie',
-        },
-        level: {
-            type: String,
-            enum: ['Bronze', 'Silver', 'Gold'],
-            default: 'Bronze',
-        },
-        trips: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Trips',
-            }
-        ],
+const User = sequelize.define('refferal_users', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        unique: true,
     },
-    { timestamps: true }, // Автоматически добавляет createdAt и updatedAt
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    phone: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    first_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    last_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    coupon_code: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    affiliate_id: { 
+        type: DataTypes.STRING, 
+        allowNull: true,
+    },
+    role: {
+        type: DataTypes.STRING,
+        defaultValue: 'Genie',
+    },
+    level: {
+        type: DataTypes.ENUM('Bronze', 'Silver', 'Gold'),
+        defaultValue: 'Bronze',
+    },
+    booked_trips_count: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+}, { timestamps: true },
 )
 
-UserSchema.pre('save', function (next) {
-    if (this.isModified('email') && !this.username) {
-      this.username = this.email; // Устанавливаем username в email
-    }
-    next();
-})
-
-export default mongoose.model('User', UserSchema)
+export default User

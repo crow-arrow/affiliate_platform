@@ -13,7 +13,7 @@ import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
 export const AdminNavbar = () => {
     const isAuth = useSelector(checkIsAuth)
     const userRole = useSelector(checkRole)
-    const firstName = useSelector((state) => state.auth.user?.firstName)
+    const first_name = useSelector((state) => state.auth.user?.first_name)
 
     if (!isAuth || userRole !== 'Admin') {
         return null
@@ -34,7 +34,7 @@ export const AdminNavbar = () => {
                         {userRole}
                     </span>
                     <span className="text-xs text-black block">
-                        Hi, {firstName}
+                        Hi, {first_name}
                     </span>
                 </div>
                 <UnfoldMoreOutlinedIcon />

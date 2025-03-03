@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { DataGrid, GridToolbar } from '@mui/x-data-grid'
-import { Box, Typography } from '@mui/material'
+import { Box, Typography, CircularProgress } from '@mui/material'
 // import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import { useDispatch, useSelector } from "react-redux"
 import { fetchTrips } from "../redux/features/trips/tripSlice"
@@ -22,28 +22,39 @@ export const Trips = () => {
   // }
 
   const columns = [
-    { field: 'order_id', headerName: 'Order ID'},
+    { field: 'id', headerName: 'Order ID'},
+    { field: 'traveller_amount', headerName: 'Traveller Number' },
     { field: 'travel_date', headerName: 'Travel Date', flex: 1 },
-    { field: 'traveller_amount', headerName: 'Traveller Number', flex: 1 },
-    { field: 'coupon_code', headerName: 'Coupon', flex: 1 },
-    { field: 'affiliate_id', headerName: 'Ref ID', flex: 1 },
     { field: 'order_status', headerName: 'Order Status' },
     { field: 'total_price', headerName: 'Total Price' },
     { field: 'currency', headerName: 'Currency' },
+    { field: 'coupon_code', headerName: 'Coupon', flex: 1 },
+    { field: 'affiliate_id', headerName: 'Ref ID', flex: 1 },
   ];
 
-  if (status === 'loading') return <p>Loading...</p>
-  if (error) return <p>Error: {error}</p>
+  // Статус загрузки
+  if (status === 'loading') {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress />
+      </Box>
+    )
+  }
 
   return (
     <Box style={{ height: '100%', width: '100%' }}>
       <DataGrid 
-        rows={trips}
+        rows={trips.trips}
         columns={columns}
         checkboxSelection
         disableRowSelectionOnClick
         slots={{ toolbar: GridToolbar }}
-        getRowId={(row) => row.order_id}
+        getRowId={(row) => row.id}
       />
     </Box>
   )

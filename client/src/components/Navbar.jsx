@@ -12,7 +12,7 @@ export const Navbar = () => {
 
   const isAuth = useSelector(checkIsAuth)
   const userRole = useSelector(checkRole)
-  const firstName = useSelector((state) => state.auth.user?.firstName)
+  const first_name = useSelector((state) => state.auth.user?.first_name)
 
   return (
     <div>
@@ -30,7 +30,7 @@ export const Navbar = () => {
                 {userRole}
             </span>
             <span className="text-xs text-black block">
-                Hi, {firstName}
+                Hi, {first_name}
             </span>
         </div>
         <UnfoldMoreOutlinedIcon />

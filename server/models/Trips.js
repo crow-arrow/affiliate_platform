@@ -1,39 +1,47 @@
-import mongoose from "mongoose"
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
 
-const TripsSchema = new mongoose.Schema({
-    order_id: {
-        type: Number,
-        required: true,
-        unique: true
+const Trips = sequelize.define(
+    "wp_tourmaster_order",
+    {
+        id: {
+            type: DataTypes.BIGINT.UNSIGNED,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+        traveller_amount: {
+            type: DataTypes.SMALLINT.UNSIGNED,
+            allowNull: false,
+        },
+        travel_date: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
+        },
+        order_status: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        total_price: {
+            type: DataTypes.DECIMAL(19, 4),
+            allowNull: false,
+        },
+        currency: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+        coupon_code: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        affiliate_id: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
     },
-    travel_date: { 
-        type: Date 
-    },
-    traveller_amount: { 
-        type: Number, 
-        required: true 
-    },
-    coupon_code: { 
-        type: String
-    },
-    affiliate_id: { 
-        type: String
-    },
-    order_status: { 
-        type: String, 
-        required: true 
-    },
-    total_price: { 
-        type: Number, 
-        required: true 
-    },
-    currency: { 
-        type: String 
-    },
-    author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-    },
-}, { timestamps: true })
+    {
+        tableName: 'wp_tourmaster_order',
+        timestamps: false
+    }
+);
 
-export default mongoose.model("Trips", TripsSchema)
+export default Trips;

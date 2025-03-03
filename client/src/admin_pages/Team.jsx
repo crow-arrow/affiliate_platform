@@ -22,27 +22,9 @@ export const Team = () => {
     }
 
     const columns = [
-        {
-            field: '_id',
-            headerName: 'ID',
-            renderCell: (params) => {
-                const id = params.value.toString()
-                const truncatedId = id.length > 5 ? id.slice(0, 5) + '...' : id
-                            
-                return (
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography>{truncatedId}</Typography>
-                        <button 
-                            onClick={() => handleCopy(params.value)}
-                        >
-                            <ContentCopyRoundedIcon />
-                        </button>
-                    </Box>
-                )
-            }
-        },
-        { field: 'firstName', headerName: 'First Name', editable: true, flex: 1 },
-        { field: 'lastName', headerName: 'Last Name', editable: true, flex: 1 },
+        { field: 'id', headerName: 'ID' },
+        { field: 'first_name', headerName: 'First Name', editable: true, flex: 1 },
+        { field: 'last_name', headerName: 'Last Name', editable: true, flex: 1 },
         { field: 'email', headerName: 'Email', editable: true, flex: 1 },
         { field: 'phone', headerName: 'Phone', editable: true, flex: 1 },
         { field: 'role', headerName: 'Role', editable: true, width: 100 },
@@ -68,18 +50,18 @@ export const Team = () => {
                 )
             }
         },
-        { field: 'couponCode', headerName: 'Coupon', editable: true, flex: 1 },
+        { field: 'coupon_code', headerName: 'Coupon', editable: true, flex: 1 },
         {
-            field: 'affiliateId',
+            field: 'affiliate_id',
             headerName: 'Ref Link',
             renderCell: (params) => {
                 if (!params.value) return null;
                 const ref = params.value.toString()
-                const truncatedId = ref.length > 5 ? ref.slice(0, 5) + '...' : ref
+                const truncatedRef = ref.length > 5 ? ref.slice(0, 5) + '...' : ref
                             
                 return (
                     <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography>{truncatedId}</Typography>
+                        <Typography>{truncatedRef}</Typography>
                         <button 
                             onClick={() => handleCopy(params.value)}
                         >
@@ -89,6 +71,7 @@ export const Team = () => {
                 )
             }
         },
+        { field: 'booked_trips_count', headerName: 'Trips'},
     ];
 
     if (status === 'loading') return <p>Loading...</p>
@@ -102,7 +85,7 @@ export const Team = () => {
                 checkboxSelection
                 disableRowSelectionOnClick
                 slots={{ toolbar: GridToolbar }}
-                getRowId={(row) => row._id}
+                getRowId={(row) => row.id}
             />
         </Box>
     )

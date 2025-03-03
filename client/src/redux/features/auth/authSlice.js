@@ -11,18 +11,17 @@ const initialState = {
 
 export const registerUser = createAsyncThunk(
     'auth/registerUser', 
-    async ({ email, phone, firstName, lastName, password }, { rejectWithValue }) => {
+    async ({ email, phone, first_name, last_name, password }, { rejectWithValue }) => {
         try {
             const { data } = await axios.post('/auth/signup', {
                 email,
                 phone,
-                firstName,
-                lastName, 
+                first_name,
+                last_name, 
                 password,
             })
             if (data.token) {
                 window.localStorage.setItem('token', data.token)
-
                 return data
             }
         } catch (error) {
@@ -34,11 +33,11 @@ export const registerUser = createAsyncThunk(
 )
 
 export const loginUser  = createAsyncThunk(
-    'auth/loginUser ', 
-    async ({ username, password }, { rejectWithValue }) => {
+    'auth/loginUser', 
+    async ({ email, password }, { rejectWithValue }) => {
         try {
             const { data } = await axios.post('/auth/login', {
-                username, 
+                email, 
                 password,
             })
             if (data.token) {
@@ -46,12 +45,10 @@ export const loginUser  = createAsyncThunk(
                 return { user: data.user, token: data.token }
             }
         } catch (error) {
-            return rejectWithValue(
-                error.response?.data?.message || error.response?.data || 'The service is temporarily unavailable. Please try again later'
-            );
+            return rejectWithValue(error.response?.data?.message || error.message)
         }
     }
-);
+)
 
 export const getMe = createAsyncThunk('auth/getMe', async () => {
     try {
@@ -105,7 +102,7 @@ const authSlice = createSlice({
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.isLoading = false
-                state.status = action.payload.message
+                state.status = action.payload
             })
             // Check authorization
             .addCase(getMe.pending, (state) => {

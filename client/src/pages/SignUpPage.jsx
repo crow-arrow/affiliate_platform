@@ -9,8 +9,8 @@ export const SignUpPage = () => {
 
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const [first_name, setFirstName] = useState('')
+  const [last_name, setLastName] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
@@ -40,8 +40,8 @@ export const SignUpPage = () => {
         email,
         username: email,
         phone,
-        firstName,
-        lastName,
+        first_name,
+        last_name,
         password,
       }))
       await dispatch(getMe())
@@ -120,7 +120,7 @@ export const SignUpPage = () => {
                 id="first-name"
                 name="first-name"
                 type="text"
-                value={firstName}
+                value={first_name}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
                 autoComplete="given-name"
@@ -138,7 +138,7 @@ export const SignUpPage = () => {
                 id="last-name"
                 name="last-name"
                 type="text"
-                value={lastName}
+                value={last_name}
                 onChange={(e) => setLastName(e.target.value)}
                 required
                 autoComplete="family-name"

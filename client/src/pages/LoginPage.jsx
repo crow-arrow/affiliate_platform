@@ -7,7 +7,7 @@ import { toast } from 'react-toastify'
 
 export const LoginPage = () => {
 
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
   const { status, user } = useSelector((state) => state.auth)
@@ -34,7 +34,7 @@ export const LoginPage = () => {
 
     try {
       await dispatch(loginUser({
-        username,
+        email,
         password,
       }))
     } catch (error) {
@@ -62,18 +62,18 @@ export const LoginPage = () => {
           method="POST" 
           className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm/6 font-medium text-gray-900">
-              Username
+            <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
+              Email
             </label>
             <div className="mt-2">
               <input
-                id="username"
-                name="username"
+                id="email"
+                name="email"
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
-                autoComplete="username"
+                autoComplete="email"
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
