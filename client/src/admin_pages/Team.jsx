@@ -32,20 +32,20 @@ export const Team = () => {
             field: 'level',
             headerName: 'Level',
             editable: true,
-            width: 100,
+            flex: 1,
             renderCell: ({ row: { level } }) => {
                 return (
-                    <Box className='flex h-12 my-0.5 justify-center items-center'>
+                    <Box className="w-[100%] h-[100%] flex justify-center items-center">
                         <Box 
-                            className={`w-[100%] my-0 mx-auto p-1.5 rounded-md
-                                ${level === 'Bronze' ? 'bg-bronze-500' : 
-                                level === 'Silver' ? 'bg-gray-200' : 
-                                level === 'Gold' ? 'bg-accent' : 'bg-none'}`}                        
-                            >
-                            <p className="text-center text-sm text-gray-800">
+                        className={`w-[100%] text-center p-1.5 rounded-md
+                            ${level === 'Bronze' ? 'bg-bronze-500' : 
+                            level === 'Silver' ? 'bg-gray-200' : 
+                            level === 'Gold' ? 'bg-accent' : 'bg-none'}`}                        
+                        >
+                            <Typography>
                                 { level }
-                            </p>
-                        </Box>
+                            </Typography>
+                    </Box>
                     </Box>
                 )
             }
@@ -56,19 +56,31 @@ export const Team = () => {
             headerName: 'Ref Link',
             renderCell: (params) => {
                 if (!params.value) return null;
-                const ref = params.value.toString()
-                const truncatedRef = ref.length > 5 ? ref.slice(0, 5) + '...' : ref
-                            
+                const ref = params.value.toString();
+                const truncatedRef = ref.length > 5 ? ref.slice(0, 5) + '...' : ref;
+                
+                // Формирование ссылки
+                const refLink = `https://jinn-travel.com/?affiliateId=${ref}`;
+            
                 return (
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography>{truncatedRef}</Typography>
-                        <button 
-                            onClick={() => handleCopy(params.value)}
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Typography>
+                        <a 
+                            href={refLink} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="hover:underline underline-offset-4 decoration-accent hover:text-accent duration-300"
                         >
-                            <ContentCopyRoundedIcon />
-                        </button>
-                    </Box>
-                )
+                            {truncatedRef}
+                        </a>
+                    </Typography>
+                    <button 
+                            onClick={() => handleCopy(refLink)}
+                        >
+                        <ContentCopyRoundedIcon />
+                    </button>
+                </Box>
+                );
             }
         },
         { field: 'booked_trips_count', headerName: 'Trips'},
@@ -78,7 +90,15 @@ export const Team = () => {
     if (error) return <p>Error: {error}</p>
 
     return (
-        <Box style={{ height: '100%', width: '100%' }}>
+        <Box 
+            sx={{
+                "& .MuiDataGrid-cell": {
+                    // display: "flex",
+                    // alignItems: "center",
+                    margin: "auto",
+                }
+            }}  
+            style={{ height: '100%', width: '100%' }}>
             <DataGrid 
                 rows={users}
                 columns={columns}

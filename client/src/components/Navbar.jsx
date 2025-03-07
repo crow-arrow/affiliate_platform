@@ -16,52 +16,33 @@ export const Navbar = () => {
 
   return (
     <div>
-    {isAuth && <div className="left-0 top-20 flex flex-col flex-grow-1 w-60 px-8 pb-4 min-h-[calc(100vh-80px)]">
-      <button
-        className="flex w-full px-2 py-2 my-2 rounded-md justify-between items-center"
-      >
-        <img 
-            src="https://api.dicebear.com/9.x/notionists/svg" 
-            alt="Avatar"
-            className="size-8 rounded shrink-0 shadow"
-        />
-        <div className="text-start">
-            <span className="text-m block text-stone-500">
-                {userRole}
-            </span>
-            <span className="text-xs text-black block">
-                Hi, {first_name}
-            </span>
-        </div>
-        <UnfoldMoreOutlinedIcon />
-      </button>
-      <nav className='flex flex-1'>
-        
-        <ul className='flex flex-1 flex-col justify-between gap-y-7'>
+    {isAuth && <div className="left-0 top-20 flex flex-col flex-grow-1 px-8 min-h-[calc(100vh-150px)]">
+      <nav className="flex flex-1">
+        <ul className="flex flex-1 flex-col justify-between gap-y-7 text-gray-200">
           <li>
             <ul className="flex flex-col gap-y-2">
-              <li className='flex'>
+              <li className="flex">
                 <NavLink to="../my-account" 
                   className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-white text-accent'}`}>
                     <RoofingRoundedIcon />
                     Dashboard
                 </NavLink>
               </li>
-              <li className='flex'>
+              <li className="flex">
                 <NavLink to="../trips" 
                   className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-white text-accent'}`}>
                     <LuggageOutlinedIcon />
                     Trips
                 </NavLink>
               </li>
-              <li className='flex'>
+              <li className="flex">
                 <NavLink to="../calender" 
                   className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-white text-accent'}`}>
                     <CalendarTodayOutlinedIcon />
                     Calender
                 </NavLink>
               </li>
-              <li className='flex'>
+              <li className="flex">
                 <NavLink to="../documents" 
                   className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-white text-accent'}`}>
                     <InsertDriveFileOutlinedIcon />
@@ -70,7 +51,7 @@ export const Navbar = () => {
               </li>
             </ul>
           </li>
-          <li className='flex mt-auto'>
+          <li className="flex mt-auto">
             <NavLink to="../settings" 
               className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-white text-accent'}`}>
               <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" aria-hidden="true" data-slot="icon">

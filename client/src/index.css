@@ -7,6 +7,14 @@
     font-family: "Lexend Giga", serif;
     min-height: 100vh;
   }
+  .link {
+    text-decoration: underline;
+    color: inherit; /* Наследует цвет родительского элемента */
+  }
+  
+  .link:hover {
+    color: #d8b21d; /* Замените на ваш цвет акцента */
+  }
   .material-symbols-outlined {
     font-variation-settings:
     'FILL' 0,

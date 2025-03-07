@@ -22,13 +22,13 @@ const Trips = sequelize.define(
             allowNull: true,
         },
         total_price: {
-            type: DataTypes.DECIMAL(19, 4),
+            type: DataTypes.DECIMAL(19, 2),
             allowNull: false,
         },
-        currency: {
-            type: DataTypes.TEXT,
-            allowNull: true,
-        },
+        // currency: {
+        //     type: DataTypes.TEXT,
+        //     allowNull: true,
+        // },
         coupon_code: {
             type: DataTypes.STRING,
             allowNull: true,

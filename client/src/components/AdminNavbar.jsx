@@ -8,40 +8,19 @@ import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined
 import LocalActivityOutlinedIcon from '@mui/icons-material/LocalActivityOutlined'
 import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined'
 import TuneRoundedIcon from '@mui/icons-material/TuneRounded'
-import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
 
 export const AdminNavbar = () => {
     const isAuth = useSelector(checkIsAuth)
     const userRole = useSelector(checkRole)
-    const first_name = useSelector((state) => state.auth.user?.first_name)
 
     if (!isAuth || userRole !== 'Admin') {
         return null
     }
 
     return (
-        <div className="left-0 top-20 flex flex-col flex-grow-1 w-60 px-8 pb-4 min-h-[calc(100vh-80px)]">
-            <button
-                className="flex w-full px-2 py-2 my-2 rounded-md justify-between items-center"
-            >
-                <img 
-                    src="https://api.dicebear.com/9.x/notionists/svg" 
-                    alt="Avatar"
-                    className="size-8 rounded shrink-0 shadow"
-                />
-                <div className="text-start">
-                    <span className="text-m block text-stone-500">
-                        {userRole}
-                    </span>
-                    <span className="text-xs text-black block">
-                        Hi, {first_name}
-                    </span>
-                </div>
-                <UnfoldMoreOutlinedIcon />
-            </button>
+        <div className="left-0 top-20 flex flex-col flex-grow-1 px-8 min-h-[calc(100vh-150px)]">
             <nav className='flex flex-1'>
-                
-                <ul className='flex flex-1 flex-col justify-between gap-y-7'>
+                <ul className='flex flex-1 flex-col justify-between gap-y-7 text-gray-200'>
                     <li>
                         <ul className="flex flex-col gap-y-2">
                             <li className='flex'>
@@ -96,7 +75,6 @@ export const AdminNavbar = () => {
                         </NavLink>
                     </li>
                 </ul>
-
             </nav>
         </div>
     )

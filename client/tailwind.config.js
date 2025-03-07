@@ -13,7 +13,16 @@ module.exports = {
         bronze: {
           500: '#CD7F32',
         }
-      }
+      },
+      textUnderlineOffset: {
+        '4': '4px',
+        '6': '6px',
+      },
+      backgroundOpacity: {
+        '10': '0.1',
+        '20': '0.2',
+        '95': '0.95',
+      },
     },
   },
   plugins: [],

@@ -48,6 +48,10 @@ const User = sequelize.define('refferal_users', {
         type: DataTypes.INTEGER,
         defaultValue: 0
     },
+    earned_commission: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+    },
 }, { timestamps: true },
 )
 

@@ -3,11 +3,11 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 import { Box, Typography, CircularProgress } from '@mui/material'
 // import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import { useDispatch, useSelector } from "react-redux"
-import { fetchTrips } from "../redux/features/trips/tripSlice"
+import { fetchTrips } from "../redux/features/users/userSlice"
 
 export const Trips = () => {
   const dispatch = useDispatch()
-  const { trips, status, error } = useSelector((state) => state.trips)
+  const { trips, status, error } = useSelector((state) => state.user)
 
   useEffect(() => {
     dispatch(fetchTrips())
@@ -26,10 +26,8 @@ export const Trips = () => {
     { field: 'traveller_amount', headerName: 'Traveller Number' },
     { field: 'travel_date', headerName: 'Travel Date', flex: 1 },
     { field: 'order_status', headerName: 'Order Status' },
-    { field: 'total_price', headerName: 'Total Price' },
-    { field: 'currency', headerName: 'Currency' },
-    { field: 'coupon_code', headerName: 'Coupon', flex: 1 },
-    { field: 'affiliate_id', headerName: 'Ref ID', flex: 1 },
+    { field: 'total_price', headerName: 'Total Price in EUR' },
+    { field: 'commission', headerName: 'Commission' },
   ];
 
   // Статус загрузки
@@ -49,9 +47,8 @@ export const Trips = () => {
   return (
     <Box style={{ height: '100%', width: '100%' }}>
       <DataGrid 
-        rows={trips.trips}
+        rows={trips}
         columns={columns}
-        checkboxSelection
         disableRowSelectionOnClick
         slots={{ toolbar: GridToolbar }}
         getRowId={(row) => row.id}
