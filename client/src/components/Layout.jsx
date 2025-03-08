@@ -20,7 +20,7 @@ export const Layout = () => {
             <nav className="w-60 mt-8">
                 <Navbar />
             </nav>
-            <main className="flex-1 h-[75vh] p-4 m-8 overflow-auto bg-white opacity-80 rounded-2xl">
+            <main className="flex-1 h-[75vh] p-4 m-8 overflow-auto text-white bg-white/30 backdrop-blur-sm rounded-2xl">
                 <Outlet />
             </main>
           </div>
