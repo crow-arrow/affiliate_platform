@@ -1,20 +1,23 @@
 import User from '../models/User.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import {sendVerificationEmail} from '../services/emailUtils.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // Register User
 export const signUp = async (req, res) => {
     try {
-        const { email, phone, first_name, last_name, password } = req.body
+        const { email, phone, first_name, last_name, password } = req.body;
 
-        const isUsed = await User.findOne({ where: { email } })
+        const isUsed = await User.findOne({ where: { email } });
 
         if (isUsed) {
-            return res.status(409).json({ message: 'Email already exists' })
+            return res.status(409).json({ message: 'Email already exists' });
         }
 
-        const salt = bcrypt.genSaltSync(10)
-        const hash = bcrypt.hashSync(password, salt)
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(password, salt);
 
         const newUser = await User.create({
             email,
@@ -23,19 +26,47 @@ export const signUp = async (req, res) => {
             last_name,
             password: hash,
             role: 'Genie',
-        })
+            emailVerified: false,
+        });
 
+        // Генерация токена для подтверждения email
         const token = jwt.sign(
             { id: newUser.id, role: newUser.role },
             process.env.JWT_SECRET,
-            { expiresIn: '30d' }
-        )
+            { expiresIn: '30m' }
+        );
 
-        res.status(201).json({ user: { id: newUser.id, email: newUser.email }, token, message: 'Account successfully created' })
+        // Отправка email с подтверждением
+        sendVerificationEmail(newUser.email, token);
+
+        res.status(201).json({
+            user: { id: newUser.id, email: newUser.email },
+            token,
+            message: 'Account successfully created. Please check your email to verify your account.'
+        });
     } catch (error) {
-        res.status(500).json({ message: 'User creation error' })
+        res.status(500).json({ message: 'User creation error' });
     }
-}
+};
+// Email Confirmation Function
+export const verifyEmail = async (req, res) => {
+    const { token } = req.query;
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findByPk(decoded.id);
+
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        user.emailVerified = true;
+        await user.save();
+
+        res.status(200).json({ message: 'Email successfully verified' });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ message: 'Invalid or expired token' });
+    }
+};
 
 // Login user
 export const login = async (req, res) => {
@@ -45,6 +76,10 @@ export const login = async (req, res) => {
 
         if (!user) {
             return res.status(404).json({ message: 'User does not exist' })
+        }
+
+        if (!user.emailVerified) {
+            return res.status(400).json({ message: "👌 Almost Done — you'll get a confirmation email any minute now." });
         }
 
         const isPasswordCorrect = await bcrypt.compare(password, user.password)
@@ -59,7 +94,13 @@ export const login = async (req, res) => {
             { expiresIn: '30d' }
         )
 
-        res.status(201).json({ token, user, message: 'You are in' })
+        res.status(200).json({ 
+            token, 
+            user: user.get({ 
+                plain: true,
+                attributes: { exclude: ['password'] }
+            }),
+            message: 'You are in' })
     } catch (error) {
         console.error(error)
         res.status(400).json({ message: 'Login failed. Please try again' })
@@ -81,7 +122,13 @@ export const getMe = async (req, res) => {
             { expiresIn: '30d' }
         )
 
-        res.json({ token, user })
+        res.json({ 
+            token, 
+            user: user.get({ 
+            plain: true,
+            attributes: { exclude: ['password'] }
+            })
+        })
     } catch (error) {
         console.error(error)
         res.status(403).json({ message: 'Access denied' })

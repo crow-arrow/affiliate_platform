@@ -44,4 +44,12 @@ const Trips = sequelize.define(
     }
 );
 
+// Хук для отправки уведомлений через WebSocket
+Trips.afterCreate((trip, options) => {
+    console.log("New trip added into the DB:", trip);
+
+    // Отправляем уведомление через WebSocket
+    sendNewTripNotification(trip);
+})
+
 export default Trips;

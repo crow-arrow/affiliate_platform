@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchUsers } from '../redux/features/users/userSlice'
 
 export const Team = () => {
+    console.log('Render List')
+
     const dispatch = useDispatch()
     const { users, status, error } = useSelector((state) => state.user || [])
 
@@ -38,9 +40,9 @@ export const Team = () => {
                     <Box className="w-[100%] h-[100%] flex justify-center items-center">
                         <Box 
                         className={`w-[100%] text-center p-1.5 rounded-md
-                            ${level === 'Bronze' ? 'bg-bronze-500' : 
-                            level === 'Silver' ? 'bg-gray-200' : 
-                            level === 'Gold' ? 'bg-accent' : 'bg-none'}`}                        
+                            ${level === 'Bronze' ? 'bg-bronze-500 text-gray-800' : 
+                            level === 'Silver' ? 'bg-gray-200 text-gray-800' : 
+                            level === 'Gold' ? 'bg-accent text-gray-800' : 'bg-none'}`}                        
                         >
                             <Typography>
                                 { level }
@@ -58,8 +60,7 @@ export const Team = () => {
                 if (!params.value) return null;
                 const ref = params.value.toString();
                 const truncatedRef = ref.length > 5 ? ref.slice(0, 5) + '...' : ref;
-                
-                // Формирование ссылки
+
                 const refLink = `https://jinn-travel.com/?affiliateId=${ref}`;
             
                 return (
@@ -93,20 +94,23 @@ export const Team = () => {
         <Box 
             sx={{
                 "& .MuiDataGrid-cell": {
-                    // display: "flex",
-                    // alignItems: "center",
                     margin: "auto",
-                }
+                    color: "white",
+                },
+                "& .MuiDataGrid-footerContainer, .MuiDataGrid-container--top": {
+                    backgroundColor: (theme) => `${theme.palette.background.default} !important`,
+                },
             }}  
-            style={{ height: '100%', width: '100%' }}>
-            <DataGrid 
-                rows={users}
-                columns={columns}
-                checkboxSelection
-                disableRowSelectionOnClick
-                slots={{ toolbar: GridToolbar }}
-                getRowId={(row) => row.id}
-            />
+            style={{ height: '100%', width: '100%' }}
+        >
+        <DataGrid 
+            rows={users}
+            columns={columns}
+            checkboxSelection
+            disableRowSelectionOnClick
+            slots={{ toolbar: GridToolbar }}
+            getRowId={(row) => row.id}
+        />
         </Box>
     )
 }

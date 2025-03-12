@@ -11,10 +11,11 @@ import { AllOrders } from './admin_pages/AllOrders.jsx'
 
 import { Dashboard } from './pages/Dashboard'
 import { Trips } from './pages/Trips.jsx'
-import { Calender } from './pages/Calender.jsx'
+import { Calendar } from './pages/Calendar.jsx'
 import { Documents } from './pages/Documents.jsx'
 import { Settings } from './pages/Settings.jsx'
 
+import { EmailVerification } from './components/verification/EmailVerification.jsx'
 import { LoginPage } from './pages/LoginPage'
 import { SignUpPage } from './pages/SignUpPage'
 import { NotFound } from './pages/NotFound.jsx'
@@ -25,6 +26,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { getMe, checkIsAuth } from './redux/features/auth/authSlice.js'
+import { Profile } from './pages/Profile.jsx'
 
 function App() {
   const dispatch = useDispatch()
@@ -45,6 +47,7 @@ function App() {
         {/* Публичные страницы */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/verify-email" element={<EmailVerification />} />
 
         <Route path="/" element={isAuth ? (<AdminProtectedRoute allowedRoles={['Admin', 'Genie']}>
           <Layout />
@@ -53,11 +56,10 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="my-account" element={<Dashboard />} />
           <Route path="trips" element={<Trips />} />
-          <Route path="calender" element={<Calender />} />
+          <Route path="calendar" element={<Calendar />} />
           <Route path="documents" element={<Documents />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="signup" element={<SignUpPage />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
 
         {/* Используем защищенные маршруты для админов */}
@@ -70,7 +72,7 @@ function App() {
           <Route path="orders" element={<AllOrders />} />
           <Route path="assign-coupon" element={<AssignCoupon />} />
           <Route path="assign-level" element={<AssignLevel />} />
-          <Route path="calender" element={<Calender />} />
+          <Route path="calender" element={<Calendar />} />
           <Route path="invoices" element={<Invoices />} />
           <Route path="settings" element={<Settings />} />
         </Route>

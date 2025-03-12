@@ -45,7 +45,7 @@ export const AdminNavbar = () => {
                                 </NavLink>
                             </li>
                             <li className='flex'>
-                                <NavLink to="../admin/calender" 
+                                <NavLink to="../admin/calendar" 
                                 className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
                                     <CalendarTodayOutlinedIcon />
                                     Calender

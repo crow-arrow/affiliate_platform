@@ -1,64 +1,108 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import axios from '../../../utils/axios'
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "../../../utils/axios";
 
-// Get All Users
-export const fetchUsers = createAsyncThunk('user/fetchUsers', async (_, { rejectWithValue }) => {
+// 1. Создаем асинхронный экшен для загрузки аватара
+export const uploadAvatar = createAsyncThunk(
+  "user/uploadAvatar",
+  async (formData, { rejectWithValue }) => {
     try {
-        const { data } = await axios.get('/users/get-users') // Загружаем всех пользователей
-        return data
+      const { data } = await axios.patch("/users/avatar");
+      await axios.post("/api/upload", data, {
+        headers: {
+          "content-type": "mulpipart/form-data",
+        },
+      });
+      return data;
     } catch (error) {
-        return rejectWithValue(error.response?.data?.message || 'Error users loading')
+      return rejectWithValue(error.response?.data?.message || "Неизвестная");
     }
-})
+  }
+);
+// Get All Users
+export const fetchUsers = createAsyncThunk(
+  "user/fetchUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get("/users/get-users"); // Загружаем всех пользователей
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Error users loading"
+      );
+    }
+  }
+);
 
 // Get User Trips
-export const fetchTrips = createAsyncThunk('trips/fetchTrips', async (_, { rejectWithValue }) => {
+export const fetchTrips = createAsyncThunk(
+  "trips/fetchTrips",
+  async (_, { rejectWithValue }) => {
     try {
-        const { data } = await axios.get('/users/get-trips')
-        return data
+      const { data } = await axios.get("/users/get-trips");
+      return data;
     } catch (error) {
-        return rejectWithValue(error.response?.data?.message || 'Error trips loading')
+      return rejectWithValue(
+        error.response?.data?.message || "Error trips loading"
+      );
     }
-})
+  }
+);
 
 const userSlice = createSlice({
-    name: 'user',
-    initialState: {
-        users: [],
-        trips: [], // ✅ Добавил trips в initialState
-        status: 'idle', // idle | loading | succeeded | failed
-        error: null,
-    },
-    extraReducers: (builder) => {
-        builder
-            // Get All Users
-            .addCase(fetchUsers.pending, (state) => {
-                state.status = 'loading'
-                state.error = null
-            })
-            .addCase(fetchUsers.fulfilled, (state, action) => {
-                state.status = 'succeeded'
-                state.users = action.payload
-            })
-            .addCase(fetchUsers.rejected, (state, action) => {
-                state.status = 'failed'
-                state.error = action.payload
-            })
+  name: "user",
+  initialState: {
+    users: [],
+    trips: [], // ✅ Добавил trips в initialState
+    status: "idle", // idle | loading | succeeded | failed
+    error: null,
+  },
+  extraReducers: (builder) => {
+    builder
+      // 1. Создаем асинхронный экшен для загрузки аватара
+      .addCase(uploadAvatar.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(uploadAvatar.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        // Можно обновить информацию о пользователе в store, например, avatarUrl
+        state.users = state.users.map((user) =>
+          user.id === action.payload.id
+            ? { ...user, avatarUrl: action.payload.avatarUrl }
+            : user
+        );
+      })
+      .addCase(uploadAvatar.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload.message || "Неизвестная ошибка";
+      })
+      // Get All Users
+      .addCase(fetchUsers.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.users = action.payload;
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
 
-            // Get User Trips
-            .addCase(fetchTrips.pending, (state) => {
-                state.status = 'loading'
-                state.error = null
-            })
-            .addCase(fetchTrips.fulfilled, (state, action) => {
-                state.status = 'succeeded'
-                state.trips = action.payload.trips
-            })
-            .addCase(fetchTrips.rejected, (state, action) => {
-                state.status = 'failed'
-                state.error = action.payload // ✅ Добавил вывод ошибки
-            })
-    },
-})
+      // Get User Trips
+      .addCase(fetchTrips.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(fetchTrips.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.trips = action.payload.trips;
+      })
+      .addCase(fetchTrips.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload; // ✅ Добавил вывод ошибки
+      });
+  },
+});
 
-export default userSlice.reducer
+export default userSlice.reducer;

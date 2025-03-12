@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkIsAuth, checkRole, logout } from '../redux/features/auth/authSlice'
 import { toast } from 'react-toastify'
@@ -23,12 +23,15 @@ export const Header = () => {
         }, 300); // задержка в 500 мс
         setTimer(newTimer);
     };
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const isAuth = useSelector(checkIsAuth)
     const userRole = useSelector(checkRole)
     const firstName = useSelector((state) => state.auth.user?.first_name)
+    const isAdminPage = location.pathname.startsWith("/admin");
 
     const logoutHandler = async () => {
         
@@ -39,7 +42,6 @@ export const Header = () => {
         await new Promise(resolve => setTimeout(resolve, 0))
         navigate('/login');
     }
-
 
     return (
         <div>
@@ -52,11 +54,11 @@ export const Header = () => {
                     </div>
                     <label className="relative block mx-8 w-full">
                         <span className="sr-only">Search</span>
-                        <span className="absolute z-50 inset-y-0 right-0 flex items-center px-4 text-gray-700">
+                        <span className="absolute z-10 inset-y-0 right-0 flex items-center px-4 text-gray-200">
                             {/* <a href="#" onClick={''}></a> */}
                             <SearchOutlinedIcon />
                         </span>
-                        <input className="placeholder:italic placeholder:text-slate-400 block bg-white/30 backdrop-blur-sm w-full border border-slate-300 rounded-md py-2 pl-4 pr-3 shadow-sm focus:outline-none focus:border-accent focus:ring-accent focus:ring-1 sm:text-sm" placeholder="Search for anything..." type="text" name="search"/>
+                        <input className="placeholder:italic text-gray-200 placeholder:text-slate-400 block bg-white/30 backdrop-blur-sm w-full border border-slate-300 rounded-md py-2 pl-4 pr-3 shadow-sm focus:outline-none focus:border-accent focus:ring-accent focus:ring-1 sm:text-sm" placeholder="Search for anything..." type="text" name="search"/>
                     </label>
                     <div className="flex items-center justify-between gap-x-4">
                         <span className="inset-y-0 left-0 flex items-center pl-2">
@@ -91,16 +93,48 @@ export const Header = () => {
                             </button>
 
                             {dropdownOpen && (
-                                <div className="absolute z-100 -bottom-4 mt-2 w-40 rounded-md text-gray-200 bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm"
-                                    onMouseEnter={handleMouseEnter} 
-                                    onMouseLeave={handleMouseLeave}
-                                >
-                                    <button
-                                        onClick={logoutHandler}
-                                        className="w-full text-left px-4 py-2 rounded-md text-gray-200 hover:text-accent hover:bg-gray-200"
+                                <div>
+                                    <ul className="absolute w-auto whitespace-nowrap z-10 right-0 top-20 rounded-md shadow-custom-white text-gray-200 bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm"
+                                        onMouseEnter={handleMouseEnter} 
+                                        onMouseLeave={handleMouseLeave}
                                     >
-                                        Выйти
-                                    </button>
+                                        <li className="w-full px-4 py-2 rounded-md text-gray-200 hover:text-accent">
+                                            <Link
+                                                to="../profile"
+                                                className="flex w-full text-left"
+                                            >
+                                                Profile
+                                            </Link>
+                                        </li>
+                                        {!isAdminPage && userRole === 'Admin' && (
+                                        <li className="w-full px-4 py-2 rounded-md text-gray-200 hover:text-accent">
+                                            <Link
+                                                to="../admin/dashboard"
+                                                className="flex w-full text-left"
+                                            >
+                                                Admin Panel
+                                            </Link>
+                                        </li>
+                                        )}
+                                        {isAdminPage && userRole === 'Admin' && (
+                                        <li className="w-full px-4 py-2 rounded-md text-gray-200 hover:text-accent">
+                                            <Link
+                                                to="../my-account"
+                                                className="flex w-full text-left"
+                                            >
+                                                Genie Panel
+                                            </Link>
+                                        </li>
+                                        )}
+                                        <li className="w-full px-4 py-2 rounded-md text-gray-200 hover:text-accent">
+                                            <button
+                                                onClick={logoutHandler}
+                                                className="flex w-full text-left"
+                                            >
+                                                Logout
+                                            </button>
+                                        </li>
+                                    </ul>
                                 </div>
                             )}
                         </div>

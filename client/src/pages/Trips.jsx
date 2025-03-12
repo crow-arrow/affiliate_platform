@@ -1,7 +1,6 @@
 import React, { useEffect } from "react"
 import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 import { Box, Typography, CircularProgress } from '@mui/material'
-// import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import { useDispatch, useSelector } from "react-redux"
 import { fetchTrips } from "../redux/features/users/userSlice"
 
@@ -13,14 +12,6 @@ export const Trips = () => {
     dispatch(fetchTrips())
   }, [dispatch])
 
-  // const handleCopy = (id) => {
-  //   navigator.clipboard.writeText(id).then(() => {
-  //     alert('ID copied to clipboard!')
-  //   }).catch((err) => {
-  //     alert('Failed to copy: ' + err)
-  //   })
-  // }
-
   const columns = [
     { field: 'id', headerName: 'Order ID'},
     { field: 'traveller_amount', headerName: 'Traveller Number' },
@@ -30,7 +21,6 @@ export const Trips = () => {
     { field: 'commission', headerName: 'Commission' },
   ];
 
-  // Статус загрузки
   if (status === 'loading') {
     return (
       <Box
@@ -45,7 +35,18 @@ export const Trips = () => {
   }
 
   return (
-    <Box style={{ height: '100%', width: '100%' }}>
+    <Box 
+        sx={{
+          "& .MuiDataGrid-cell": {
+              margin: "auto",
+              color: "white",
+          },
+          "& .MuiDataGrid-footerContainer, .MuiDataGrid-container--top": {
+              backgroundColor: (theme) => `${theme.palette.background.default} !important`,
+          },
+        }} 
+        style={{ height: '100%', width: '100%' }}
+      >
       <DataGrid 
         rows={trips}
         columns={columns}

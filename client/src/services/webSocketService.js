@@ -1,6 +1,13 @@
 let socket;
 
 export const initWebSocket = (dispatch) => {
+    // Проверка на существующее подключение
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        console.log('WebSocket уже подключен');
+        return;
+    }
+
+    // Создаем подключение
     socket = new WebSocket("ws://localhost:8080");
 
     socket.onopen = () => {
@@ -8,10 +15,18 @@ export const initWebSocket = (dispatch) => {
     };
 
     socket.onmessage = (event) => {
-        const { type, data } = JSON.parse(event.data);
-        if (type === "newTour") {
-        dispatch({ type: "ADD_TOUR", payload: data }); // Диспатчим в Redux
+        try {
+            const { type, data } = JSON.parse(event.data);
+            if (type === "newTour") {
+                dispatch({ type: "ADD_TOUR", payload: data }); // Диспатчим в Redux
+            }
+        } catch (error) {
+            console.error("Ошибка при обработке сообщения WebSocket", error);
         }
+    };
+
+    socket.onerror = (error) => {
+        console.error("Ошибка WebSocket", error);
     };
 
     socket.onclose = () => {
@@ -20,5 +35,8 @@ export const initWebSocket = (dispatch) => {
 };
 
 export const closeWebSocket = () => {
-    if (socket) socket.close();
+    if (socket) {
+        socket.close();
+        console.log("WebSocket закрыт");
+    }
 };

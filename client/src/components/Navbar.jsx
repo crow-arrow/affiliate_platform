@@ -11,8 +11,6 @@ import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined';
 export const Navbar = () => {
 
   const isAuth = useSelector(checkIsAuth)
-  const userRole = useSelector(checkRole)
-  const first_name = useSelector((state) => state.auth.user?.first_name)
 
   return (
     <div>
@@ -36,7 +34,7 @@ export const Navbar = () => {
                 </NavLink>
               </li>
               <li className="flex">
-                <NavLink to="../calender" 
+                <NavLink to="../calendar" 
                   className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
                     <CalendarTodayOutlinedIcon />
                     Calender
