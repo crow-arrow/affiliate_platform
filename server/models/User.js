@@ -1,3 +1,4 @@
+import Trips from "./Trips.js";
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
@@ -60,10 +61,12 @@ const User = sequelize.define(
     },
     avatarUrl: {
       type: DataTypes.STRING,
-      default: "../uploads/default-avatar.png",
+      default: "/uploads/default-avatar.png",
     },
   },
   { timestamps: true }
 );
+
+User.hasMany(Trips, { foreignKey: "user_id", sourceKey: "id" });
 
 export default User;

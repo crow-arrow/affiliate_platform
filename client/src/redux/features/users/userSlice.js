@@ -1,29 +1,31 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../../../utils/axios";
 
-// 1. Создаем асинхронный экшен для загрузки аватара
+// Upload Avatar
 export const uploadAvatar = createAsyncThunk(
   "user/uploadAvatar",
   async (formData, { rejectWithValue }) => {
     try {
-      const { data } = await axios.patch("/users/avatar");
-      await axios.post("/api/upload", data, {
+      const { data } = await axios.patch("/uploads/avatar", formData, {
         headers: {
-          "content-type": "mulpipart/form-data",
+          "Content-Type": "multipart/form-data",
         },
       });
       return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Неизвестная");
+      return rejectWithValue(
+        error.response?.data?.message || "Ошибка загрузки"
+      );
     }
   }
 );
+
 // Get All Users
 export const fetchUsers = createAsyncThunk(
   "user/fetchUsers",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get("/users/get-users"); // Загружаем всех пользователей
+      const { data } = await axios.get("/users/get-users");
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -52,55 +54,60 @@ const userSlice = createSlice({
   name: "user",
   initialState: {
     users: [],
-    trips: [], // ✅ Добавил trips в initialState
-    status: "idle", // idle | loading | succeeded | failed
-    error: null,
+    currentUser: {
+      avatarUrl: "",
+    },
+    trips: [],
+    // Разделение статусов и ошибок для разных операций
+    avatarStatus: "idle", // idle | loading | succeeded | failed
+    usersStatus: "idle",
+    tripsStatus: "idle",
+    avatarError: null,
+    usersError: null,
+    tripsError: null,
   },
   extraReducers: (builder) => {
     builder
-      // 1. Создаем асинхронный экшен для загрузки аватара
+      // Upload avatar
       .addCase(uploadAvatar.pending, (state) => {
-        state.status = "loading";
+        state.avatarStatus = "loading";
+        state.avatarError = null;
       })
       .addCase(uploadAvatar.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        // Можно обновить информацию о пользователе в store, например, avatarUrl
-        state.users = state.users.map((user) =>
-          user.id === action.payload.id
-            ? { ...user, avatarUrl: action.payload.avatarUrl }
-            : user
-        );
+        state.avatarStatus = "succeeded";
+        state.currentUser.avatarUrl = action.payload.user.avatarUrl;
       })
       .addCase(uploadAvatar.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload.message || "Неизвестная ошибка";
+        state.avatarStatus = "failed";
+        state.avatarError = action.payload || "Неизвестная ошибка";
       })
+
       // Get All Users
       .addCase(fetchUsers.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
+        state.usersStatus = "loading";
+        state.usersError = null;
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.usersStatus = "succeeded";
         state.users = action.payload;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload;
+        state.usersStatus = "failed";
+        state.usersError = action.payload;
       })
 
       // Get User Trips
       .addCase(fetchTrips.pending, (state) => {
-        state.status = "loading";
-        state.error = null;
+        state.tripsStatus = "loading";
+        state.tripsError = null;
       })
       .addCase(fetchTrips.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.tripsStatus = "succeeded";
         state.trips = action.payload.trips;
       })
       .addCase(fetchTrips.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.payload; // ✅ Добавил вывод ошибки
+        state.tripsStatus = "failed";
+        state.tripsError = action.payload;
       });
   },
 });

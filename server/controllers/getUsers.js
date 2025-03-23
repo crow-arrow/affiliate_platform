@@ -2,28 +2,6 @@ import User from "../models/User.js";
 import Trips from "../models/Trips.js";
 import { Op } from "sequelize";
 
-// Загрузка аватара
-export const uploadAvatar = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" });
-    }
-
-    const user = await User.findByPk(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    user.avatarUrl = `/uploads/${req.file.filename}`;
-    await user.save();
-
-    res.status(200).json({ user });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({

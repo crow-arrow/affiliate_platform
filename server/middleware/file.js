@@ -1,13 +1,15 @@
 import multer from "multer";
 import path from "path";
 
-// Настройки для multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Папка для хранения аватаров
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + path.extname(file.originalname)); // Имя файла с текущей датой
+    const userId = req.userId || "default";
+    const ext = path.extname(file.originalname);
+    const filename = `UserId-${userId}-${Date.now()}${ext}`;
+    cb(null, filename);
   },
 });
 

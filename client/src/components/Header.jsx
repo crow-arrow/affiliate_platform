@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkIsAuth, checkRole, logout } from '../redux/features/auth/authSlice'
 import { toast } from 'react-toastify'
+import avatarLogo from '../assets/avatar.png'
 import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined'
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined'
+import {API_URL} from "../config"
 
 export const Header = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -12,15 +14,15 @@ export const Header = () => {
 
     const handleMouseEnter = () => {
         if (timer) {
-        clearTimeout(timer); // Очистить предыдущий таймер, если есть
+        clearTimeout(timer);
         }
-        setDropdownOpen(true); // Открыть дропдаун
+        setDropdownOpen(true);
     };
 
     const handleMouseLeave = () => {
         const newTimer = setTimeout(() => {
-        setDropdownOpen(false); // Закрыть дропдаун через 1 секунду
-        }, 300); // задержка в 500 мс
+        setDropdownOpen(false);
+        }, 300);
         setTimer(newTimer);
     };
 
@@ -31,6 +33,10 @@ export const Header = () => {
     const isAuth = useSelector(checkIsAuth)
     const userRole = useSelector(checkRole)
     const firstName = useSelector((state) => state.auth.user?.first_name)
+    const currentUser = useSelector((state) => state.auth.user)
+    console.log(currentUser)
+    const avatar = currentUser.avatarUrl ? `${API_URL + currentUser.avatarUrl}` : avatarLogo
+    console.log(avatar)
     const isAdminPage = location.pathname.startsWith("/admin");
 
     const logoutHandler = async () => {
@@ -75,7 +81,7 @@ export const Header = () => {
                                 onMouseLeave={handleMouseLeave}
                             >
                                 <img 
-                                    src="https://api.dicebear.com/9.x/notionists/svg" 
+                                    src={avatar} 
                                     alt="Avatar"
                                     className="size-8 rounded shrink-0 shadow"
                                 />

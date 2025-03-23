@@ -1,13 +1,14 @@
-import axios from 'axios'
+import axios from "axios";
+import { API_URL } from "../config";
 
 const instance = axios.create({
-    baseURL: 'http://localhost:3002/api',
-})
+  baseURL: `${API_URL}api`,
+});
 
-instance.interceptors.request.use(config => {
-    config.headers.Authorization = window.localStorage.getItem('token')
+instance.interceptors.request.use((config) => {
+  config.headers.Authorization = window.localStorage.getItem("token");
 
-    return config
-})
+  return config;
+});
 
-export default instance
+export default instance;

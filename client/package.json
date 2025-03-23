@@ -28,6 +28,7 @@
     "axios": "^1.7.9",
     "postcss": "^8.5.1",
     "react": "^19.0.0",
+    "react-avatar-edit": "^1.2.0",
     "react-dom": "^19.0.0",
     "react-pro-sidebar": "^1.1.0",
     "react-redux": "^9.2.0",
