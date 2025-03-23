@@ -34,9 +34,7 @@ export const Header = () => {
     const userRole = useSelector(checkRole)
     const firstName = useSelector((state) => state.auth.user?.first_name)
     const currentUser = useSelector((state) => state.auth.user)
-    console.log(currentUser)
     const avatar = currentUser.avatarUrl ? `${API_URL + currentUser.avatarUrl}` : avatarLogo
-    console.log(avatar)
     const isAdminPage = location.pathname.startsWith("/admin");
 
     const logoutHandler = async () => {
