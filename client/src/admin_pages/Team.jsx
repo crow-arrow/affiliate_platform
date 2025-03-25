@@ -39,7 +39,7 @@ export const Team = () => {
                 return (
                     <Box className="w-[100%] h-[100%] flex justify-center items-center">
                         <Box 
-                        className={`w-[100%] text-center p-1.5 rounded-md
+                        className={`w-[100%] text-center p-1.5 rounded-3xl
                             ${level === 'Bronze' ? 'bg-bronze-500 text-gray-800' : 
                             level === 'Silver' ? 'bg-gray-200 text-gray-800' : 
                             level === 'Gold' ? 'bg-accent text-gray-800' : 'bg-none'}`}                        

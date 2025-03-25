@@ -91,7 +91,7 @@ export const Calendar = () => {
         <Typography variant="h5">Events</Typography>
         <List>
           {currentEvents.map((event) => (
-            <ListItem key={event.id} className="bg-teal-900 my-2 rounded-md">
+            <ListItem key={event.id} className="bg-teal-900 my-2 rounded-3xl">
               <ListItemText
                 primary={event.title}
                 secondary={
@@ -112,7 +112,7 @@ export const Calendar = () => {
       {/* Календарь */}
       <Box className="flex-grow flex-shrink basis-[80%] ml-4">
         <FullCalendar
-          className="rounded-md"
+          className="rounded-3xl"
           height="70vh"
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
           scrollTime={0}

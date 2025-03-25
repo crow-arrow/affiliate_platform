@@ -61,7 +61,7 @@ const User = sequelize.define(
     },
     avatarUrl: {
       type: DataTypes.STRING,
-      default: "/uploads/default-avatar.png",
+      allowNull: true,
     },
   },
   { timestamps: true }

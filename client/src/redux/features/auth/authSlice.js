@@ -46,7 +46,7 @@ export const loginUser = createAsyncThunk(
       });
       if (data.token) {
         window.localStorage.setItem("token", data.token);
-        return { user: data.user, token: data.token };
+        return { user: data.user, token: data.token, message: data.message };
       }
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -76,6 +76,11 @@ const authSlice = createSlice({
       state.token = null;
       state.isLoading = false;
       state.status = null;
+    },
+    updateUserAvatar: (state, action) => {
+      if (state.user) {
+        state.user.avatarUrl = action.payload;
+      }
     },
   },
   extraReducers: (builder) => {

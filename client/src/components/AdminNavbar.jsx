@@ -25,42 +25,42 @@ export const AdminNavbar = () => {
                         <ul className="flex flex-col gap-y-2">
                             <li className='flex'>
                                 <NavLink to="../admin/dashboard" 
-                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
+                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-3xl hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
                                     <RoofingRoundedIcon />
                                     Dashboard
                                 </NavLink>
                             </li>
                             <li className='flex'>
                                 <NavLink to="../admin/team" 
-                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
+                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-3xl hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
                                     <Groups3OutlinedIcon />
                                     Team
                                 </NavLink>
                             </li>
                             <li className='flex'>
                                 <NavLink to="../admin/orders" 
-                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
+                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-3xl hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
                                     <Groups3OutlinedIcon />
                                     Orders
                                 </NavLink>
                             </li>
                             <li className='flex'>
                                 <NavLink to="../admin/calendar" 
-                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
+                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-3xl hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
                                     <CalendarTodayOutlinedIcon />
                                     Calender
                                 </NavLink>
                             </li>
                             <li className='flex'>
                                 <NavLink to="../admin/assign-coupon" 
-                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
+                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-3xl hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
                                     <LocalActivityOutlinedIcon />
                                     Add Coupon
                                 </NavLink>
                             </li>
                             <li className='flex'>
                                 <NavLink to="../admin/assign-level" 
-                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
+                                className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-3xl hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
                                     <ReceiptOutlinedIcon />
                                     Invoices
                                 </NavLink>
@@ -69,7 +69,7 @@ export const AdminNavbar = () => {
                     </li>
                     <li className='flex mt-auto'>
                         <NavLink to="../admin/settings" 
-                        className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-md hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
+                        className={({ isActive }) => `group flex p-2 gap-2 w-full text-s rounded-3xl hover:bg-white hover:text-accent transition-colors ${isActive && 'bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm text-accent'}`}>
                             <TuneRoundedIcon />
                             Settings
                         </NavLink>

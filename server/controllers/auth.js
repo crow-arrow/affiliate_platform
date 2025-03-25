@@ -27,7 +27,6 @@ export const signUp = async (req, res) => {
       password: hash,
       role: "Genie",
       emailVerified: false,
-      avatarUrl: "/uploads/default-avatar.png",
     });
 
     // Генерация токена для подтверждения email
@@ -101,10 +100,10 @@ export const login = async (req, res) => {
 
     res.status(200).json({
       token,
-      user: user.get({
-        plain: true,
-        attributes: { exclude: ["password"] },
-      }),
+      user: {
+        ...user.toJSON(),
+        password: undefined,
+      },
       message: "You are in",
     });
   } catch (error) {

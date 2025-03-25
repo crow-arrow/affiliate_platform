@@ -8,8 +8,10 @@ export const Layout = () => {
   return (
     <React.Fragment>
       <div className="relative flex flex-col min-h-screen">
-        <div className="absolute inset-0 before:absolute before:inset-0 before:bg-black before:opacity-70" 
-                        style={{ backgroundImage: `url(${Uzbekistan})`, backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div 
+          className="absolute inset-0 before:absolute before:inset-0 before:bg-black before:opacity-70" 
+          style={{ backgroundImage: `url(${Uzbekistan})`, backgroundSize: "cover", backgroundPosition: "center" }}
+        >
         </div>
         <div className="relative z-10">
           <header>

@@ -23,7 +23,7 @@ export const SignUpPage = () => {
     if (status) {
       toast(status)
     }
-    if (isAuth && user?.role) {  // Убедитесь, что у user есть role
+    if (isAuth && user?.role) {
       navigate('/my-account')
     }
   }, [status, isAuth, user, navigate])
@@ -89,7 +89,7 @@ export const SignUpPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -106,7 +106,7 @@ export const SignUpPage = () => {
                 onChange={(e) => setPhone(e.target.value)}
                 required
                 autoComplete="phone"
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -124,7 +124,7 @@ export const SignUpPage = () => {
                 onChange={(e) => setFirstName(e.target.value)}
                 required
                 autoComplete="given-name"
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -142,7 +142,7 @@ export const SignUpPage = () => {
                 onChange={(e) => setLastName(e.target.value)}
                 required
                 autoComplete="family-name"
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -162,14 +162,14 @@ export const SignUpPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between">
-              <label htmlFor="confirm-password">
+              <label htmlFor="confirm-password" className="block text-sm/6 font-medium text-gray-900">
                 Confirm Password
               </label>
             </div>
@@ -180,7 +180,7 @@ export const SignUpPage = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -189,7 +189,7 @@ export const SignUpPage = () => {
             <button
               type="submit"
               disabled={status === "loading"}
-              className="flex w-full justify-center rounded-md bg-accent px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-accentDark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="flex w-full justify-center rounded-3xl bg-accent px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-accentDark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               Sign up
             </button>

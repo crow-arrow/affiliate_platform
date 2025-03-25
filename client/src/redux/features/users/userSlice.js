@@ -4,17 +4,18 @@ import axios from "../../../utils/axios";
 // Upload Avatar
 export const uploadAvatar = createAsyncThunk(
   "user/uploadAvatar",
-  async (formData, { rejectWithValue }) => {
+  async (formData, { dispatch, rejectWithValue }) => {
     try {
       const { data } = await axios.patch("/uploads/avatar", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+      dispatch(fetchUsers());
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Ошибка загрузки"
+        error.response?.data?.message || "Error uploading"
       );
     }
   }
@@ -58,7 +59,6 @@ const userSlice = createSlice({
       avatarUrl: "",
     },
     trips: [],
-    // Разделение статусов и ошибок для разных операций
     avatarStatus: "idle", // idle | loading | succeeded | failed
     usersStatus: "idle",
     tripsStatus: "idle",

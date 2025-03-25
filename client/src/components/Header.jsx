@@ -34,7 +34,7 @@ export const Header = () => {
     const userRole = useSelector(checkRole)
     const firstName = useSelector((state) => state.auth.user?.first_name)
     const currentUser = useSelector((state) => state.auth.user)
-    const avatar = currentUser.avatarUrl ? `${API_URL + currentUser.avatarUrl}` : avatarLogo
+    const avatar = currentUser.avatarUrl ? `${API_URL}${currentUser.avatarUrl}` : avatarLogo
     const isAdminPage = location.pathname.startsWith("/admin");
 
     const logoutHandler = async () => {
@@ -62,7 +62,7 @@ export const Header = () => {
                             {/* <a href="#" onClick={''}></a> */}
                             <SearchOutlinedIcon />
                         </span>
-                        <input className="placeholder:italic text-gray-200 placeholder:text-slate-400 block bg-white/30 backdrop-blur-sm w-full border border-slate-300 rounded-md py-2 pl-4 pr-3 shadow-sm focus:outline-none focus:border-accent focus:ring-accent focus:ring-1 sm:text-sm" placeholder="Search for anything..." type="text" name="search"/>
+                        <input className="placeholder:italic text-gray-200 placeholder:text-slate-400 block bg-white/30 backdrop-blur-sm w-full border border-slate-300 rounded-3xl py-2 pl-4 pr-3 shadow-sm focus:outline-none focus:border-accent focus:ring-accent focus:ring-1 sm:text-sm" placeholder="Search for anything..." type="text" name="search"/>
                     </label>
                     <div className="flex items-center justify-between gap-x-4">
                         <span className="inset-y-0 left-0 flex items-center pl-2">
@@ -74,7 +74,7 @@ export const Header = () => {
                         <span className='text-3xl text-gray-200'>￨</span>
                         <div className="relative w-40">
                             <button
-                                className="flex w-full my-8 rounded-md justify-between items-center"
+                                className="flex w-full my-8 rounded-3xl justify-between items-center"
                                 onMouseEnter={handleMouseEnter} 
                                 onMouseLeave={handleMouseLeave}
                             >
@@ -98,20 +98,20 @@ export const Header = () => {
 
                             {dropdownOpen && (
                                 <div>
-                                    <ul className="absolute w-auto whitespace-nowrap z-10 right-0 top-20 rounded-md shadow-custom-white text-gray-200 bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm"
+                                    <ul className="absolute w-auto whitespace-nowrap z-10 right-0 top-20 rounded-3xl shadow-custom-white text-gray-200 bg-[linear-gradient(rgba(255,255,255,0.3),transparent)] backdrop-blur-sm"
                                         onMouseEnter={handleMouseEnter} 
                                         onMouseLeave={handleMouseLeave}
                                     >
-                                        <li className="w-full px-4 py-2 rounded-md text-gray-200 hover:text-accent">
+                                        <li className="w-full px-4 py-2 rounded-3xl text-gray-200 hover:text-accent">
                                             <Link
-                                                to="../profile"
+                                                to="../settings"
                                                 className="flex w-full text-left"
                                             >
-                                                Profile
+                                                Settings
                                             </Link>
                                         </li>
                                         {!isAdminPage && userRole === 'Admin' && (
-                                        <li className="w-full px-4 py-2 rounded-md text-gray-200 hover:text-accent">
+                                        <li className="w-full px-4 py-2 rounded-3xl text-gray-200 hover:text-accent">
                                             <Link
                                                 to="../admin/dashboard"
                                                 className="flex w-full text-left"
@@ -121,7 +121,7 @@ export const Header = () => {
                                         </li>
                                         )}
                                         {isAdminPage && userRole === 'Admin' && (
-                                        <li className="w-full px-4 py-2 rounded-md text-gray-200 hover:text-accent">
+                                        <li className="w-full px-4 py-2 rounded-3xl text-gray-200 hover:text-accent">
                                             <Link
                                                 to="../my-account"
                                                 className="flex w-full text-left"
@@ -130,7 +130,7 @@ export const Header = () => {
                                             </Link>
                                         </li>
                                         )}
-                                        <li className="w-full px-4 py-2 rounded-md text-gray-200 hover:text-accent">
+                                        <li className="w-full px-4 py-2 rounded-3xl text-gray-200 hover:text-accent">
                                             <button
                                                 onClick={logoutHandler}
                                                 className="flex w-full text-left"
