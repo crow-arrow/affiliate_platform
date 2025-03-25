@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { signUpSchema, loginSchema } from "../validations/validationSchemas.js";
 import { sendVerificationEmail } from "../services/emailUtils.js";
 import dotenv from "dotenv";
 dotenv.config();
@@ -8,8 +9,18 @@ dotenv.config();
 // Register User
 export const signUp = async (req, res) => {
   try {
-    const { email, phone, first_name, last_name, password } = req.body;
+    const { error } = signUpSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        errors: error.details.map((err) => ({
+          field: err.context.key, // Какое поле с ошибкой
+          message: err.message, // Текст ошибки
+        })),
+      });
+    }
 
+    const { email, phone, first_name, last_name, password } = req.body;
     const isUsed = await User.findOne({ where: { email } });
 
     if (isUsed) {
@@ -29,14 +40,12 @@ export const signUp = async (req, res) => {
       emailVerified: false,
     });
 
-    // Генерация токена для подтверждения email
     const token = jwt.sign(
       { id: newUser.id, role: newUser.role, avatarUrl: newUser.avatarUrl },
       process.env.JWT_SECRET,
       { expiresIn: "30m" }
     );
 
-    // Отправка email с подтверждением
     sendVerificationEmail(newUser.email, token);
 
     res.status(201).json({
@@ -72,6 +81,17 @@ export const verifyEmail = async (req, res) => {
 // Login user
 export const login = async (req, res) => {
   try {
+    const { error } = loginSchema.validate(req.body, { abortEarly: false });
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        errors: error.details.map((err) => ({
+          field: err.context.key,
+          message: err.message,
+        })),
+      });
+    }
+
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import logo from '../assets/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
-import { loginUser } from '../redux/features/auth/authSlice'
+import { loginUser, checkIsAuth } from '../redux/features/auth/authSlice'
 import { toast } from 'react-toastify'
 
 export const LoginPage = () => {
@@ -10,23 +10,25 @@ export const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const { status, user } = useSelector((state) => state.auth)
+  const { status, user, errors } = useSelector((state) => state.auth)
+  const isAuth = useSelector(checkIsAuth)
   const role = user?.role
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (user) {
+    if (status) toast(status);
+    if (errors.length > 0) {
+      errors.forEach((err) => toast.error(err.message))
+    }
+    if (isAuth && user) {
       if (role === 'Admin') {
         navigate('/admin/dashboard')
       } else {
         navigate('/my-account')
       }
     }
-    if (status) {
-      toast(status);
-    }
-  }, [status, user, navigate])
+  }, [status, errors, isAuth, user, navigate])
 
   const handleSubmit = async (e) => {
 
@@ -37,9 +39,9 @@ export const LoginPage = () => {
         email,
         password,
       }))
+
     } catch (error) {
-      console.error('Error during login:', error.response?.data || error.message)
-      toast("Login failed. Please try again.")
+      toast.error('Error during login:', error.response?.data || error.message)
     }
   }
 
@@ -58,6 +60,7 @@ export const LoginPage = () => {
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form 
+          noValidate
           onSubmit={handleSubmit}
           method="POST" 
           className="space-y-6">
@@ -74,7 +77,7 @@ export const LoginPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -99,7 +102,7 @@ export const LoginPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>

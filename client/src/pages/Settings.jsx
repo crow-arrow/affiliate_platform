@@ -15,6 +15,43 @@ export const Settings = () => {
     setAvatar(currentUser.avatarUrl ? `${API_URL}${currentUser.avatarUrl}` : avatarLogo);
   }, [currentUser]);
 
+  const { status, user } = useSelector((state) => state.auth)
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [first_name, setFirstName] = useState('')
+  const [last_name, setLastName] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!")
+      return
+    }
+
+    try {
+      await dispatch(registerUser({
+        email,
+        username: email,
+        phone,
+        first_name,
+        last_name,
+        password,
+      }))
+      await dispatch(getMe())
+      setEmail('')
+      setPhone('')
+      setFirstName('')
+      setLastName('')
+      setPassword('')
+      setConfirmPassword('')
+    } catch (error) {
+      console.error('Error during registration:', error.response?.data || error.message)
+      toast.error("Registration failed. Please try again.")
+    }
+  }
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updateKey, setUpdateKey] = useState(0);
 
@@ -66,9 +103,9 @@ export const Settings = () => {
       </div>
       <h2>Personal Information</h2>
       <form 
-          action="#"
+          onSubmit={handleSubmit}
           method="POST" 
-          className="grid grid-cols-2 max-md:grid-cols-1 gap-5"
+          className="grid grid-cols-2 max-md:grid-cols-1 gap-y-5 gap-x-20"
         >
           <div>
             <label htmlFor="email" className="block text-sm/6 font-medium text-gray-200">
@@ -79,12 +116,11 @@ export const Settings = () => {
                 id="email"
                 name="email"
                 type="email"
-                placeholder={userEmail}
-                // value={email}
+                value={userEmail}
                 // onChange={(e) => setEmail(e.target.value)}
-                disabled
+                readOnly
                 autoComplete="email"
-                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm disabled:bg-gray-600"
+                className="block w-full rounded-3xl shadow-inset-2 bg-gray-400 px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -98,11 +134,11 @@ export const Settings = () => {
                 name="phone"
                 type="phone"
                 placeholder={userPhone}
-                // value={phone}
-                // onChange={(e) => setPhone(e.target.value)}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 required
                 autoComplete="phone"
-                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -117,11 +153,11 @@ export const Settings = () => {
                 name="first-name"
                 type="text"
                 placeholder={userFirstName}
-                // value={first_name}
-                // onChange={(e) => setFirstName(e.target.value)}
+                value={first_name}
+                onChange={(e) => setFirstName(e.target.value)}
                 required
                 autoComplete="given-name"
-                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -136,11 +172,11 @@ export const Settings = () => {
                 name="last-name"
                 type="text"
                 placeholder={userLastName}
-                // value={last_name}
-                // onChange={(e) => setLastName(e.target.value)}
+                value={last_name}
+                onChange={(e) => setLastName(e.target.value)}
                 required
                 autoComplete="family-name"
-                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -156,11 +192,11 @@ export const Settings = () => {
                 id="password"
                 name="password"
                 type="password"
-                // value={password}
-                // onChange={(e) => setPassword(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
-                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -175,23 +211,24 @@ export const Settings = () => {
               <input
                 type="password"
                 id="confirm-password"
-                // value={confirmPassword}
-                // onChange={(e) => setConfirmPassword(e.target.value)}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="block w-full rounded-3xl bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
-        </form>
-        <div className='flex justify-end'>
-          <button
-            type="submit"
-            // disabled={status === "loading"}
-            className="w-1/5 rounded-3xl bg-primary mt-12 px-3 py-1.5 shadow-custom text-sm font-semibold text-center text-white hover:shadow-inset-white-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-all"
-          >
-            Save
-          </button>
+          <div className='col-span-2 flex justify-end'>
+            <button
+              type="submit"
+              disabled={status === "loading"}
+              className="w-1/5 rounded-3xl bg-primary mt-12 px-3 py-1.5 shadow-custom text-sm font-semibold text-center text-white hover:shadow-inset-white-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-all"
+            >
+              Save
+            </button>
         </div>
+      </form>
+
         <Profile isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   )

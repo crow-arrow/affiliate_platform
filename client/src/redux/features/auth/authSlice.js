@@ -28,9 +28,12 @@ export const registerUser = createAsyncThunk(
       }
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.response?.data ||
-          "The service is temporarily unavailable. Please try again later"
+        error.response?.data?.errors || [
+          {
+            message:
+              "The service is temporarily unavailable. Please try again later",
+          },
+        ]
       );
     }
   }
@@ -49,7 +52,11 @@ export const loginUser = createAsyncThunk(
         return { user: data.user, token: data.token, message: data.message };
       }
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return rejectWithValue(
+        error.response?.data?.errors || [
+          { message: error.response?.data?.message },
+        ]
+      );
     }
   }
 );
@@ -69,7 +76,11 @@ export const getMe = createAsyncThunk("auth/getMe", async () => {
 
 const authSlice = createSlice({
   name: "auth",
-  initialState,
+  initialState: {
+    user: null,
+    isLoading: false,
+    errors: [],
+  },
   reducers: {
     logout: (state) => {
       state.user = null;
@@ -89,31 +100,37 @@ const authSlice = createSlice({
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
         state.status = null;
+        state.errors = [];
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.status = action.payload.message;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.errors = [];
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
         state.status = action.payload;
+        state.errors = action.payload;
       })
       // Login
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
         state.status = null;
+        state.errors = [];
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
         state.status = action.payload.message;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.errors = [];
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
         state.status = action.payload;
+        state.errors = action.payload;
       })
       // Check authorization
       .addCase(getMe.pending, (state) => {
