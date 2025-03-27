@@ -48,3 +48,31 @@ export const loginSchema = Joi.object({
     "any.required": "Password is required",
   }),
 });
+
+export const resetPasswordValidation = Joi.object({
+  token: Joi.string().required().messages({
+    "string.empty": "Token is required",
+    "any.required": "Token is required",
+  }),
+  newPassword: Joi.string()
+    .min(8)
+    .max(50)
+    .pattern(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*+?&])[A-Za-z\d@$!%*+?&]+$/
+    )
+    .required()
+    .messages({
+      "string.min": "Password must be at least 8 characters long",
+      "string.max": "Password must be no longer than 50 characters",
+      "string.pattern.base":
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*+?&)",
+      "any.required": "Password is required",
+    }),
+  confirmPassword: Joi.string()
+    .valid(Joi.ref("newPassword"))
+    .required()
+    .messages({
+      "any.only": "Passwords do not match",
+      "any.required": "Confirm the password",
+    }),
+});

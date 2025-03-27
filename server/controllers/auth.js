@@ -14,8 +14,8 @@ export const signUp = async (req, res) => {
       return res.status(400).json({
         success: false,
         errors: error.details.map((err) => ({
-          field: err.context.key, // Какое поле с ошибкой
-          message: err.message, // Текст ошибки
+          field: err.context.key,
+          message: err.message,
         })),
       });
     }

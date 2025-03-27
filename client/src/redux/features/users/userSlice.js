@@ -41,7 +41,7 @@ export const fetchTrips = createAsyncThunk(
   "trips/fetchTrips",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get("/users/get-trips");
+      const { data } = await axios.get("/users/:id/trips");
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -76,6 +76,7 @@ const userSlice = createSlice({
       .addCase(uploadAvatar.fulfilled, (state, action) => {
         state.avatarStatus = "succeeded";
         state.currentUser.avatarUrl = action.payload.user.avatarUrl;
+        state.message = action.payload.message;
       })
       .addCase(uploadAvatar.rejected, (state, action) => {
         state.avatarStatus = "failed";

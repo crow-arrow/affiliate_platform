@@ -1,13 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "../../../utils/axios";
 
-const initialState = {
-  user: null,
-  token: null,
-  isLoading: false,
-  status: "",
-};
-
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async (
@@ -48,6 +41,7 @@ export const loginUser = createAsyncThunk(
         password,
       });
       if (data.token) {
+        console.log(data.token);
         window.localStorage.setItem("token", data.token);
         return { user: data.user, token: data.token, message: data.message };
       }
@@ -78,7 +72,9 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
+    token: null,
     isLoading: false,
+    status: "",
     errors: [],
   },
   reducers: {
@@ -107,7 +103,6 @@ const authSlice = createSlice({
         state.status = action.payload.message;
         state.user = action.payload.user;
         state.token = action.payload.token;
-        state.errors = [];
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -148,7 +143,7 @@ const authSlice = createSlice({
         state.status = action.payload;
         state.user = null;
         state.token = null;
-        window.localStorage.removeItem("token"); // Удаляем токен при ошибке
+        window.localStorage.removeItem("token");
       })
       .addCase("@init", (state) => {
         const token = window.localStorage.getItem("token");

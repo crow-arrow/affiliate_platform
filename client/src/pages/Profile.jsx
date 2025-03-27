@@ -8,20 +8,19 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 
 export const Profile = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
-  const { users, status, error } = useSelector((state) => state.user || {});
+  const { users, avatarStatus, message, error } = useSelector((state) => state.user || {});
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [succeeded, setSucceeded] = useState(false);
 
   useEffect(() => {
     if (isOpen) dispatch(fetchUsers());
   }, [dispatch, isOpen]);
 
   useEffect(() => {
-    if (succeeded) {
-      dispatch(fetchUsers());
-    }
-  }, [succeeded, dispatch]);
+    if (avatarStatus === "succeeded" && message) {
+      toast.success(message);
+  }
+  }, [avatarStatus, message]);
 
   const onCrop = (preview) => {
     setPreview(preview);
@@ -54,8 +53,6 @@ export const Profile = ({ isOpen, onClose }) => {
           payload: response.payload.user.avatarUrl
         });
       }
-  
-      toast("Avatar changed successfully");
       onClose();
     } catch (error) {
       toast.error("Error uploading avatar.");

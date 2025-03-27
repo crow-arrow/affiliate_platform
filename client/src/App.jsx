@@ -4,8 +4,6 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 import { AdminDashboard } from './admin_pages/AdminDashboard.jsx'
 import { Team } from './admin_pages/Team.jsx'
-import { AssignCoupon } from './admin_pages/AssignCoupon.jsx'
-import { AssignLevel } from './admin_pages/AssignLevel.jsx'
 import { Invoices } from './admin_pages/Invoices.jsx'
 import { AllOrders } from './admin_pages/AllOrders.jsx'
 
@@ -16,6 +14,7 @@ import { Documents } from './pages/Documents.jsx'
 import { Settings } from './pages/Settings.jsx'
 
 import { EmailVerification } from './components/verification/EmailVerification.jsx'
+import { PasswordRecover } from './pages/PasswordRecover.jsx'
 import { LoginPage } from './pages/LoginPage'
 import { SignUpPage } from './pages/SignUpPage'
 import { NotFound } from './pages/NotFound.jsx'
@@ -48,6 +47,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/verify-email" element={<EmailVerification />} />
+        <Route path="/reset-password/:token" element={<PasswordRecover />} />
 
         <Route path="/" element={isAuth ? (<AdminProtectedRoute allowedRoles={['Admin', 'Genie']}>
           <Layout />
@@ -70,8 +70,6 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="team" element={<Team />} />
           <Route path="orders" element={<AllOrders />} />
-          <Route path="assign-coupon" element={<AssignCoupon />} />
-          <Route path="assign-level" element={<AssignLevel />} />
           <Route path="calender" element={<Calendar />} />
           <Route path="invoices" element={<Invoices />} />
           <Route path="settings" element={<Settings />} />

@@ -30,7 +30,7 @@ export const uploadAvatar = async (req, res) => {
       fs.unlinkSync(oldAvatar);
     }
 
-    res.status(200).json({ user });
+    res.status(200).json({ message: "Avatar successfully uploaded!", user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

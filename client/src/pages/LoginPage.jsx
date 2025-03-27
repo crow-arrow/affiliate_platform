@@ -39,7 +39,6 @@ export const LoginPage = () => {
         email,
         password,
       }))
-
     } catch (error) {
       toast.error('Error during login:', error.response?.data || error.message)
     }
@@ -77,6 +76,7 @@ export const LoginPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
+                placeholder='exemple@jinn-travel.com'
                 className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
@@ -88,7 +88,7 @@ export const LoginPage = () => {
                 Password
               </label>
               <div className="text-sm">
-                <a href="#" className="font-semibold text-accent hover:text-accentDark">
+                <a href="#" className="font-semibold text-accent hover:text-accentDark transition-colors">
                   Forgot password?
                 </a>
               </div>
@@ -101,6 +101,7 @@ export const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                placeholder='*********'
                 autoComplete="current-password"
                 className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
@@ -111,7 +112,7 @@ export const LoginPage = () => {
             <button
               type="submit"
               disabled={status === "loading"}
-              className="flex w-full justify-center rounded-3xl bg-accent px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-accentDark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              className="flex w-full justify-center rounded-3xl bg-accent px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-accentDark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-90 transition-all"
             >
               Login
             </button>
@@ -120,7 +121,7 @@ export const LoginPage = () => {
 
         <p className="mt-10 text-center text-sm/6 text-gray-500">
           Not a member?{' '}
-          <Link to='/signup' className="font-semibold text-accent hover:text-accentDark">
+          <Link to='/signup' className="font-semibold text-accent hover:text-accentDark transition-colors">
             SignUp now
           </Link>
         </p>

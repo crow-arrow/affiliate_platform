@@ -10,6 +10,7 @@ const router = new Router();
 // http://localhost:3002/api/users
 router.get("/get-users", getAllUsers); // Все пользователи
 router.get("/get-user/:id", checkAuth, getUserById); // Один пользователь
-router.get("/get-trips", checkAuth, getUserTrips);
+router.get("/:id/trips", checkAuth, getUserTrips);
+router.get("/:id/edit-profile", checkAuth, getUserTrips);
 
 export default router;

@@ -66,13 +66,13 @@ export const SignUpPage = () => {
       </div>
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form noValidate onSubmit={handleSubmit} className="space-y-6">
-          {[{ label: 'Email', type: 'email', value: email, setValue: setEmail },
-            { label: 'Phone Number', type: 'phone', value: phone, setValue: setPhone },
-            { label: 'First Name', type: 'text', value: firstName, setValue: setFirstName },
-            { label: 'Last Name', type: 'text', value: lastName, setValue: setLastName },
-            { label: 'Password', type: 'password', value: password, setValue: setPassword },
-            { label: 'Confirm Password', type: 'password', value: confirmPassword, setValue: setConfirmPassword }]
-            .map(({ label, type, value, setValue }, index) => (
+          {[{ label: 'Email', type: 'email', placeholder: 'exemple@jinn-travel.com', value: email, setValue: setEmail },
+            { label: 'Phone Number', type: 'phone', placeholder: '+49 (151) 290-175-33', value: phone, setValue: setPhone },
+            { label: 'First Name', type: 'text', placeholder: 'Will', value: firstName, setValue: setFirstName },
+            { label: 'Last Name', type: 'text', placeholder: 'Smith', value: lastName, setValue: setLastName },
+            { label: 'Password', type: 'password', placeholder: '*********', value: password, setValue: setPassword },
+            { label: 'Confirm Password', type: 'password', placeholder: '*********', value: confirmPassword, setValue: setConfirmPassword }]
+            .map(({ label, type, placeholder, value, setValue }, index) => (
               <div key={index}>
                 <label className="block text-sm font-medium text-gray-900">{label}</label>
                 <div className="mt-2">
@@ -80,6 +80,7 @@ export const SignUpPage = () => {
                     type={type}
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
+                    placeholder={placeholder}
                     required
                     className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-accent sm:text-sm"
                   />
@@ -87,14 +88,14 @@ export const SignUpPage = () => {
               </div>
             ))}
           <div>
-            <button type="submit" disabled={status === "loading"} className="w-full rounded-3xl bg-accent px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-accentDark">
+            <button type="submit" disabled={status === "loading"} className="w-full rounded-3xl bg-accent px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-accentDark active:scale-90 transition-all">
               Sign up
             </button>
           </div>
         </form>
         <p className="mt-10 text-center text-sm text-gray-500">
           Already have an account?{' '}
-          <Link to='/login' className="font-semibold text-accent hover:text-accentDark">Login here</Link>
+          <Link to='/login' className="font-semibold text-accent hover:text-accentDark transition-colors">Login here</Link>
         </p>
       </div>
     </div>

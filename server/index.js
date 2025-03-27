@@ -6,9 +6,9 @@ import { fileURLToPath } from "url";
 
 import sequelize from "./config/database.js";
 import authRoutes from "./routes/auth.js";
+import resetPasswordRoutes from "./routes/reserPassword.js";
 import userRoutes from "./routes/userRoutes.js";
 import tripsRoutes from "./routes/tripsRoutes.js";
-import assignCouponRoute from "./routes/assignCouponRoute.js";
 import User from "./models/User.js";
 import fileRoutes from "./routes/fileRoutes.js";
 
@@ -36,6 +36,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/trips", tripsRoutes);
 // app.use("/api/assign-coupon", assignCouponRoute);
 app.use("/api/uploads", fileRoutes);
+app.use("/api/password", resetPasswordRoutes);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -83,7 +83,7 @@ export const Settings = () => {
                 style={{
                   backgroundColor: 'white', 
                   color: 'black', 
-                  border: '2px dashed black', 
+                  border: '1.5px dashed black',
                   borderRadius: '50%', 
                   fontSize: '2rem',
                   padding: '4px',
@@ -101,7 +101,7 @@ export const Settings = () => {
           </span>
         </div>
       </div>
-      <h2>Personal Information</h2>
+      <h2 className='text-2xl py-4'>Personal Information</h2>
       <form 
           onSubmit={handleSubmit}
           method="POST" 
@@ -222,7 +222,7 @@ export const Settings = () => {
             <button
               type="submit"
               disabled={status === "loading"}
-              className="w-1/5 rounded-3xl bg-primary mt-12 px-3 py-1.5 shadow-custom text-sm font-semibold text-center text-white hover:shadow-inset-white-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent transition-all"
+              className="w-1/5 rounded-3xl bg-primary mt-12 px-3 py-1.5 shadow-custom text-sm font-semibold text-center text-white hover:shadow-inset-white-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-90 transition-all"
             >
               Save
             </button>
