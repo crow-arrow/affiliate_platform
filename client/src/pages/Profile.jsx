@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import PropTypes from 'prop-types';
 import { fetchUsers, uploadAvatar} from "../redux/features/users/userSlice";
 import Avatar from "react-avatar-edit";
 import avatarLogo from '../assets/avatar.png';
@@ -8,7 +9,7 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 
 export const Profile = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
-  const { users, avatarStatus, message, error } = useSelector((state) => state.user || {});
+  const { users, avatarStatus, status, message, error } = useSelector((state) => state.user || {});
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -55,29 +56,30 @@ export const Profile = ({ isOpen, onClose }) => {
       }
       onClose();
     } catch (error) {
-      toast.error("Error uploading avatar.");
+      console.error('Error during avatar upload:', error)
+      toast.error('Error during uploading avatar:', error.response?.data || error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const onBeforeFileLoad = (elem) => {
-    const file = elem.target.files[0];
+  // const onBeforeFileLoad = (elem) => {
+  //   const file = elem.target.files[0];
 
-    const allowedTypes = ['image/jpeg', 'image/png'];
-    if (!allowedTypes.includes(file.type)) {
-      alert('Invalid file format. Please choose an image in JPEG or PNG format.');
-      elem.target.value = "";
-      return;
-    }
+  //   const allowedTypes = ['image/jpeg', 'image/png'];
+  //   if (!allowedTypes.includes(file.type)) {
+  //     alert('Invalid file format. Please choose an image in JPEG or PNG format.');
+  //     elem.target.value = "";
+  //     return;
+  //   }
 
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      alert('File is too big! Max: 5MB.');
-      elem.target.value = "";
-      return;
-    }
-  };
+  //   const maxSize = 5 * 1024 * 1024;
+  //   if (file.size > maxSize) {
+  //     alert('File is too big! Max: 5MB.');
+  //     elem.target.value = "";
+  //     return;
+  //   }
+  // };
 
   const user = users && users.length > 0 ? users[0] : null;
   const isButtonDisabled = loading
@@ -129,4 +131,9 @@ export const Profile = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
+};
+
+Profile.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 };

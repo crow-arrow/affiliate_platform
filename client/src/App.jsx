@@ -15,6 +15,7 @@ import { Settings } from './pages/Settings.jsx'
 
 import { EmailVerification } from './components/verification/EmailVerification.jsx'
 import { PasswordRecover } from './pages/PasswordRecover.jsx'
+import { RequestPasswordReset } from './pages/RequestPasswordReset.jsx'
 import { LoginPage } from './pages/LoginPage'
 import { SignUpPage } from './pages/SignUpPage'
 import { NotFound } from './pages/NotFound.jsx'
@@ -46,8 +47,9 @@ function App() {
         {/* Публичные страницы */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/verify-email" element={<EmailVerification />} />
+        <Route path="/verify-email/:token" element={<EmailVerification />} />
         <Route path="/reset-password/:token" element={<PasswordRecover />} />
+        <Route path="/request-reset" element={<RequestPasswordReset />} />
 
         <Route path="/" element={isAuth ? (<AdminProtectedRoute allowedRoles={['Admin', 'Genie']}>
           <Layout />
@@ -59,7 +61,7 @@ function App() {
           <Route path="calendar" element={<Calendar />} />
           <Route path="documents" element={<Documents />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
 
         {/* Используем защищенные маршруты для админов */}
@@ -70,7 +72,7 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="team" element={<Team />} />
           <Route path="orders" element={<AllOrders />} />
-          <Route path="calender" element={<Calendar />} />
+          <Route path="calendar" element={<Calendar />} />
           <Route path="invoices" element={<Invoices />} />
           <Route path="settings" element={<Settings />} />
         </Route>

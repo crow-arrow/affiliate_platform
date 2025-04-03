@@ -22,7 +22,7 @@ export const Layout = () => {
             <nav className="w-1/5 mt-8 mr-8">
                 <Navbar />
             </nav>
-            <main className="flex-1 h-[75vh] p-4 my-8 overflow-auto text-white bg-white/30 backdrop-blur-sm rounded-2xl">
+            <main className="flex-1 h-[75vh] p-4 my-8 overflow-auto text-white bg-primary backdrop-blur-sm rounded-2xl">
                 <Outlet />
             </main>
           </div>

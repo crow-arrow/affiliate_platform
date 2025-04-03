@@ -1,12 +1,12 @@
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 import { DataGrid, GridToolbar } from '@mui/x-data-grid'
-import { Box, Typography, CircularProgress } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 import { useDispatch, useSelector } from "react-redux"
 import { fetchTrips } from "../redux/features/users/userSlice"
 
 export const Trips = () => {
   const dispatch = useDispatch()
-  const { trips, status, error } = useSelector((state) => state.user)
+  const { trips, status } = useSelector((state) => state.user)
 
   useEffect(() => {
     dispatch(fetchTrips())

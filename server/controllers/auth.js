@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { signUpSchema, loginSchema } from "../validations/validationSchemas.js";
-import { sendVerificationEmail } from "../services/emailUtils.js";
+import { sendVerificationEmail } from "../controllers/emailController.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -45,7 +45,6 @@ export const signUp = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "30m" }
     );
-
     sendVerificationEmail(newUser.email, token);
 
     res.status(201).json({
@@ -56,25 +55,6 @@ export const signUp = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "User creation error" });
-  }
-};
-// Email Confirmation Function
-export const verifyEmail = async (req, res) => {
-  const { token } = req.query;
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findByPk(decoded.id);
-
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    user.emailVerified = true;
-    await user.save();
-
-    res.status(200).json({ message: "Email successfully verified" });
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({ message: "Invalid or expired token" });
   }
 };
 

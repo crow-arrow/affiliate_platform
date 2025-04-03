@@ -1,43 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { verifyEmail } from '../../redux/features/verification/emailVerificationSlice.js'
+import { toast } from 'react-toastify';
 
 export const EmailVerification = () => {
-    const [status, setStatus] = useState('loading');
-    const [message, setMessage] = useState('');
 
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const { token } = useParams();
+    const { status, message, error } = useSelector((state) => state.verification);
 
     useEffect(() => {
-        // Извлекаем токен из URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-
-        if (!token) {
-        setStatus('error');
-        setMessage('Ошибка: Токен не найден.');
-        } else {
-        // Отправляем запрос на сервер для подтверждения email
-        fetch(`${import.meta.env.VITE_API_URL}/api/auth/verify-email?token=${token}`, {
-            method: 'GET',
-        })
-            .then((response) => response.json())
-            .then((data) => {
-            if (data.message === 'Email successfully verified') {
-                setStatus('success');
-                setMessage('Ваш email успешно подтвержден!');
-                setTimeout(() => navigate('/my-account'), 3000)
-            } else {
-                setStatus('error');
-                setMessage('Ошибка при подтверждении email. Попробуйте еще раз.');
-            }
-            })
-            .catch((error) => {
-            console.error('Error:', error);
-            setStatus('error');
-            setMessage('Произошла ошибка, попробуйте позже.');
-            });
+        if (token) {
+            dispatch(verifyEmail(token));
         }
-    }, [navigate]);
+    }, [token, dispatch]);
+
+    useEffect(() => {
+        if (status === "succeeded") {
+            toast.success(message);
+            setTimeout(() => navigate('/my-account'), 2000);
+        } else if (status === 'failed') {
+            toast.error(error || 'An error occurred');
+        }
+    }, [status, message, error, navigate]);
 
     return (
         <div style={styles.container}>
@@ -48,7 +35,9 @@ export const EmailVerification = () => {
             <div style={styles.loader}></div>
             </>
         ) : (
-            <p style={status === 'success' ? styles.success : styles.error}>{message}</p>
+            <p style={status === 'succeeded' ? styles.success : styles.error}>
+                {message || 'Something went wrong'}
+            </p>
         )}
         </div>
     );

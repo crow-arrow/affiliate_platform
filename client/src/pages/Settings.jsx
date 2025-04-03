@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { toast } from 'react-toastify';
+import { getMe, registerUser } from '../redux/features/auth/authSlice';
 import { Profile } from "./Profile";
 import avatarLogo from '../assets/avatar.png'
 import {API_URL} from "../config"
@@ -8,6 +10,7 @@ import PartyModeOutlinedIcon from '@mui/icons-material/PartyModeOutlined';
 
 export const Settings = () => {
 
+  const dispatch = useDispatch()
   const [avatar, setAvatar] = useState(avatarLogo);
   const currentUser = useSelector((state) => state.auth.user)
 
@@ -15,7 +18,7 @@ export const Settings = () => {
     setAvatar(currentUser.avatarUrl ? `${API_URL}${currentUser.avatarUrl}` : avatarLogo);
   }, [currentUser]);
 
-  const { status, user } = useSelector((state) => state.auth)
+  const { status } = useSelector((state) => state.auth)
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [first_name, setFirstName] = useState('')

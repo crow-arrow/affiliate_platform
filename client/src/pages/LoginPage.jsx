@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import logo from '../assets/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
@@ -17,7 +17,7 @@ export const LoginPage = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (status) toast(status);
+    if (status) toast(status)
     if (errors.length > 0) {
       errors.forEach((err) => toast.error(err.message))
     }
@@ -28,7 +28,7 @@ export const LoginPage = () => {
         navigate('/my-account')
       }
     }
-  }, [status, errors, isAuth, user, navigate])
+  }, [status, errors, isAuth, user, role, navigate])
 
   const handleSubmit = async (e) => {
 
@@ -88,9 +88,9 @@ export const LoginPage = () => {
                 Password
               </label>
               <div className="text-sm">
-                <a href="#" className="font-semibold text-accent hover:text-accentDark transition-colors">
+                <Link to={'/request-reset'} className="font-semibold text-accent hover:text-accentDark transition-colors">
                   Forgot password?
-                </a>
+                </Link>
               </div>
             </div>
             <div className="mt-2">

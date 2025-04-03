@@ -80,7 +80,7 @@ const userSlice = createSlice({
       })
       .addCase(uploadAvatar.rejected, (state, action) => {
         state.avatarStatus = "failed";
-        state.avatarError = action.payload || "Неизвестная ошибка";
+        state.avatarError = action.payload || "Unknown error";
       })
 
       // Get All Users

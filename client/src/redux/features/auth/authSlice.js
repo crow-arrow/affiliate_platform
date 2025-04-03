@@ -20,6 +20,7 @@ export const registerUser = createAsyncThunk(
         return data;
       }
     } catch (error) {
+      console.error("Error response:", error.response);
       return rejectWithValue(
         error.response?.data?.errors || [
           {
@@ -41,7 +42,6 @@ export const loginUser = createAsyncThunk(
         password,
       });
       if (data.token) {
-        console.log(data.token);
         window.localStorage.setItem("token", data.token);
         return { user: data.user, token: data.token, message: data.message };
       }
@@ -55,18 +55,21 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-export const getMe = createAsyncThunk("auth/getMe", async () => {
-  try {
-    const { data } = await axios.get("/auth/me");
-    return data;
-  } catch (error) {
-    return rejectWithValue(
-      error.response?.data?.message ||
-        error.response?.data ||
-        "The service is temporarily unavailable. Please try again later"
-    );
+export const getMe = createAsyncThunk(
+  "auth/getMe",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get("/auth/me");
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.response?.data ||
+          "The service is temporarily unavailable. Please try again later"
+      );
+    }
   }
-});
+);
 
 const authSlice = createSlice({
   name: "auth",

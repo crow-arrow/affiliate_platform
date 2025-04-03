@@ -1,13 +1,11 @@
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import { resetPasswordValidation } from "../validations/validationSchemas.js";
 import transporter from "../utils/mailer.js";
+import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import dotenv from "dotenv";
-dotenv.config();
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,24 +13,22 @@ const __dirname = path.dirname(__filename);
 const logoPath = path.resolve(__dirname, "../assets/logo.png");
 const logoBase64 = fs.readFileSync(logoPath, { encoding: "base64" });
 
-export const requestPasswordReset = async (req, res) => {
+// Send email with varification link function
+export const sendVerificationEmail = async (email, token, res) => {
   try {
-    const { email } = req.body;
+    const verificationLink = `${process.env.CLIENT_URL}/verify-email/${token}`;
+    console.log(verificationLink);
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    const resetToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "15m",
-    });
-    const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+    console.log("User found:", user);
 
     const mailOptions = {
       from: `"Jinn Travel" <hello@example.com>`,
       to: `${email}`,
-      subject: "Password recover",
+      subject: "Email verification",
       html: `
       <table role="presentation" 
         style="width: 100%; 
@@ -59,16 +55,16 @@ export const requestPasswordReset = async (req, res) => {
                     color: white;
                     margin-block: 50px;
                 ">
-                    Please reset your password
+                    NEW AFFILIATE
                 </header>
                 <div style="text-align: start;">
-                    <h1>Password recover</h1>
+                    <h1>Email Confirmation</h1>
                     <p>Hello ${user.first_name || ""},</p>
-                    <p>you requested a reset link for your password. Simply click on the link below and create a new password:</p>
+                    <p>Click the link below to confirm your email:</p>
                 </div>
                 <div class="center" style="text-align: start; margin-block: 50px;">
                     <a 
-                        href="${resetLink}"
+                        href="${verificationLink}"
                         style="
                             background-color: #13283c; 
                             color: white; 
@@ -78,7 +74,7 @@ export const requestPasswordReset = async (req, res) => {
                         target="_blank" 
                         title="Open in new tab"
                     >
-                        <b>Reset Password</b>
+                        <b>Verify your account</b>
                     </a>
                 </div>
                 <footer style="text-align: start;">
@@ -114,41 +110,32 @@ export const requestPasswordReset = async (req, res) => {
     };
 
     await transporter.sendMail(mailOptions);
-    return res.json({ message: "Reset link sent to your email" });
+    console.log("Verification email sent to:", email);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Error sending verification email:", error);
   }
 };
 
-export const resetPassword = async (req, res) => {
+// Email Confirmation Function
+export const verifyEmail = async (req, res) => {
+  const { token } = req.params;
+
+  console.log("Token:", token);
   try {
-    req.body.token = req.params.token;
-    const { error } = resetPasswordValidation.validate(req.body, {
-      abortEarly: false,
-    });
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        errors: error.details.map((err) => ({
-          field: err.context.key,
-          message: err.message,
-        })),
-      });
-    }
-
-    const { token, newPassword } = req.body;
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded:", decoded);
     const user = await User.findByPk(decoded.id);
+
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-    await user.save();
+    user.emailVerified = true;
 
-    return res.json({ message: "Password successfully reset" });
+    await user.save();
+    console.log("User:", user);
+
+    res.status(200).json({ message: "Email successfully verified" });
   } catch (error) {
-    console.error("Error in resetPassword:", error);
+    console.error(error);
     res.status(400).json({ message: "Invalid or expired token" });
   }
 };

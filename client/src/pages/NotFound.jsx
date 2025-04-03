@@ -1,5 +1,3 @@
-// src/pages/NotFound.js
-import React from 'react'
 import notFoundImage from "../assets/404.jpg"
 
 export const NotFound = () => (

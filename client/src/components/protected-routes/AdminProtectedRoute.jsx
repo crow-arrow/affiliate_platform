@@ -1,7 +1,7 @@
-import React from 'react'
 import { Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { checkIsAuth } from '../../redux/features/auth/authSlice'
+import PropTypes from 'prop-types'
 
 const AdminProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useSelector(state => state.auth)
@@ -12,6 +12,11 @@ const AdminProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   return children
+}
+
+AdminProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+  allowedRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
 }
 
 export default AdminProtectedRoute

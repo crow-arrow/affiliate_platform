@@ -1,0 +1,19 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-tailwindcss"
+  ],
+  "plugins": [
+    "stylelint-order"
+  ],
+  "rules": {
+    "order/properties-alphabetical-order": true,
+    "block-no-empty": true,
+    "color-no-invalid-hex": true,
+    "declaration-colon-space-after": "always",
+    "declaration-colon-space-before": "never",
+    "block-opening-brace-newline-before": "always",
+    "selector-list-comma-space-before": "never",
+    "tailwindcss/no-custom-classname": true
+  }
+}

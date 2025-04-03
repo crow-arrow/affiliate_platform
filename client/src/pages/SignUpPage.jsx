@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import logo from '../assets/logo.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -23,7 +23,7 @@ export const SignUpPage = () => {
     if (errors.length > 0) {
       errors.forEach((err) => toast.error(err.message));
     }
-    if (isAuth && user?.role) navigate('/my-account')
+    if (isAuth && user?.role) navigate('/verify-email/:token')
   }, [status, errors, isAuth, user, navigate])
 
   const handleSubmit = async (e) => {
