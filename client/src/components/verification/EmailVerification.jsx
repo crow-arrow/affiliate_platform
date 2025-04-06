@@ -1,8 +1,12 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { verifyEmail } from '../../redux/features/verification/emailVerificationSlice.js'
 import { toast } from 'react-toastify';
+import logo from '../../assets/logo.png'
+import preloader from '../../assets/preloader.gif'
+import ErrorIcon from '@mui/icons-material/Error';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 export const EmailVerification = () => {
 
@@ -20,56 +24,50 @@ export const EmailVerification = () => {
     useEffect(() => {
         if (status === "succeeded") {
             toast.success(message);
-            setTimeout(() => navigate('/my-account'), 2000);
+            setTimeout(() => navigate('/login'), 2000);
         } else if (status === 'failed') {
             toast.error(error || 'An error occurred');
         }
     }, [status, message, error, navigate]);
 
     return (
-        <div style={styles.container}>
-        <h2>Подтверждение Email</h2>
-        {status === 'loading' ? (
-            <>
-            <p>Пожалуйста, подождите, пока мы подтверждаем ваш email...</p>
-            <div style={styles.loader}></div>
-            </>
-        ) : (
-            <p style={status === 'succeeded' ? styles.success : styles.error}>
-                {message || 'Something went wrong'}
-            </p>
-        )}
+        <div className='flex flex-col w-full h-screen bg-gradient-primary justify-center items-center'>
+            <Link to="/login">
+                <img alt="Jinn community" src={logo} className="mx-auto h-20 w-auto" />
+            </Link>
+            <div className='flex flex-col bg-white relative w-1/3 h-1/4 p-8 mt-10 justify-between items-center rounded-xl shadow-custom'>
+                {status === 'loading' ? (
+                    <div className='flex flex-col items-center justify-between'>
+                        <p className='w-full text-lg text-center'>
+                            <span>Pleace wait till we will confirm your email...</span>
+                        </p>
+                        <img className='absolute w-80 h-auto top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2' src={preloader} alt="Loading" />
+                    </div>
+                ) : 
+                status === 'succeeded' ? (
+                    <div className='flex flex-col gap-4 items-center justify-between text-green-400'>
+                        <CheckCircleIcon sx={{ fontSize: '3rem' }} />
+                        <p className='w-full text-2xl text-center'>
+                            <span className='ml-2'>{message}</span>
+                        </p>
+                    </div>
+                ) :
+                status === 'failed' ? (
+                    <div className='flex flex-col gap-4 items-center justify-between text-red-600'>
+                        <ErrorIcon sx={{ fontSize: '3rem' }} />
+                        <p className='w-full text-2xl text-center'>
+                            <span className='ml-2'>{error}</span>
+                        </p>
+                    </div>
+                ) : 
+                <div className='flex flex-col gap-4 items-center justify-between text-red-600'>
+                    <ErrorIcon sx={{ fontSize: '3rem' }} />
+                    <p className='w-full text-2xl text-center'>
+                        <span className='ml-2'>{error}</span>
+                    </p>
+                </div>
+            }
+            </div>
         </div>
     );
-};
-
-const styles = {
-    container: {
-        fontFamily: 'Arial, sans-serif',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        backgroundColor: '#f4f4f4',
-        margin: 0,
-        textAlign: 'center',
-        padding: '20px',
-    },
-    loader: {
-        display: 'inline-block',
-        width: '50px',
-        height: '50px',
-        border: '5px solid #f3f3f3',
-        borderTop: '5px solid #3498db',
-        borderRadius: '50%',
-        animation: 'spin 1s linear infinite',
-    },
-    success: {
-        color: 'green',
-        fontSize: '18px',
-    },
-    error: {
-        color: 'red',
-        fontSize: '18px',
-    },
 };

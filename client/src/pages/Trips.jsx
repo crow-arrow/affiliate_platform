@@ -18,7 +18,7 @@ export const Trips = () => {
     { field: 'travel_date', headerName: 'Travel Date', flex: 1 },
     { field: 'order_status', headerName: 'Order Status' },
     { field: 'total_price', headerName: 'Total Price in EUR' },
-    { field: 'commission', headerName: 'Commission' },
+    { field: 'commission', headerName: 'Commission', cellClassName: 'name-column--cell', },
   ];
 
   if (status === 'loading') {
@@ -37,15 +37,56 @@ export const Trips = () => {
   return (
     <Box 
         sx={{
-          "& .MuiDataGrid-cell": {
+          "& .MuiDataGrid-root": {
+              padding: "16px",
+              border: "none",
+          },
+          "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-cell": {
               margin: "auto",
               color: "white",
+              borderTop: "none",
           },
-          "& .MuiDataGrid-footerContainer, .MuiDataGrid-container--top": {
+          "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-row--borderBottom .MuiDataGrid-columnHeader": {
+            borderBottom: "none",
+            borderTop: "none",
+          },
+          "& .css-1tdeh38": {
+            borderTop: "none",
+          },
+          "& .MuiDataGrid-columnSeparator": {
+            width: "0.5px"
+          },
+          "& .MuiDataGrid-filler": {
+            borderTop: "none",
+            border: "none",
+          },
+          "& .MuiDataGrid-container--top": {
               backgroundColor: (theme) => `${theme.palette.background.default} !important`,
+              color: "#87888C",
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: "none",
+          },
+          "& .css-1hr2sou-MuiTablePagination-root, .MuiButtonBase-root > svg, .MuiTablePagination-actions > button, .MuiInputBase-root > svg": {
+            color: "#87888C",
+            fill: "#87888C",
+          },
+          "& .name-column--cell": {
+            color: (theme) => `${theme.palette.secondary.main} !important`,
+            backgroundColor: (theme) => `${theme.custom.gradient} !important`,
+          },
+          "& .MuiDataGrid-toolbarContainer .MuiButtonText": {
+            color: "#ffffff",
+            backgroundColor: "black",
+          },
+          "& .css-1gtchvp-MuiPaper-root, .css-1ws6qdq-MuiPaper-root-MuiDataGrid-paper": {
+            color: "#ffffff",
+            backgroundColor: "#000000 !important",
+            borderRadius: "20px",
           },
         }} 
         style={{ height: '100%', width: '100%' }}
+        className="p-4 rounded-2xl bg-secondary"
       >
       <DataGrid 
         rows={trips}

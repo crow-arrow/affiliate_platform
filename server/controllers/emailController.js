@@ -49,7 +49,7 @@ export const sendVerificationEmail = async (email, token, res) => {
                     display: block;
                     padding: 20px;
                     text-align: center;
-                    background-color: #13283c;
+                    background-image: linear-gradient(150deg, rgba(11,46,51,1) 0%, rgba(79,124,130,1) 100%);
                     font-size: 24px;
                     font-weight: bold;
                     color: white;
@@ -66,7 +66,7 @@ export const sendVerificationEmail = async (email, token, res) => {
                     <a 
                         href="${verificationLink}"
                         style="
-                            background-color: #13283c; 
+                            background-image: linear-gradient(150deg, rgba(11,46,51,1) 0%, rgba(79,124,130,1) 100%);
                             color: white; 
                             text-decoration: none; 
                             padding: 15px; 
@@ -77,6 +77,7 @@ export const sendVerificationEmail = async (email, token, res) => {
                         <b>Verify your account</b>
                     </a>
                 </div>
+                <p>* the link will expire in 15 minutes *</p>
                 <footer style="text-align: start;">
                     <b>That wasn't you?</b>
                     <p>Please contact our customer care team directly to protect your account:</p>
@@ -123,17 +124,28 @@ export const verifyEmail = async (req, res) => {
   console.log("Token:", token);
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded:", decoded);
     const user = await User.findByPk(decoded.id);
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    if (user.emailVerified) {
+      return res.status(409).json({
+        message: "Email is already verified",
+      });
+    }
+
     user.emailVerified = true;
-
     await user.save();
-    console.log("User:", user);
 
-    res.status(200).json({ message: "Email successfully verified" });
+    const authToken = jwt.sign(
+      { id: user.id, role: user.role, avatarUrl: user.avatarUrl },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+    res.status(200).json({
+      message: "Email successfully verified",
+      token: authToken,
+    });
   } catch (error) {
     console.error(error);
     res.status(400).json({ message: "Invalid or expired token" });

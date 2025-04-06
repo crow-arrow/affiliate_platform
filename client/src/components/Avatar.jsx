@@ -7,7 +7,7 @@ import Avatar from "react-avatar-edit";
 import avatarLogo from '../assets/avatar.png';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 
-export const Profile = ({ isOpen, onClose }) => {
+export const CropAvatar = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const { users, avatarStatus, status, message, error } = useSelector((state) => state.user || {});
   const [preview, setPreview] = useState(null);
@@ -133,7 +133,7 @@ export const Profile = ({ isOpen, onClose }) => {
   );
 };
 
-Profile.propTypes = {
+CropAvatar.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
 };

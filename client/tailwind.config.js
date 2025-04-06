@@ -1,11 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: "class",
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        primary: "#13283c",
+        primary: "#171821",
+        secondary: "rgba(255,255,255,0.1)",
         accent: "#d8b21d",
+        accentBlue: "#A9DFD8",
+        accentPink: "#F2C8ED",
         accentDark: "#b09119",
         background: "rgb(245, 241, 237)",
         bronze: {
@@ -20,6 +24,15 @@ export default {
         10: "0.1",
         20: "0.2",
         95: "0.95",
+      },
+      backgroundImage: {
+        "gradient-custom":
+          "linear-gradient(150deg, rgba(242,200,237,1) 0%, rgba(169,223,216,1) 100%)",
+        "gradient-primary":
+          "linear-gradient(150deg, rgba(11,46,51,1) 0%, rgba(79,124,130,1) 100%)",
+        "gradient-secondary":
+          "linear-gradient(150deg, rgba(242,240,239,1) 0%, rgba(255,255,255,1) 100%)",
+        "gradient-blur": "linear-gradient(rgba(255,255,255,0.3),transparent)",
       },
       boxShadow: {
         custom:

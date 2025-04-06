@@ -15,8 +15,7 @@ export const registerUser = createAsyncThunk(
         last_name,
         password,
       });
-      if (data.token) {
-        window.localStorage.setItem("token", data.token);
+      if (data.message) {
         return data;
       }
     } catch (error) {
@@ -43,6 +42,7 @@ export const loginUser = createAsyncThunk(
       });
       if (data.token) {
         window.localStorage.setItem("token", data.token);
+        console.log(data.token);
         return { user: data.user, token: data.token, message: data.message };
       }
     } catch (error) {
@@ -77,7 +77,7 @@ const authSlice = createSlice({
     user: null,
     token: null,
     isLoading: false,
-    status: "",
+    status: "idle",
     errors: [],
   },
   reducers: {
@@ -98,52 +98,54 @@ const authSlice = createSlice({
       // Register
       .addCase(registerUser.pending, (state) => {
         state.isLoading = true;
-        state.status = null;
-        state.errors = [];
+        state.status = "loading";
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.status = action.payload.message;
+        state.status = "succeeded";
+        state.message = action.payload.message;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.errors = [];
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.status = action.payload;
+        state.status = "failed";
         state.errors = action.payload;
       })
       // Login
       .addCase(loginUser.pending, (state) => {
         state.isLoading = true;
-        state.status = null;
-        state.errors = [];
+        state.status = "loading";
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.status = action.payload.message;
+        state.status = "succeeded";
+        state.message = action.payload.message;
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.errors = [];
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.status = action.payload;
+        state.status = "failed";
         state.errors = action.payload;
       })
       // Check authorization
       .addCase(getMe.pending, (state) => {
         state.isLoading = true;
-        state.status = null;
+        state.status = "loading";
       })
       .addCase(getMe.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.status = null;
+        state.status = "succeeded";
+        state.message = action.payload.message;
         state.user = action.payload?.user;
         state.token = action.payload?.token;
       })
-      .addCase(getMe.rejected, (state, action) => {
+      .addCase(getMe.rejected, (state) => {
         state.isLoading = false;
-        state.status = action.payload;
+        state.status = "failed";
         state.user = null;
         state.token = null;
         window.localStorage.removeItem("token");

@@ -87,11 +87,11 @@ export const Calendar = () => {
       }}
     >
       {/* Боковая панель с событиями */}
-      <Box className="flex-grow flex-shrink basis-[20%] p-4 border-r overflow-y-auto h-[70vh]">
-        <Typography variant="h5">Events</Typography>
+      <Box className="flex-grow flex-shrink basis-[20%] p-4 overflow-y-auto rounded-2xl bg-secondary">
+        <Typography className="text-center" variant="h4">Events</Typography>
         <List>
           {currentEvents.map((event) => (
-            <ListItem key={event.id} className="bg-teal-900 my-2 rounded-3xl">
+            <ListItem key={event.id} className="bg-teal-900 my-2 rounded-xl">
               <ListItemText
                 primary={event.title}
                 secondary={
@@ -110,7 +110,7 @@ export const Calendar = () => {
       </Box>
 
       {/* Календарь */}
-      <Box className="flex-grow flex-shrink basis-[80%] ml-4">
+      <Box className="flex-grow flex-shrink basis-[80%] ml-4 p-4 rounded-2xl bg-secondary">
         <FullCalendar
           className="rounded-3xl"
           height="70vh"

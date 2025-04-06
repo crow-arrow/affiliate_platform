@@ -16,6 +16,7 @@ import { Settings } from './pages/Settings.jsx'
 import { EmailVerification } from './components/verification/EmailVerification.jsx'
 import { PasswordRecover } from './pages/PasswordRecover.jsx'
 import { RequestPasswordReset } from './pages/RequestPasswordReset.jsx'
+import {EmailSentMessage} from './pages/EmailSentMessage.jsx'
 import { LoginPage } from './pages/LoginPage'
 import { SignUpPage } from './pages/SignUpPage'
 import { NotFound } from './pages/NotFound.jsx'
@@ -26,12 +27,16 @@ import 'react-toastify/dist/ReactToastify.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { getMe, checkIsAuth } from './redux/features/auth/authSlice.js'
-import { Profile } from './pages/Profile.jsx'
+import { CropAvatar } from './components/Avatar.jsx'
 
 function App() {
   const dispatch = useDispatch()
   const isAuth = useSelector(checkIsAuth)
   const [isLoaded, setIsLoaded] = useState(false)
+  const {user} = useSelector((state) => state.auth)
+  const emailVerified = user?.emailVerified === true
+  console.log(emailVerified)
+  const showAppLayout = isLoaded && isAuth && user && user.emailVerified;
 
   useEffect(() => {
     dispatch(getMe()).finally(() => setIsLoaded(true))
@@ -50,18 +55,21 @@ function App() {
         <Route path="/verify-email/:token" element={<EmailVerification />} />
         <Route path="/reset-password/:token" element={<PasswordRecover />} />
         <Route path="/request-reset" element={<RequestPasswordReset />} />
+        <Route path="/sent-message" element={<EmailSentMessage />} />
 
-        <Route path="/" element={isAuth ? (<AdminProtectedRoute allowedRoles={['Admin', 'Genie']}>
+        <Route path="/" element={showAppLayout ? (<AdminProtectedRoute allowedRoles={['Admin', 'Genie']}>
           <Layout />
         </AdminProtectedRoute>
-        ) : <Navigate to='/login' /> }>
+        ) : isLoaded
+        ? <Navigate to='/login' />
+        : <div>Загрузка...</div> }>
           <Route index element={<Dashboard />} />
           <Route path="my-account" element={<Dashboard />} />
           <Route path="trips" element={<Trips />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="documents" element={<Documents />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="profile" element={<Profile />} />
+          <Route path="crop-avatar" element={<CropAvatar />} />
         </Route>
 
         {/* Используем защищенные маршруты для админов */}

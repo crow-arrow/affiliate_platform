@@ -81,8 +81,7 @@ export const login = async (req, res) => {
 
     if (!user.emailVerified) {
       return res.status(400).json({
-        message:
-          "👌 Almost Done — you'll get a confirmation email any minute now.",
+        message: "👌 Almost Done — verify your email any.",
       });
     }
 
@@ -95,7 +94,7 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "30d" }
+      { expiresIn: "15m" }
     );
 
     res.status(200).json({
@@ -124,7 +123,7 @@ export const getMe = async (req, res) => {
     const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "30d" }
+      { expiresIn: "7d" }
     );
 
     res.json({

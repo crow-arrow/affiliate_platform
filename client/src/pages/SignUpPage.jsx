@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import logo from '../assets/logo.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { registerUser, getMe, checkIsAuth } from '../redux/features/auth/authSlice'
+import { registerUser, logout } from '../redux/features/auth/authSlice'
 import { toast } from 'react-toastify'
 
 export const SignUpPage = () => {
@@ -13,18 +13,18 @@ export const SignUpPage = () => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
 
-  const { status, user, errors } = useSelector((state) => state.auth)
-  const isAuth = useSelector(checkIsAuth)
+  const { status, message, errors } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (status) toast(status)
+    if (status === "succeeded") toast(message)
+      console.log(message)
+      dispatch(logout())
     if (errors.length > 0) {
       errors.forEach((err) => toast.error(err.message));
     }
-    if (isAuth && user?.role) navigate('/verify-email/:token')
-  }, [status, errors, isAuth, user, navigate])
+  }, [status, message, errors, dispatch, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -34,24 +34,22 @@ export const SignUpPage = () => {
     }
 
     try {
-      const resultAction = await dispatch(registerUser({
+      await dispatch(registerUser({
         email,
         username: email,
         phone,
         first_name: firstName,
         last_name: lastName,
         password,
-      }))
+      })).unwrap()
+      setEmail('')
+      setPhone('')
+      setFirstName('')
+      setLastName('')
+      setPassword('')
+      setConfirmPassword('')
 
-      if (registerUser.fulfilled.match(resultAction)) {
-        await dispatch(getMe())
-        setEmail('')
-        setPhone('')
-        setFirstName('')
-        setLastName('')
-        setPassword('')
-        setConfirmPassword('')
-      }
+      navigate('/sent-message')
     } catch (error) {
       console.error('Error during registration:', error.response?.data || error.message)
       toast.error("Registration failed. Please try again.")
@@ -59,7 +57,7 @@ export const SignUpPage = () => {
   }
 
   return (
-    <div className="flex h-screen flex-1 flex-col justify-center px-6 mx-auto lg:px-8">
+    <div className="flex h-screen bg-gradient-primary flex-1 flex-col justify-center px-6 mx-auto lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <img alt="Jinn community" src={logo} className="mx-auto h-10 w-auto" />
         <h2 className="mt-10 text-center text-2xl font-bold text-gray-900">Join our community!</h2>

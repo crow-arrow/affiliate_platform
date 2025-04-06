@@ -10,14 +10,15 @@ export const LoginPage = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const { status, user, errors } = useSelector((state) => state.auth)
+  const { status, user, message, errors } = useSelector((state) => state.auth)
   const isAuth = useSelector(checkIsAuth)
   const role = user?.role
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (status) toast(status)
+    if (status === "succeeded") toast(message)
+      console.log(message)
     if (errors.length > 0) {
       errors.forEach((err) => toast.error(err.message))
     }
@@ -28,31 +29,28 @@ export const LoginPage = () => {
         navigate('/my-account')
       }
     }
-  }, [status, errors, isAuth, user, role, navigate])
+  }, [status, message, errors, isAuth, user, role, navigate])
 
   const handleSubmit = async (e) => {
 
     e.preventDefault()
 
     try {
-      await dispatch(loginUser({
-        email,
-        password,
-      }))
+      await dispatch(loginUser({ email, password })).unwrap()
     } catch (error) {
-      toast.error('Error during login:', error.response?.data || error.message)
+      toast.error(error.response?.data?.message)
     }
   }
 
   return (
-    <div className="flex h-screen flex-1 flex-col justify-center px-6 mx-auto lg:px-8">
+    <div className="flex h-screen bg-gradient-primary flex-1 flex-col justify-center px-6 mx-auto lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <img
           alt="Jinn comunity"
           src={logo}
           className="mx-auto h-10 w-auto"
         />
-        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-100">
           Sign in to your account
         </h2>
       </div>
@@ -61,10 +59,9 @@ export const LoginPage = () => {
         <form 
           noValidate
           onSubmit={handleSubmit}
-          method="POST" 
           className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
+            <label htmlFor="email" className="block text-sm/6 font-medium text-gray-100">
               Email
             </label>
             <div className="mt-2">
@@ -77,14 +74,14 @@ export const LoginPage = () => {
                 required
                 autoComplete="email"
                 placeholder='exemple@jinn-travel.com'
-                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-800 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
 
           <div>
             <div className="flex items-center justify-between">
-              <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
+              <label htmlFor="password" className="block text-sm/6 font-medium text-gray-100">
                 Password
               </label>
               <div className="text-sm">
@@ -103,7 +100,7 @@ export const LoginPage = () => {
                 required
                 placeholder='*********'
                 autoComplete="current-password"
-                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-800 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -112,14 +109,14 @@ export const LoginPage = () => {
             <button
               type="submit"
               disabled={status === "loading"}
-              className="flex w-full justify-center rounded-3xl bg-accent px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-accentDark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-90 transition-all"
+              className="flex w-full justify-center rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-accentDark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-90 transition-all"
             >
               Login
             </button>
           </div>
         </form>
 
-        <p className="mt-10 text-center text-sm/6 text-gray-500">
+        <p className="mt-10 text-center text-sm/6 text-gray-100">
           Not a member?{' '}
           <Link to='/signup' className="font-semibold text-accent hover:text-accentDark transition-colors">
             SignUp now

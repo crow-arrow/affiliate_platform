@@ -1,34 +1,35 @@
-import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { Navbar } from './Navbar.jsx'
 import { Header } from './Header.jsx'
-import Uzbekistan from "../assets/uzbekistan-0017.jpg"
 
 export const Layout = () => {
   return (
-    <React.Fragment>
-      <div className="relative flex flex-col min-h-screen">
-        <div 
-          className="absolute inset-0 before:absolute before:inset-0 before:bg-black before:opacity-70" 
-          style={{ backgroundImage: `url(${Uzbekistan})`, backgroundSize: "cover", backgroundPosition: "center" }}
-        >
-        </div>
-        <div className="relative z-10">
-          <header>
+    <div className="relative h-screen overflow-hidden">
+      {/* Background */}
+      <div 
+        className="absolute inset-0 bg-primary before:absolute before:inset-0"
+      ></div>
+
+      {/* Content */}
+      <div className="relative z-10 flex h-full text-gray-200">
+        {/* Sticky Navbar */}
+        <aside className="w-60 sticky top-0 self-start mx-8 mb-4 box-border text-gray-400">
+          <Navbar />
+        </aside>
+
+        <div className="flex flex-col flex-1">
+
+          {/* Sticky Header */}
+          <header className="sticky h-20 top-0 z-20">
             <Header />
           </header>
 
-          <div className="flex flex-1 mx-8">
-            <nav className="w-1/5 mt-8 mr-8">
-                <Navbar />
-            </nav>
-            <main className="flex-1 h-[75vh] p-4 my-8 overflow-auto text-white bg-primary backdrop-blur-sm rounded-2xl">
-                <Outlet />
-            </main>
-          </div>
+          {/* Scrollable Main Section */}
+          <main className="flex-1 overflow-auto mx-8 my-4">
+            <Outlet />
+          </main>
         </div>
-        
       </div>
-    </React.Fragment>
+    </div>
   )
 }

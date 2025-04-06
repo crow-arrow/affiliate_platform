@@ -5,8 +5,12 @@ export const verifyEmail = createAsyncThunk(
   "verification/verifyEmail",
   async (token, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/auth/verify-email/${token}`);
-      if (response.status === 200) return response.data;
+      const { data } = await axios.get(`/auth/verify-email/${token}`, {
+        params: { token },
+      });
+      if (data.token) {
+        return data;
+      }
     } catch (error) {
       console.error("Error sending verification email:", error);
       return rejectWithValue(

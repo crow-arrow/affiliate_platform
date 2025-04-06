@@ -56,17 +56,45 @@ export const AllOrders = () => {
 
   return (
     <Box 
-        sx={{
-          "& .MuiDataGrid-cell": {
-              margin: "auto",
-              color: "white",
-          },
-          "& .MuiDataGrid-footerContainer, .MuiDataGrid-container--top": {
-              backgroundColor: (theme) => `${theme.palette.background.default} !important`,
-          },
-        }} 
-        style={{ height: '100%', width: '100%' }}
-      >
+      sx={{
+        "& .MuiDataGrid-root": {
+            padding: "16px",
+            border: "none",
+        },
+        "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-cell": {
+            margin: "auto",
+            color: "white",
+            borderTop: "none",
+        },
+        "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-row--borderBottom .MuiDataGrid-columnHeader": {
+          borderBottom: "none",
+          borderTop: "none",
+        },
+        "& .css-1tdeh38": {
+          borderTop: "none",
+        },
+        "& .MuiDataGrid-columnSeparator": {
+          width: "0.5px"
+        },
+        "& .MuiDataGrid-filler": {
+          borderTop: "none",
+          border: "none",
+        },
+        "& .MuiDataGrid-container--top": {
+            backgroundColor: (theme) => `${theme.palette.background.default} !important`,
+            color: "#87888C",
+        },
+        "& .MuiDataGrid-footerContainer": {
+          borderTop: "none",
+        },
+        "& .css-1hr2sou-MuiTablePagination-root, .MuiButtonBase-root > svg, .MuiTablePagination-actions > button, .MuiInputBase-root > svg": {
+          color: "#87888C",
+          fill: "#87888C",
+        },
+      }} 
+      style={{ height: '100%', width: '100%' }}
+      className="p-4 rounded-2xl bg-secondary"
+    >
       <DataGrid 
         rows={trips}
         columns={columns}
