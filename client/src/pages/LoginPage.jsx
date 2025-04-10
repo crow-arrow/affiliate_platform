@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import logo from '../assets/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
-import { loginUser, checkIsAuth } from '../redux/features/auth/authSlice'
+import { loginUser, checkIsAuth, clearErrors } from '../redux/features/auth/authSlice'
 import { toast } from 'react-toastify'
 
 export const LoginPage = () => {
+
+  console.log('LoginPage rendered')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -17,11 +19,9 @@ export const LoginPage = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (status === "succeeded") toast(message)
-      console.log(message)
-    if (errors.length > 0) {
-      errors.forEach((err) => toast.error(err.message))
-    }
+    if (status === "succeeded") 
+      toast(message)
+
     if (isAuth && user) {
       if (role === 'Admin') {
         navigate('/admin/dashboard')
@@ -31,14 +31,24 @@ export const LoginPage = () => {
     }
   }, [status, message, errors, isAuth, user, role, navigate])
 
+  const loading = status === "loading"
+
   const handleSubmit = async (e) => {
 
     e.preventDefault()
 
     try {
       await dispatch(loginUser({ email, password })).unwrap()
-    } catch (error) {
-      toast.error(error.response?.data?.message)
+      setEmail('')
+      setPassword('')
+    } catch (errors) {
+      if (errors && Array.isArray(errors) && errors.length > 0) {
+
+        toast.error(errors[0].message || "Unknown error");
+        dispatch(clearErrors());
+      }
+      setEmail('')
+      setPassword('')
     }
   }
 
@@ -48,14 +58,14 @@ export const LoginPage = () => {
         <img
           alt="Jinn comunity"
           src={logo}
-          className="mx-auto h-10 w-auto"
+          className="mx-auto h-20 w-auto"
         />
-        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-100">
+        <h2 className="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-100">
           Sign in to your account
         </h2>
       </div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
         <form 
           noValidate
           onSubmit={handleSubmit}
@@ -74,7 +84,8 @@ export const LoginPage = () => {
                 required
                 autoComplete="email"
                 placeholder='exemple@jinn-travel.com'
-                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-800 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                tabIndex={1}
+                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-800 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -100,7 +111,8 @@ export const LoginPage = () => {
                 required
                 placeholder='*********'
                 autoComplete="current-password"
-                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-800 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                tabIndex={2}
+                className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-800 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -108,15 +120,16 @@ export const LoginPage = () => {
           <div>
             <button
               type="submit"
-              disabled={status === "loading"}
-              className="flex w-full justify-center rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-accentDark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-90 transition-all"
+              disabled={loading}
+              tabIndex={3}
+              className="flex w-full justify-center rounded-full bg-accent mt-10 px-3 py-1.5 text-sm font-semibold text-gray-100 shadow-sm hover:bg-accentDark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-90 transition-all"
             >
-              Login
+              {loading ? "Loading..." : "Log in"}
             </button>
           </div>
         </form>
 
-        <p className="mt-10 text-center text-sm/6 text-gray-100">
+        <p className="mt-6 text-center text-sm/6 text-gray-100">
           Not a member?{' '}
           <Link to='/signup' className="font-semibold text-accent hover:text-accentDark transition-colors">
             SignUp now

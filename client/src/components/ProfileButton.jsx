@@ -74,10 +74,10 @@ export const ProfileButton = () => {
                 {dropdownOpen && (
                     <div>
                         <ul className="absolute w-auto overflow-hidden whitespace-nowrap z-10 left-0 top-12 
-                                rounded-xl shadow-custom-white bg-gradient-blur backdrop-blur-sm"
+                                rounded-xl shadow-custom bg-gradient-blur backdrop-blur-sm text-gray-300"
                         >
                             <li className="w-full px-4 py-2
-                                hover:text-accentBlue hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
+                                hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
                             >
                                 <Link
                                     to="../settings"
@@ -89,7 +89,7 @@ export const ProfileButton = () => {
                             {!isAdminPage && userRole === 'Admin' && (
                             <li className="
                                 w-full px-4 py-2
-                                hover:text-accentBlue hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
+                                hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
                             >
                                 <Link
                                     to="../admin/dashboard"
@@ -101,7 +101,7 @@ export const ProfileButton = () => {
                             )}
                             {isAdminPage && userRole === 'Admin' && (
                             <li className="w-full px-4 py-2
-                                hover:text-accentBlue hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
+                                hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
                             >
                                 <Link
                                     to="../my-account"
@@ -112,7 +112,7 @@ export const ProfileButton = () => {
                             </li>
                             )}
                             <li className="w-full px-4 py-2
-                                hover:text-accentBlue hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
+                                hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
                             >
                                 <button
                                     onClick={logoutHandler}

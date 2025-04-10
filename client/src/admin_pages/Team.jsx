@@ -1,9 +1,12 @@
 import { useEffect } from 'react'
 import { DataGrid, GridToolbar } from '@mui/x-data-grid'
-import { Box, Typography } from '@mui/material'
+import { Box, Typography, Avatar } from '@mui/material'
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchUsers } from '../redux/features/users/userSlice'
+import { toast } from 'react-toastify';
+import {API_URL} from "../config"
+import avatarLogo from '../assets/avatar.png'
 
 export const Team = () => {
     console.log('Render List')
@@ -17,18 +20,35 @@ export const Team = () => {
 
     const handleCopy = (id) => {
         navigator.clipboard.writeText(id).then(() => {
-            alert('ID copied to clipboard!')
+            toast.success('ID copied to clipboard!')
         }).catch((err) => {
-            alert('Failed to copy: ' + err)
+            toast.error('Failed to copy: ' + err)
         })
     }
 
     const columns = [
-        { field: 'id', headerName: 'ID' },
+        { 
+            field: 'avatarUrl',
+            headerName: 'Avatar',
+            renderCell: (params) => (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
+                    <Avatar
+                        src={params.value ? `${API_URL}${params.value}` : avatarLogo}
+                        alt={params.row.first_name}
+                        onError={(e) => {
+                            console.error("Error Avatar rendering:", params.value, e);
+                            }}
+                    />
+                </Box>
+            ),
+            width: 80,
+            sortable: false,
+            filterable: false,
+        },
         { field: 'first_name', headerName: 'First Name', editable: true, flex: 1 },
         { field: 'last_name', headerName: 'Last Name', editable: true, flex: 1 },
-        { field: 'email', headerName: 'Email', editable: true, flex: 1 },
-        { field: 'phone', headerName: 'Phone', editable: true, flex: 1 },
+        { field: 'email', headerName: 'Email', editable: true, sortable: false, flex: 1 },
+        { field: 'phone', headerName: 'Phone', editable: true, sortable: false, flex: 1 },
         { field: 'role', headerName: 'Role', editable: true, width: 100 },
         { 
             field: 'level',
@@ -47,15 +67,16 @@ export const Team = () => {
                             <Typography>
                                 { level }
                             </Typography>
-                    </Box>
+                        </Box>
                     </Box>
                 )
             }
         },
-        { field: 'coupon_code', headerName: 'Coupon', editable: true, flex: 1 },
+        { field: 'coupon_code', headerName: 'Coupon', editable: true, sortable: false, flex: 1 },
         {
             field: 'affiliate_id',
             headerName: 'Ref Link',
+            sortable: false,
             renderCell: (params) => {
                 if (!params.value) return null;
                 const ref = params.value.toString();
@@ -93,15 +114,43 @@ export const Team = () => {
     return (
         <Box 
             sx={{
-                "& .MuiDataGrid-cell": {
+                "& .MuiDataGrid-root": {
+                    padding: "16px",
+                    border: "none",
+                },
+                "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-cell": {
                     margin: "auto",
                     color: "white",
+                    borderTop: "none",
                 },
-                "& .MuiDataGrid-footerContainer, .MuiDataGrid-container--top": {
+                "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-row--borderBottom .MuiDataGrid-columnHeader": {
+                    borderBottom: "none",
+                    borderTop: "none",
+                },
+                "& .css-1tdeh38": {
+                    borderTop: "none",
+                },
+                "& .MuiDataGrid-columnSeparator": {
+                    width: "0.5px"
+                },
+                "& .MuiDataGrid-filler": {
+                    borderTop: "none",
+                    border: "none",
+                },
+                "& .MuiDataGrid-container--top": {
                     backgroundColor: (theme) => `${theme.palette.background.default} !important`,
+                    color: "#87888C",
                 },
-            }}  
+                "& .MuiDataGrid-footerContainer": {
+                    borderTop: "none",
+                },
+                "& .css-1hr2sou-MuiTablePagination-root, .MuiButtonBase-root > svg, .MuiTablePagination-actions > button, .MuiInputBase-root > svg": {
+                    color: "#87888C",
+                    fill: "#87888C",
+                },
+            }} 
             style={{ height: '100%', width: '100%' }}
+            className="p-4 rounded-2xl bg-secondary"
         >
         <DataGrid 
             rows={users}

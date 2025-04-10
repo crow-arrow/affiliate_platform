@@ -14,8 +14,8 @@ export const Header = () => {
         <div>
             {isAuth && <div className="inline-flex w-full h-20 justify-between">
                 <header className="flex w-full justify-between items-center px-8">
-                    <div className="w-60 mr-8">
-                        <label className="relative block w-full">
+                    <div className="mr-4 flex-grow">
+                        <label className="relative block">
                             <span className="sr-only">Search</span>
                             <span className="absolute z-10 inset-y-0 right-0 flex items-center px-4">
                                 {/* <a href="#" onClick={''}></a> */}
@@ -25,8 +25,8 @@ export const Header = () => {
                                 className="
                                     placeholder:italic 
                                     placeholder:text-slate-400 
-                                    block bg-white/30 backdrop-blur-sm 
-                                    w-full shadow-inset-2 border border-slate-300 rounded-3xl 
+                                    block bg-secondary backdrop-blur-sm
+                                    w-full shadow-inset-2 outline-none rounded-xl 
                                     py-2 pl-4 pr-3 
                                     focus:outline-none focus:border-accent 
                                     focus:ring-accent focus:ring-1 sm:text-sm" 
@@ -34,7 +34,7 @@ export const Header = () => {
                             />
                         </label>
                     </div>
-                    <div className='flex flex-1 justify-end items-center'>
+                    <div className='flex lg:w-72 justify-end items-center'>
                         <div className="flex items-center justify-between gap-x-4">
                             <span className="inset-y-0 left-0 flex items-center pr-8 mr-4 border-r-2 border-r-gray-400">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -29,42 +29,42 @@ export const AdminNavbar = () => {
                     <ul className="flex flex-col gap-y-2">
                         <li className="flex">
                         <NavLink to="../admin/dashboard" 
-                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentBlue transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentBlue'}`}>
+                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentAqua transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentAqua'}`}>
                             <RoofingRoundedIcon />
                             Dashboard
                         </NavLink>
                         </li>
                         <li className="flex">
                         <NavLink to="../admin/team" 
-                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentBlue transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentBlue'}`}>
+                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentAqua transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentAqua'}`}>
                             <Groups3OutlinedIcon />
                             Team
                         </NavLink>
                         </li>
                         <li className="flex">
                         <NavLink to="../admin/orders" 
-                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentBlue transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentBlue'}`}>
+                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentAqua transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentAqua'}`}>
                             <CalendarTodayOutlinedIcon />
                             Orders
                         </NavLink>
                         </li>
                         <li className="flex">
                         <NavLink to="../admin/calendar" 
-                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentBlue transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentBlue'}`}>
+                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentAqua transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentAqua'}`}>
                             <CalendarTodayOutlinedIcon />
                             Calender
                         </NavLink>
                         </li>
                         <li className="flex">
                         <NavLink to="../admin/assign-coupon" 
-                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentBlue transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentBlue'}`}>
+                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentAqua transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentAqua'}`}>
                             <LocalActivityOutlinedIcon />
                             Assign Coupon
                         </NavLink>
                         </li>
                         <li className="flex">
                         <NavLink to="../admin/invoices" 
-                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentBlue transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentBlue'}`}>
+                            className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentAqua transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentAqua'}`}>
                             <ReceiptOutlinedIcon />
                             Invoices
                         </NavLink>

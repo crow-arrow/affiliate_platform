@@ -38,6 +38,7 @@ const emailVerificationSlice = createSlice({
       .addCase(verifyEmail.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.message = action.payload.message;
+        state.error = null;
       })
       .addCase(verifyEmail.rejected, (state, action) => {
         state.status = "failed";

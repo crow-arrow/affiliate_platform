@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import PropTypes from 'prop-types';
 import { fetchUsers, uploadAvatar} from "../redux/features/users/userSlice";
-import Avatar from "react-avatar-edit";
 import avatarLogo from '../assets/avatar.png';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import {CustomFileInput} from '../components/CustomFileInput'
+import 'react-advanced-cropper/dist/themes/corners.css';
 
-export const CropAvatar = ({ isOpen, onClose }) => {
+export const CropAvatarTest = ({ isOpen, onClose }) => {
 
   console.log('Avatar rendered')
 
@@ -25,6 +26,9 @@ export const CropAvatar = ({ isOpen, onClose }) => {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
+//   const [cropImage, setCropImage] = useState(null);
+//   const cropperRef = useRef(null);
+
   useEffect(() => {
     if (isOpen) dispatch(fetchUsers());
   }, [dispatch, isOpen]);
@@ -35,12 +39,13 @@ export const CropAvatar = ({ isOpen, onClose }) => {
   }
   }, [avatarStatus, message]);
 
-  const onCrop = (preview) => {
-    setPreview(preview);
-  };
+//   const handleImageSelected = (imageDataUrl) => {
+//     setCropImage(imageDataUrl);
+//     setPreview(null);
+//   };
 
-  const onCloseCrop = () => {
-    setPreview(null);
+  const handleImageCropped = (croppedImageDataUrl) => {
+    setPreview(croppedImageDataUrl); // Обновляем превью обрезанным изображением
   };
 
   const handleUploadAvatar = async () => {
@@ -75,24 +80,6 @@ export const CropAvatar = ({ isOpen, onClose }) => {
     }
   };
 
-  // const onBeforeFileLoad = (elem) => {
-  //   const file = elem.target.files[0];
-
-  //   const allowedTypes = ['image/jpeg', 'image/png'];
-  //   if (!allowedTypes.includes(file.type)) {
-  //     alert('Invalid file format. Please choose an image in JPEG or PNG format.');
-  //     elem.target.value = "";
-  //     return;
-  //   }
-
-  //   const maxSize = 5 * 1024 * 1024;
-  //   if (file.size > maxSize) {
-  //     alert('File is too big! Max: 5MB.');
-  //     elem.target.value = "";
-  //     return;
-  //   }
-  // };
-
   const user = users && users.length > 0 ? users[0] : null;
   const isButtonDisabled = loading
 
@@ -108,15 +95,14 @@ export const CropAvatar = ({ isOpen, onClose }) => {
           <div className="flex flex-col w-full justify-center items-center">
             <div className="flex gap-16 items-start">
               <div>
-                <Avatar
+                <CustomFileInput 
                   width={390}
                   height={295}
-                  onCrop={onCrop}
-                  onClose={onCloseCrop}
-                  // onBeforeFileLoad={onBeforeFileLoad}
-                  // exportSize={200}
-                  // exportQuality={1}
-                  mimeTypes="image/jpeg, image/png"
+                  mimeTypes="image/jpeg, image/png, image/webp, image/avif"
+                //   onImageSelected={handleImageSelected}
+                  onImageCropped={handleImageCropped}
+                  maxFileSize={10 * 1024 * 1024}
+                  allowedFileTypes={['image/jpeg', 'image/png', 'image/webp', 'image/avif']}
                 />
                 <button
                   onClick={handleUploadAvatar}
@@ -127,11 +113,11 @@ export const CropAvatar = ({ isOpen, onClose }) => {
                 </button>
               </div>
               <div className="flex flex-col gap-6 justify-between">
-                <span className="text-center w-[200px] text-xl">Preview</span>
+                <span className="text-center w-20 text-xl">Preview</span>
                 {preview ? (
-                  <img key={preview} src={preview} alt="" />
+                    <img key={preview} className="w-28 h-28 object-cover rounded-full" src={preview} alt="Preview" />
                 ) : (
-                  <img key={user.avatarUrl} className="w-[200px]" src={user.avatarUrl || avatarLogo} alt="Preview" />
+                    <img key={avatarLogo} className="w-28 h-28 object-cover rounded-full" src={avatarLogo} alt="Preview" />
                 )}
               </div>
             </div>
@@ -145,7 +131,7 @@ export const CropAvatar = ({ isOpen, onClose }) => {
   );
 };
 
-CropAvatar.propTypes = {
+CropAvatarTest.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
 };

@@ -13,6 +13,20 @@ export const requestPasswordReset = createAsyncThunk(
   }
 );
 
+export const checkResetLink = createAsyncThunk(
+  "password/checkResetLink",
+  async (token, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.post(`/password/check-reset-link`, {
+        token,
+      });
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 export const resetPassword = createAsyncThunk(
   "password/resetPassword",
   async ({ token, newPassword, confirmPassword }, { rejectWithValue }) => {
@@ -23,6 +37,7 @@ export const resetPassword = createAsyncThunk(
       });
       return data;
     } catch (error) {
+      console.log(error);
       return rejectWithValue(
         error.response?.data?.errors || [
           {
@@ -40,22 +55,47 @@ const resetPasswordSlice = createSlice({
     user: null,
     token: null,
     status: "idle",
+    requestResetError: null,
     errors: [],
+    message: null,
+    linkValid: null,
+    linkError: null,
   },
-  reducers: {},
+  reducers: {
+    clearErrors: (state) => {
+      state.errors = [];
+      state.requestResetError = null;
+      state.message = null;
+      state.status = "idle";
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(requestPasswordReset.pending, (state) => {
         state.status = "loading";
-        state.errors = [];
+        state.requestResetError = null;
       })
       .addCase(requestPasswordReset.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.message = action.payload.message;
+        state.requestResetError = null;
       })
       .addCase(requestPasswordReset.rejected, (state, action) => {
         state.status = "failed";
-        state.errors = action.payload;
+        state.requestResetError = action.payload;
+      })
+      .addCase(checkResetLink.pending, (state) => {
+        state.linkValid = null;
+        state.linkError = null;
+      })
+      .addCase(checkResetLink.fulfilled, (state, action) => {
+        state.linkValid = action.payload.valid;
+        state.linkError = null;
+      })
+      .addCase(checkResetLink.rejected, (state, action) => {
+        state.linkValid = false;
+        state.linkError =
+          action.payload?.message || "An unexpected error occurred";
       })
       .addCase(resetPassword.pending, (state) => {
         state.status = "loading";
@@ -64,6 +104,7 @@ const resetPasswordSlice = createSlice({
       .addCase(resetPassword.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.message = action.payload.message;
+        state.errors = [];
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.status = "failed";
@@ -72,4 +113,5 @@ const resetPasswordSlice = createSlice({
   },
 });
 
+export const { clearErrors } = resetPasswordSlice.actions;
 export default resetPasswordSlice.reducer;

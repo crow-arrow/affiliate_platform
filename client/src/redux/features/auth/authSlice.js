@@ -19,12 +19,11 @@ export const registerUser = createAsyncThunk(
         return data;
       }
     } catch (error) {
-      console.error("Error response:", error.response);
+      console.log(error);
       return rejectWithValue(
         error.response?.data?.errors || [
           {
-            message:
-              "The service is temporarily unavailable. Please try again later",
+            message: error.response?.data?.message,
           },
         ]
       );
@@ -42,7 +41,6 @@ export const loginUser = createAsyncThunk(
       });
       if (data.token) {
         window.localStorage.setItem("token", data.token);
-        console.log(data.token);
         return { user: data.user, token: data.token, message: data.message };
       }
     } catch (error) {
@@ -86,6 +84,11 @@ const authSlice = createSlice({
       state.token = null;
       state.isLoading = false;
       state.status = null;
+    },
+    clearErrors: (state) => {
+      state.errors = [];
+      state.message = null;
+      state.status = "idle";
     },
     updateUserAvatar: (state, action) => {
       if (state.user) {
@@ -142,6 +145,7 @@ const authSlice = createSlice({
         state.message = action.payload.message;
         state.user = action.payload?.user;
         state.token = action.payload?.token;
+        state.errors = [];
       })
       .addCase(getMe.rejected, (state) => {
         state.isLoading = false;
@@ -166,6 +170,7 @@ export const checkRole = (state) => {
   return role;
 };
 
+export const { clearErrors } = authSlice.actions;
 export const { logout } = authSlice.actions;
 
 export default authSlice.reducer;

@@ -77,6 +77,7 @@ const userSlice = createSlice({
         state.avatarStatus = "succeeded";
         state.currentUser.avatarUrl = action.payload.user.avatarUrl;
         state.message = action.payload.message;
+        state.avatarError = null;
       })
       .addCase(uploadAvatar.rejected, (state, action) => {
         state.avatarStatus = "failed";
@@ -91,6 +92,7 @@ const userSlice = createSlice({
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.usersStatus = "succeeded";
         state.users = action.payload;
+        state.usersError = null;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.usersStatus = "failed";
@@ -105,6 +107,7 @@ const userSlice = createSlice({
       .addCase(fetchTrips.fulfilled, (state, action) => {
         state.tripsStatus = "succeeded";
         state.trips = action.payload.trips;
+        state.tripsError = null;
       })
       .addCase(fetchTrips.rejected, (state, action) => {
         state.tripsStatus = "failed";

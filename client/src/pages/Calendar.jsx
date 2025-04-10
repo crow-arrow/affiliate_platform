@@ -112,7 +112,6 @@ export const Calendar = () => {
       {/* Календарь */}
       <Box className="flex-grow flex-shrink basis-[80%] ml-4 p-4 rounded-2xl bg-secondary">
         <FullCalendar
-          className="rounded-3xl"
           height="70vh"
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
           scrollTime={0}

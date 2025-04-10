@@ -35,7 +35,7 @@ export const EmailVerification = () => {
             <Link to="/login">
                 <img alt="Jinn community" src={logo} className="mx-auto h-20 w-auto" />
             </Link>
-            <div className='flex flex-col bg-white relative w-1/3 h-1/4 p-8 mt-10 justify-between items-center rounded-xl shadow-custom'>
+            <div className='flex flex-col bg-gray-100 relative w-1/3 h-1/4 p-8 mt-10 justify-between items-center rounded-xl shadow-custom'>
                 {status === 'loading' ? (
                     <div className='flex flex-col items-center justify-between'>
                         <p className='w-full text-lg text-center'>

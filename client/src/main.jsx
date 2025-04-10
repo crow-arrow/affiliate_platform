@@ -11,7 +11,7 @@ import CssBaseline from "@mui/material/CssBaseline"
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <Provider store={store}>
-    <ThemeProvider theme={theme}>
+      <ThemeProvider theme={theme}>
         <CssBaseline />
         <App />
       </ThemeProvider>

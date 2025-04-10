@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { toast } from 'react-toastify';
 import { getMe, registerUser } from '../redux/features/auth/authSlice';
@@ -7,16 +7,16 @@ import avatarLogo from '../assets/avatar.png'
 import {API_URL} from "../config"
 
 import PartyModeOutlinedIcon from '@mui/icons-material/PartyModeOutlined';
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import InsertLinkRoundedIcon from '@mui/icons-material/InsertLinkRounded';
 
 export const Settings = () => {
 
-  const dispatch = useDispatch()
-  const [avatar, setAvatar] = useState(avatarLogo);
-  const currentUser = useSelector((state) => state.auth.user)
+  console.log('Settings rendered')
 
-  useEffect(() => {
-    setAvatar(currentUser.avatarUrl ? `${API_URL}${currentUser.avatarUrl}` : avatarLogo);
-  }, [currentUser]);
+  const dispatch = useDispatch()
+  const currentUser = useSelector((state) => state.auth.user)
+  const avatar = currentUser.avatarUrl ? `${API_URL}${currentUser.avatarUrl}` : avatarLogo
 
   const { status } = useSelector((state) => state.auth)
   const [email, setEmail] = useState('')
@@ -55,6 +55,14 @@ export const Settings = () => {
     }
   }
 
+  const handleCopy = (id) => {
+    navigator.clipboard.writeText(id).then(() => {
+        toast.success('Link copied to clipboard!')
+    }).catch((err) => {
+        toast.error('Failed to copy the link: ' + err)
+    })
+}
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updateKey, setUpdateKey] = useState(0);
 
@@ -68,47 +76,91 @@ export const Settings = () => {
   const userFirstName = currentUser.first_name
   const userLastName = currentUser.last_name
   const userLevel = currentUser.level
+  const userAffiliateId = currentUser.affiliate_id
+  const refLink = `https://jinn-travel.com/?affiliateId=${userAffiliateId}`;
 
   return (
-    <div key={updateKey} className='flex flex-col gap-5'>
-      <div className='flex flex-col bg-secondary backdrop-blur-sm rounded-2xl p-4 items-start justify-between'>
-        <h1 className='text-3xl w-conten pb-4'>Your Profile</h1>
-        <div className='flex flex-col items-center justify-around w-60 h-40 bg-primary text-2xl rounded-xl shadow-custom'>
-          <div className='relative'>
-            <img className='w-20 h-20 rounded-full shadow-inset-custom' src={avatar} alt="Avatar" />
-            <button 
-              onClick={() => setIsModalOpen(true)} 
-              className='absolute -bottom-3 left-1/2 -translate-x-1/2'
-            >
-              <PartyModeOutlinedIcon 
-                onClose={handleCloseModal} 
-                className='bg-accentBlue shadow-custom'
-                style={{
-                  color: 'black', 
-                  border: '1.5px dashed black',
-                  borderRadius: '50%', 
-                  fontSize: '2rem',
-                  padding: '4px',
-                }}
-              />
-            </button>
+    <div key={updateKey} className='flex flex-col gap-4'>
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 border-box">
+        <div className='flex flex-col justify-between rounded-2xl px-4 py-6 bg-secondary backdrop-blur-sm'>
+          <div className="col-span-full mb-6">
+            <h1 className="text-2xl w-content">Profile</h1>
           </div>
-          <span className=
-            {`py-2 px-8 rounded-2xl bg-accent
-              ${userLevel === 'Bronze' ? 'bg-bronze-500 text-gray-800' : 
-                userLevel === 'Silver' ? 'bg-gray-200 text-gray-800' : 
-                userLevel === 'Gold' ? 'bg-accent text-gray-800' : 'bg-none'}`} 
-          >
-            <b>{userLevel}</b>
-          </span>
+          <span className='text-accentOrange'>Your refferal link:</span>
+          <div className="flex flex-col items-start justify-between rounded-xl">
+            <label className="relative w-full">
+              <span className="absolute z-10 inset-y-0 left-0 flex items-center px-4">
+                {/* <a href="#" onClick={''}></a> */}
+                <InsertLinkRoundedIcon className="text-accentOrange" />
+              </span>
+              <button
+                onClick={() => handleCopy(refLink)}
+                className="absolute z-10 inset-y-0 right-0 flex items-center px-4"
+              >
+                <ContentCopyRoundedIcon className="hover:text-accentOrange transition-colors" />
+              </button>
+              <input
+                value={refLink}
+                type="text"
+                name="refferal link"
+                readOnly
+                className="
+                  text-slate-200
+                  block bg-primary outline-none
+                  w-full shadow-inset-2 rounded-xl
+                  py-2 pl-12 pr-12 sm:text-sm"
+              />
+            </label>
+          </div>
+        </div>
+        <div className='flex flex-col justify-between rounded-2xl lg:w-72 px-4 py-6 bg-secondary backdrop-blur-sm'>
+          <div className="flex flex-col items-center justify-around w-full px-4 h-40 text-2xl rounded-xl">
+            <div className="relative">
+              <img
+                className="w-20 h-20 rounded-full shadow-inset-custom"
+                src={avatar}
+                alt="Avatar"
+              />
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="absolute -bottom-3 left-1/2 -translate-x-1/2"
+              >
+                <PartyModeOutlinedIcon
+                  onClose={handleCloseModal}
+                  className="bg-accentOrange shadow-custom"
+                  style={{
+                    color: "black",
+                    border: "1.5px dashed black",
+                    borderRadius: "50%",
+                    fontSize: "2rem",
+                    padding: "4px",
+                  }}
+                />
+              </button>
+            </div>
+            <span
+              className={`py-2 px-8 rounded-2xl bg-accent
+                        ${
+                          userLevel === "Bronze"
+                            ? "bg-bronze-500 text-gray-800"
+                            : userLevel === "Silver"
+                            ? "bg-gray-200 text-gray-800"
+                            : userLevel === "Gold"
+                            ? "bg-accent text-gray-800"
+                            : "bg-none"
+                        }`}
+            >
+              <b>{userLevel}</b>
+            </span>
+          </div>
         </div>
       </div>
-      <div className='flex flex-col w-full bg-secondary backdrop-blur-sm rounded-2xl p-4 items-start justify-between'>
-        <h2 className='text-2xl py-4'>Personal Information</h2>
+      <div className='flex flex-col w-full bg-secondary backdrop-blur-sm rounded-2xl px-4 py-6 gap-y-4 items-start justify-between'>
+        <h2 className='text-2xl'>Personal Information</h2>
         <form 
             onSubmit={handleSubmit}
             method="POST" 
-            className="grid grid-cols-2 w-full max-md:grid-cols-1 gap-y-5 gap-x-20"
+            className="grid grid-cols-1 md:grid-cols-2 gap-y-5 gap-x-20 w-full"
           >
             <div>
               <label htmlFor="email" className="block text-sm/6 font-medium">
@@ -123,7 +175,7 @@ export const Settings = () => {
                   // onChange={(e) => setEmail(e.target.value)}
                   readOnly
                   autoComplete="email"
-                  className="block w-full rounded-3xl shadow-inset-2 bg-gray-400 px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                  className="block w-full rounded-3xl shadow-inset-2 bg-gray-400 px-3 py-1.5 text-base text-gray-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
                 />
               </div>
             </div>
@@ -141,7 +193,7 @@ export const Settings = () => {
                   onChange={(e) => setPhone(e.target.value)}
                   required
                   autoComplete="phone"
-                  className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                  className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
                 />
               </div>
             </div>
@@ -160,7 +212,7 @@ export const Settings = () => {
                   onChange={(e) => setFirstName(e.target.value)}
                   required
                   autoComplete="given-name"
-                  className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                  className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
                 />
               </div>
             </div>
@@ -179,7 +231,7 @@ export const Settings = () => {
                   onChange={(e) => setLastName(e.target.value)}
                   required
                   autoComplete="family-name"
-                  className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                  className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
                 />
               </div>
             </div>
@@ -199,7 +251,7 @@ export const Settings = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                  className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
                 />
               </div>
             </div>
@@ -217,23 +269,27 @@ export const Settings = () => {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
-                  className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                  className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400  sm:text-sm"
                 />
               </div>
             </div>
-            <div className='col-span-2 flex justify-end'>
+            <div className='md:col-span-2 flex justify-end'>
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="w-1/5 rounded-3xl bg-primary mt-8 px-3 py-1.5 shadow-custom text-sm font-semibold text-center text-white hover:shadow-inset-white-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-90 transition-all"
+                className="
+                  w-full md:w-1/4 rounded-xl bg-gradient-blur backdrop-blur-sm text-gray-300 
+                  mt-6 px-4 py-1.5 shadow-custom text-lg font-semibold text-center hover:text-accentAqua
+                  hover:shadow-inset-white-2 active:scale-90 transition-all"
               >
                 Save
               </button>
           </div>
         </form>
       </div>
-
-        <CropAvatar isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+        {isModalOpen && (
+          <CropAvatar isOpen={isModalOpen} onClose={handleCloseModal} />
+        )}
     </div>
   )
 }

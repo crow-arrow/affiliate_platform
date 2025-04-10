@@ -27,6 +27,13 @@ export const signUp = async (req, res) => {
       return res.status(409).json({ message: "Email already exists" });
     }
 
+    function generateRandom5DigitNumberShort() {
+      return Math.floor(Math.random() * 90000) + 10000;
+    }
+
+    const randomNumberShort = generateRandom5DigitNumberShort();
+    const affiliateId = `${first_name.toLowerCase()}_${randomNumberShort}`;
+
     const salt = bcrypt.genSaltSync(10);
     const hash = bcrypt.hashSync(password, salt);
 
@@ -36,6 +43,7 @@ export const signUp = async (req, res) => {
       first_name,
       last_name,
       password: hash,
+      affiliate_id: affiliateId,
       role: "Genie",
       emailVerified: false,
     });

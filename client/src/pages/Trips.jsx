@@ -5,6 +5,9 @@ import { useDispatch, useSelector } from "react-redux"
 import { fetchTrips } from "../redux/features/users/userSlice"
 
 export const Trips = () => {
+
+  console.log('Render List')
+  
   const dispatch = useDispatch()
   const { trips, status } = useSelector((state) => state.user)
 
@@ -17,7 +20,21 @@ export const Trips = () => {
     { field: 'traveller_amount', headerName: 'Traveller Number' },
     { field: 'travel_date', headerName: 'Travel Date', flex: 1 },
     { field: 'order_status', headerName: 'Order Status' },
-    { field: 'total_price', headerName: 'Total Price in EUR' },
+    { 
+      field: 'total_price', 
+      headerName: 'Total Price in EUR',
+      renderCell: (params) => {
+        if (params.value !== null && params.value !== undefined) {
+          const cleanedValue = params.value.replace(/[^0-9.]/g, '');
+          const parsedValue = parseFloat(cleanedValue);
+          if (!isNaN(parsedValue)) {
+            return parseFloat(parsedValue).toFixed(2);
+          }
+          return '';
+        }
+        return '';
+      },
+     },
     { field: 'commission', headerName: 'Commission', cellClassName: 'name-column--cell', },
   ];
 

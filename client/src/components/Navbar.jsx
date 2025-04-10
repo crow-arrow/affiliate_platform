@@ -24,28 +24,28 @@ export const Navbar = () => {
           <ul className="flex flex-col gap-y-2">
             <li className="flex">
               <NavLink to="../my-account" 
-                className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentBlue transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentBlue'}`}>
+                className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentAqua transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentAqua'}`}>
                   <RoofingRoundedIcon />
                   Dashboard
               </NavLink>
             </li>
             <li className="flex">
               <NavLink to="../trips" 
-                className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentBlue transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentBlue'}`}>
+                className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentAqua transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentAqua'}`}>
                   <LuggageOutlinedIcon />
                   Trips
               </NavLink>
             </li>
             <li className="flex">
               <NavLink to="../calendar" 
-                className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentBlue transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentBlue'}`}>
+                className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentAqua transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentAqua'}`}>
                   <CalendarTodayOutlinedIcon />
                   Calender
               </NavLink>
             </li>
             <li className="flex">
               <NavLink to="../documents" 
-                className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentBlue transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentBlue'}`}>
+                className={({ isActive }) => `group flex px-4 py-2 gap-2 w-full items-center text-lg rounded-lg hover:bg-gradient-blur hover:backdrop-blur-sm hover:text-accentAqua transition-colors ${isActive && 'bg-gradient-blur backdrop-blur-sm text-accentAqua'}`}>
                   <InsertDriveFileOutlinedIcon />
                   Documents
               </NavLink>

@@ -17,13 +17,11 @@ const logoBase64 = fs.readFileSync(logoPath, { encoding: "base64" });
 export const sendVerificationEmail = async (email, token, res) => {
   try {
     const verificationLink = `${process.env.CLIENT_URL}/verify-email/${token}`;
-    console.log(verificationLink);
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    console.log("User found:", user);
 
     const mailOptions = {
       from: `"Jinn Travel" <hello@example.com>`,
@@ -77,7 +75,7 @@ export const sendVerificationEmail = async (email, token, res) => {
                         <b>Verify your account</b>
                     </a>
                 </div>
-                <p>* the link will expire in 15 minutes *</p>
+                <p style="font-size: 14px;">* the link will expire in 15 minutes *</p>
                 <footer style="text-align: start;">
                     <b>That wasn't you?</b>
                     <p>Please contact our customer care team directly to protect your account:</p>
@@ -121,7 +119,6 @@ export const sendVerificationEmail = async (email, token, res) => {
 export const verifyEmail = async (req, res) => {
   const { token } = req.params;
 
-  console.log("Token:", token);
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findByPk(decoded.id);

@@ -19,6 +19,10 @@ export const requestPasswordReset = async (req, res) => {
   try {
     const { email } = req.body;
 
+    if (!email) {
+      return res.status(401).json({ message: "Email is required" });
+    }
+
     const user = await User.findOne({ where: { email } });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -53,7 +57,7 @@ export const requestPasswordReset = async (req, res) => {
                     display: block;
                     padding: 20px;
                     text-align: center;
-                    background-color: #13283c;
+                    background-image: linear-gradient(150deg, rgba(11,46,51,1) 0%, rgba(79,124,130,1) 100%);
                     font-size: 24px;
                     font-weight: bold;
                     color: white;
@@ -70,7 +74,7 @@ export const requestPasswordReset = async (req, res) => {
                     <a 
                         href="${resetLink}"
                         style="
-                            background-color: #13283c; 
+                            background-image: linear-gradient(150deg, rgba(11,46,51,1) 0%, rgba(79,124,130,1) 100%); 
                             color: white; 
                             text-decoration: none; 
                             padding: 15px; 
@@ -81,6 +85,7 @@ export const requestPasswordReset = async (req, res) => {
                         <b>Reset Password</b>
                     </a>
                 </div>
+                <p style="font-size: 14px;">* the link will expire in 15 minutes *</p>
                 <footer style="text-align: start;">
                     <b>That wasn't you?</b>
                     <p>Please contact our customer care team directly to protect your account:</p>
@@ -120,6 +125,28 @@ export const requestPasswordReset = async (req, res) => {
   }
 };
 
+export const checkResetLink = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findByPk(decoded.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    return res.json({ valid: true });
+  } catch (error) {
+    console.error("Error in checkResetLink:", error);
+
+    if (error instanceof jwt.TokenExpiredError) {
+      return res
+        .status(400)
+        .json({ valid: false, message: "Token has expired" });
+    } else {
+      return res.status(500).json({ valid: false, message: "Server error" });
+    }
+  }
+};
+
 export const resetPassword = async (req, res) => {
   try {
     req.body.token = req.params.token;
@@ -149,6 +176,9 @@ export const resetPassword = async (req, res) => {
     return res.json({ message: "Password successfully reset" });
   } catch (error) {
     console.error("Error in resetPassword:", error);
-    res.status(400).json({ message: "Invalid or expired token" });
+
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(400).json({ message: "Token has expired" });
+    }
   }
 };

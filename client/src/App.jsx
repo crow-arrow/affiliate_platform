@@ -28,22 +28,25 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { getMe, checkIsAuth } from './redux/features/auth/authSlice.js'
 import { CropAvatar } from './components/Avatar.jsx'
+import preloader from './assets/preloader.gif'
 
 function App() {
+
+  console.log('App rendered')
+
   const dispatch = useDispatch()
   const isAuth = useSelector(checkIsAuth)
   const [isLoaded, setIsLoaded] = useState(false)
   const {user} = useSelector((state) => state.auth)
   const emailVerified = user?.emailVerified === true
-  console.log(emailVerified)
-  const showAppLayout = isLoaded && isAuth && user && user.emailVerified;
+  const showAppLayout = isLoaded && isAuth && user && emailVerified
 
   useEffect(() => {
     dispatch(getMe()).finally(() => setIsLoaded(true))
   }, [dispatch])
 
   if (!isLoaded) {
-    return <div>Загрузка...</div>
+    return <div><img src={preloader} alt="Preload" /></div>
   }
 
   return (

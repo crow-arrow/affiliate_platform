@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react'
 import logo from '../assets/logo.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { registerUser, logout } from '../redux/features/auth/authSlice'
+import { registerUser, logout, clearErrors } from '../redux/features/auth/authSlice'
 import { toast } from 'react-toastify'
 
 export const SignUpPage = () => {
+
+  console.log('SignupPage rendered')
+
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [firstName, setFirstName] = useState('')
@@ -18,13 +21,12 @@ export const SignUpPage = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (status === "succeeded") toast(message)
-      console.log(message)
+    if (status === "succeeded") 
+      toast(message)
       dispatch(logout())
-    if (errors.length > 0) {
-      errors.forEach((err) => toast.error(err.message));
-    }
   }, [status, message, errors, dispatch, navigate])
+
+  const loading = status === "loading"
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -50,20 +52,23 @@ export const SignUpPage = () => {
       setConfirmPassword('')
 
       navigate('/sent-message')
-    } catch (error) {
-      console.error('Error during registration:', error.response?.data || error.message)
-      toast.error("Registration failed. Please try again.")
+    } catch (errors) {
+      if (errors && Array.isArray(errors) && errors.length > 0) {
+
+        toast.error(errors[0].message || "Unknown error");
+        dispatch(clearErrors());
+      }
     }
   }
 
   return (
     <div className="flex h-screen bg-gradient-primary flex-1 flex-col justify-center px-6 mx-auto lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <img alt="Jinn community" src={logo} className="mx-auto h-10 w-auto" />
-        <h2 className="mt-10 text-center text-2xl font-bold text-gray-900">Join our community!</h2>
+        <img alt="Jinn community" src={logo} className="mx-auto h-20 w-auto" />
+        <h2 className="mt-6 text-center text-2xl font-bold text-gray-100">Join our community!</h2>
       </div>
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form noValidate onSubmit={handleSubmit} className="space-y-6">
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form noValidate onSubmit={handleSubmit} className="space-y-2">
           {[{ label: 'Email', type: 'email', placeholder: 'exemple@jinn-travel.com', value: email, setValue: setEmail },
             { label: 'Phone Number', type: 'phone', placeholder: '+49 (151) 290-175-33', value: phone, setValue: setPhone },
             { label: 'First Name', type: 'text', placeholder: 'Will', value: firstName, setValue: setFirstName },
@@ -72,7 +77,7 @@ export const SignUpPage = () => {
             { label: 'Confirm Password', type: 'password', placeholder: '*********', value: confirmPassword, setValue: setConfirmPassword }]
             .map(({ label, type, placeholder, value, setValue }, index) => (
               <div key={index}>
-                <label className="block text-sm font-medium text-gray-900">{label}</label>
+                <label className="block text-sm font-medium text-gray-100">{label}</label>
                 <div className="mt-2">
                   <input
                     type={type}
@@ -80,18 +85,25 @@ export const SignUpPage = () => {
                     onChange={(e) => setValue(e.target.value)}
                     placeholder={placeholder}
                     required
-                    className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-accent sm:text-sm"
+                    tabIndex={1}
+                    className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 
+                       placeholder:text-gray-400 focus:outline-2 focus:outline-accent sm:text-sm"
                   />
                 </div>
               </div>
             ))}
           <div>
-            <button type="submit" disabled={status === "loading"} className="w-full rounded-3xl bg-accent px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-accentDark active:scale-90 transition-all">
-              Sign up
+            <button 
+              type="submit" 
+              disabled={loading} 
+              tabIndex={2}
+              className="flex w-full justify-center rounded-full bg-accent mt-10 px-3 py-1.5 text-sm font-semibold text-gray-100 shadow-sm hover:bg-accentDark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-90 transition-all"
+            >
+              {loading ? "Loading..." : "Sign up"}
             </button>
           </div>
         </form>
-        <p className="mt-10 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-gray-100">
           Already have an account?{' '}
           <Link to='/login' className="font-semibold text-accent hover:text-accentDark transition-colors">Login here</Link>
         </p>

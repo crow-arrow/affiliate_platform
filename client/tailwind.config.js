@@ -7,9 +7,12 @@ export default {
       colors: {
         primary: "#171821",
         secondary: "rgba(255,255,255,0.1)",
+        secondary2: "#333440",
         accent: "#d8b21d",
-        accentBlue: "#A9DFD8",
+        accentAqua: "#A9DFD8",
+        accentBlue: "#20AEF3",
         accentPink: "#F2C8ED",
+        accentOrange: "#FEB95A",
         accentDark: "#b09119",
         background: "rgb(245, 241, 237)",
         bronze: {
@@ -50,5 +53,18 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addBase, theme }) {
+      addBase({
+        ":focus-visible": {
+          outline: `2px solid ${theme("colors.accent")}`,
+          outlineOffset: "2px",
+        },
+        input: {
+          outline: "1px solid #d1d5db",
+          outlineOffset: "-1px",
+        },
+      });
+    },
+  ],
 };
