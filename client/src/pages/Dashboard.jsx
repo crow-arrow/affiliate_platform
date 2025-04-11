@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchTrips } from "../redux/features/users/userSlice"
-import { CropAvatarTest } from '../components/Test'
 
 import CurrencyExchangeRoundedIcon from '@mui/icons-material/CurrencyExchangeRounded';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
@@ -11,14 +10,6 @@ import AccountTreeRoundedIcon from '@mui/icons-material/AccountTreeRounded';
 export const Dashboard = () => {
   
   console.log("Dashboard render")
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [updateKey, setUpdateKey] = useState(0);
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setUpdateKey((prev) => prev + 1);
-  };
 
   const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth)
@@ -48,7 +39,7 @@ export const Dashboard = () => {
     }, [dispatch])
 
   return (
-    <div key={updateKey} className="w-full space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex flex-wrap w-full gap-4">
         <div className="flex flex-col lg:min-w-[608px] md:min-w-[360px] flex-1 flex-grow gap-6 px-4 py-6 rounded-2xl bg-secondary">
           <h1>Overview</h1>
@@ -75,14 +66,6 @@ export const Dashboard = () => {
             </div>
           </div>
         </div>
-        <button
-                onClick={() => setIsModalOpen(true)}
-                className="p-4 rounded-lg bg-accentAqua text-black"
-              >Avatar Uploader
-        </button>
-        {isModalOpen && (
-          <CropAvatarTest isOpen={isModalOpen} onClose={handleCloseModal} />
-        )}
       </div>
     </div>
   )

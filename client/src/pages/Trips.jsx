@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { DataGrid, GridToolbar } from '@mui/x-data-grid'
-import { Box, CircularProgress } from '@mui/material'
+import { Box, CircularProgress, Typography } from '@mui/material'
 import { useDispatch, useSelector } from "react-redux"
 import { fetchTrips } from "../redux/features/users/userSlice"
 
@@ -9,7 +9,7 @@ export const Trips = () => {
   console.log('Render List')
   
   const dispatch = useDispatch()
-  const { trips, status } = useSelector((state) => state.user)
+  const { trips, status, error } = useSelector((state) => state.user)
 
   useEffect(() => {
     dispatch(fetchTrips())
@@ -34,7 +34,7 @@ export const Trips = () => {
         }
         return '';
       },
-     },
+    },
     { field: 'commission', headerName: 'Commission', cellClassName: 'name-column--cell', },
   ];
 
@@ -47,6 +47,22 @@ export const Trips = () => {
         height="100vh"
       >
         <CircularProgress />
+      </Box>
+    )
+  }
+
+  if (error) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <Typography variant="h6" color="error">Error: {error}</Typography>
+      </Box>
+    )
+  }
+
+  if (trips.length === 0) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <Typography variant="h6">No trips available</Typography>
       </Box>
     )
   }

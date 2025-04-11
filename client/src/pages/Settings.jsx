@@ -129,8 +129,8 @@ export const Settings = () => {
                   onClose={handleCloseModal}
                   className="bg-accentOrange shadow-custom"
                   style={{
-                    color: "black",
-                    border: "1.5px dashed black",
+                    color: "gray",
+                    border: "1.5px dashed gray",
                     borderRadius: "50%",
                     fontSize: "2rem",
                     padding: "4px",

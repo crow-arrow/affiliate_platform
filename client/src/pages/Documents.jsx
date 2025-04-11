@@ -1,5 +1,3 @@
-// import React from 'react'
-
 export const Documents = () => {
   console.log('Documents rendered')
   return (

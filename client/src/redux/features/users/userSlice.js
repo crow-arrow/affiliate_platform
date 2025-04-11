@@ -65,6 +65,14 @@ const userSlice = createSlice({
     avatarError: null,
     usersError: null,
     tripsError: null,
+    message: null,
+  },
+  reducers: {
+    resetAvatarStatus: (state) => {
+      state.avatarStatus = "idle";
+      state.message = null;
+      state.avatarError = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -116,4 +124,5 @@ const userSlice = createSlice({
   },
 });
 
+export const { resetAvatarStatus } = userSlice.actions;
 export default userSlice.reducer;

@@ -76,47 +76,47 @@ export const ProfileButton = () => {
                         <ul className="absolute w-auto overflow-hidden whitespace-nowrap z-10 left-0 top-12 
                                 rounded-xl shadow-custom bg-gradient-blur backdrop-blur-sm text-gray-300"
                         >
-                            <li className="w-full px-4 py-2
+                            <li className="w-full
                                 hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
                             >
                                 <Link
                                     to="../settings"
-                                    className="flex w-full px-8 text-left"
+                                    className="flex w-full py-2 px-8 text-left"
                                 >
                                     Settings
                                 </Link>
                             </li>
                             {!isAdminPage && userRole === 'Admin' && (
                             <li className="
-                                w-full px-4 py-2
+                                w-full
                                 hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
                             >
                                 <Link
                                     to="../admin/dashboard"
-                                    className="flex w-full px-8 text-left"
+                                    className="flex w-full py-2 px-8 text-left"
                                 >
                                     Admin Panel
                                 </Link>
                             </li>
                             )}
                             {isAdminPage && userRole === 'Admin' && (
-                            <li className="w-full px-4 py-2
+                            <li className="w-full
                                 hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
                             >
                                 <Link
                                     to="../my-account"
-                                    className="flex w-full px-8 text-left"
+                                    className="flex w-full py-2 px-8 text-left"
                                 >
                                     Genie Panel
                                 </Link>
                             </li>
                             )}
-                            <li className="w-full px-4 py-2
+                            <li className="w-full
                                 hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
                             >
                                 <button
                                     onClick={logoutHandler}
-                                    className="flex w-full px-8 text-left"
+                                    className="flex w-full py-2 px-8 text-left"
                                 >
                                     Logout
                                 </button>

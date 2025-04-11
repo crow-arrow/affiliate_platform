@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { DataGrid, GridToolbar } from '@mui/x-data-grid'
-import { Box, Typography, Avatar } from '@mui/material'
+import { Box, Typography, Avatar, CircularProgress } from '@mui/material'
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchUsers } from '../redux/features/users/userSlice'
@@ -108,8 +108,34 @@ export const Team = () => {
         { field: 'booked_trips_count', headerName: 'Trips'},
     ];
 
-    if (status === 'loading') return <p>Loading...</p>
-    if (error) return <p>Error: {error}</p>
+    if (status === 'loading') {
+        return (
+            <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="100vh"
+            >
+                <CircularProgress />
+            </Box>
+        )
+    }
+        
+    if (error) {
+        return (
+        <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+            <Typography variant="h6" color="error">Error: {error}</Typography>
+        </Box>
+        )
+    }
+
+    if (users.length === 0) {
+        return (
+            <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+            <Typography variant="h6">No members</Typography>
+            </Box>
+        )
+    }
 
     return (
         <Box 
