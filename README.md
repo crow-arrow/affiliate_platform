@@ -1,1 +1,4 @@
 # affiliate_platform
+The platform designed to empower users with referral links and coupon codes to drive sales. It features a tiered system of affiliate profiles (Bronze, Silver, Gold) that evolves based on performance. The platform includes intuitive dashboards for tracking referrals, sales, and commissions in real time. With a mobile-optimized design, it ensures seamless user experience across devices.
+
+The platform offers secure and complete user registration with email verification, ensuring data protection and account authenticity. It also includes advanced analytics for monitoring user activity, tracking clicks on referral links, number of bookings generated, and calculating commissions accurately. Built with robust data security, it prioritizes transparency with clear policies and user controls.
