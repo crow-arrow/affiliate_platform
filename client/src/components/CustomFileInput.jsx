@@ -112,7 +112,12 @@ export const CustomFileInput = ({
 		<div className="flex gap-16 items-start">
 			<div
 				ref={dropAreaRef}
-				className={`relative w-[${width}px] h-[${height}px] border-2 border-dashed overflow-hidden border-gray-400 rounded-xl flex items-center justify-center cursor-pointer ${isDragging ? 'bg-gray-100' : 'bg-white'}`}
+				className={
+					`relative border-2 border-dashed overflow-hidden 
+					border-gray-400 rounded-xl flex items-center justify-center cursor-pointer 
+					${isDragging ? 'bg-gray-100' : 'bg-white'}`
+				}
+				style={{ width: `${width}px`, height: `${height}px` }}
 				onDragOver={handleDragOver}
 				onDragLeave={handleDragLeave}
 				onDrop={handleDrop}

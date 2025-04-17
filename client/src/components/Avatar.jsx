@@ -89,23 +89,24 @@ return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
     <div className="p-6 bg-secondary backdrop-blur-sm rounded-2xl shadow-lg">
         <button className="absolute top-4 right-4 text-xl" onClick={handleClose}>
-        <CloseOutlinedIcon />
+            <CloseOutlinedIcon />
         </button>
         {user ? (
         <div className="flex flex-col w-full justify-center items-start">
             <div className="flex gap-16 items-start">
                 <CustomFileInput 
-                width={390}
-                height={295}
-                mimeTypes="image/jpeg, image/png, image/webp, image/avif"
-                onImageSelected={handleImageSelected}
-                allowedFileTypes={['image/jpeg', 'image/png', 'image/webp', 'image/avif']}
+                    width={390}
+                    height={290}
+                    mimeTypes="image/jpeg, image/png, image/webp, image/avif"
+                    onImageSelected={handleImageSelected}
+                    allowedFileTypes={['image/jpeg', 'image/png', 'image/webp', 'image/avif']}
                 />
             </div>
             <button
                 onClick={handleUploadAvatar}
                 disabled={isButtonDisabled}
-                className="w-[390px] p-2 mt-8 text-s rounded-xl bg-white text-gray-900 disabled:shadow-inset-2 disabled:bg-slate-500"
+                className="w-[390px] p-2 mt-8 text-s rounded-xl bg-white text-gray-900 
+                    disabled:shadow-inset-2 disabled:bg-slate-500 disabled:animate-pulse disabled:cursor-progress"
             >
                 {loading ? "Loading..." : "Upload Avatar"}
             </button>

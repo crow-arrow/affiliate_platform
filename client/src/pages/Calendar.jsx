@@ -67,7 +67,7 @@ export const Calendar = () => {
         "& .fc-list-day-cushion": {
           backgroundColor: (theme) => `${theme.palette.secondary.main} !important`,
         },
-        "& .fc-list-event:hover": { color: "black" },
+        "& .fc-list-event:hover": { color: "white" },
         "& .fc-v-event, .fc-h-event": {
           backgroundColor: (theme) => `${theme.palette.secondary.main} !important`,
         },
@@ -87,11 +87,11 @@ export const Calendar = () => {
       }}
     >
       {/* Боковая панель с событиями */}
-      <Box className="flex-grow flex-shrink basis-[20%] p-4 overflow-y-auto rounded-2xl bg-secondary">
+      <Box className="flex-grow flex-shrink basis-[20%] p-4 overflow-y-auto rounded-2xl bg-white dark:bg-secondary">
         <Typography className="text-center" variant="h4">Events</Typography>
         <List>
           {currentEvents.map((event) => (
-            <ListItem key={event.id} className="bg-teal-900 my-2 rounded-xl">
+            <ListItem key={event.id} className="bg-accentGreen my-2 rounded-xl">
               <ListItemText
                 primary={event.title}
                 secondary={
@@ -110,7 +110,7 @@ export const Calendar = () => {
       </Box>
 
       {/* Календарь */}
-      <Box className="flex-grow flex-shrink basis-[80%] ml-4 p-4 rounded-2xl bg-secondary">
+      <Box className="flex-grow flex-shrink basis-[80%] ml-4 p-4 rounded-2xl bg-white dark:bg-secondary">
         <FullCalendar
           height="70vh"
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}

@@ -16,13 +16,14 @@ export const Trips = () => {
   }, [dispatch])
 
   const columns = [
-    { field: 'id', headerName: 'Order ID'},
-    { field: 'traveller_amount', headerName: 'Traveller Number' },
+    { field: 'id', headerName: 'Order ID', flex: 1},
+    { field: 'traveller_amount', headerName: 'Traveller Number', flex: 1 },
     { field: 'travel_date', headerName: 'Travel Date', flex: 1 },
-    { field: 'order_status', headerName: 'Order Status' },
+    { field: 'order_status', headerName: 'Order Status', flex: 1 },
     { 
       field: 'total_price', 
       headerName: 'Total Price in EUR',
+      flex: 1,
       renderCell: (params) => {
         if (params.value !== null && params.value !== undefined) {
           const cleanedValue = params.value.replace(/[^0-9.]/g, '');
@@ -35,7 +36,7 @@ export const Trips = () => {
         return '';
       },
     },
-    { field: 'commission', headerName: 'Commission', cellClassName: 'name-column--cell', },
+    { field: 'commission', headerName: 'Commission', cellClassName: 'name-column--cell', flex: 1 },
   ];
 
   if (status === 'loading') {
@@ -70,13 +71,15 @@ export const Trips = () => {
   return (
     <Box 
         sx={{
+          flex: 1,
+          minWidth: 0,
           "& .MuiDataGrid-root": {
               padding: "16px",
               border: "none",
           },
           "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-cell": {
               margin: "auto",
-              color: "white",
+              color: "gray",
               borderTop: "none",
           },
           "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-row--borderBottom .MuiDataGrid-columnHeader": {
@@ -119,7 +122,7 @@ export const Trips = () => {
           },
         }} 
         style={{ height: '100%', width: '100%' }}
-        className="p-4 rounded-2xl bg-secondary"
+        className="p-4 rounded-2xl bg-white dark:bg-secondary"
       >
       <DataGrid 
         rows={trips}

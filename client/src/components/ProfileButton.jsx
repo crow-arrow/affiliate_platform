@@ -4,10 +4,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { checkIsAuth, checkRole, logout } from '../redux/features/auth/authSlice'
 import { toast } from 'react-toastify'
 import avatarLogo from '../assets/avatar.png'
-import UnfoldMoreOutlinedIcon from '@mui/icons-material/UnfoldMoreOutlined'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
+import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined'
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined'
+import SafetyDividerOutlinedIcon from '@mui/icons-material/SafetyDividerOutlined'
 import {API_URL} from "../config"
+import PropTypes from 'prop-types'
 
-export const ProfileButton = () => {
+export const ProfileButton = ({ isOpen }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef(null)
 
@@ -49,10 +54,10 @@ export const ProfileButton = () => {
     }
 
     return (
-        <div>
-            {isAuth && <div className="relative" ref={dropdownRef}>
+        <div className='w-full'>
+            {isAuth && <div className="relative w-full" ref={dropdownRef}>
                 <button
-                    className="flex min-w-40 gap-4 rounded-3xl justify-between items-center"
+                    className="flex p-2 gap-4 group w-52 rounded-3xl justify-start items-center"
                     onClick={toggleDropdown}
                 >
                     <img 
@@ -60,64 +65,77 @@ export const ProfileButton = () => {
                         alt="Avatar"
                         className="size-8 rounded-full shadow-inset-2 shrink-0"
                     />
-                    <div className="text-start">
-                        <span className="text-xm block">
-                            Hi, {firstName}
-                        </span>
-                        <span className="text-xs block text-stone-500">
-                            {userRole}
-                        </span>
+                    <div
+                        className={`flex items-start transition-all duration-300 ease-in-out transform origin-left ${
+                        !isOpen ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-50 -translate-x-12 pointer-events-none'
+                        }`}
+                    >
+                        <div className="text-start">
+                            <span className="text-xm block">
+                                Hi, {firstName}
+                            </span>
+                            <span className="text-xs block text-stone-500">
+                                {userRole}
+                            </span>
+                        </div>
+                        <div
+                            className={`transition-transform ${dropdownOpen ? '-rotate-180' : ''}`}
+                        >
+                            <ExpandMoreIcon />
+                        </div>
                     </div>
-                    <UnfoldMoreOutlinedIcon />
                 </button>
 
                 {dropdownOpen && (
-                    <div>
-                        <ul className="absolute w-auto overflow-hidden whitespace-nowrap z-10 left-0 top-12 
-                                rounded-xl shadow-custom bg-gradient-blur backdrop-blur-sm text-gray-300"
+                    <div className='w-full'>
+                        <ul className="absolute max-md:w-screen max-md:-left-4 w-56 overflow-hidden whitespace-nowrap z-10 left-0 top-14 
+                                rounded-lg shadow-custom dark:shadow-custom-white dark:bg-primary/30 backdrop-blur-sm text-gray-300"
                         >
-                            <li className="w-full
-                                hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
+                            <li className="w-full bg-opacity-0 bg-white dark:bg-secondary/0 text-gray-500 dark:text-gray-400
+                                hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary transition-all duration-300"
                             >
                                 <Link
                                     to="../settings"
-                                    className="flex w-full py-2 px-8 text-left"
+                                    className="flex w-full py-2 pl-4 gap-2 text-left"
                                 >
+                                    <SettingsOutlinedIcon />
                                     Settings
                                 </Link>
                             </li>
                             {!isAdminPage && userRole === 'Admin' && (
-                            <li className="
-                                w-full
-                                hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
+                            <li className="w-full bg-opacity-0 bg-white dark:bg-secondary/0 text-gray-500 dark:text-gray-400
+                                hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary transition-all duration-300"
                             >
                                 <Link
                                     to="../admin/dashboard"
-                                    className="flex w-full py-2 px-8 text-left"
+                                    className="flex w-full py-2 pl-4 gap-2 text-left"
                                 >
+                                    <AdminPanelSettingsOutlinedIcon />
                                     Admin Panel
                                 </Link>
                             </li>
                             )}
                             {isAdminPage && userRole === 'Admin' && (
-                            <li className="w-full
-                                hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
+                            <li className="w-full bg-opacity-0 bg-white dark:bg-secondary/0 text-gray-500 dark:text-gray-400
+                                hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary transition-all duration-300"
                             >
                                 <Link
                                     to="../my-account"
-                                    className="flex w-full py-2 px-8 text-left"
+                                    className="flex w-full py-2 pl-4 gap-2 text-left"
                                 >
+                                    <SafetyDividerOutlinedIcon />
                                     Genie Panel
                                 </Link>
                             </li>
                             )}
-                            <li className="w-full
-                                hover:text-accentAqua hover:bg-gradient-blur hover:backdrop-blur-sm transition-colors"
+                            <li className="w-full bg-opacity-0 bg-white dark:bg-secondary/0 text-gray-500 dark:text-gray-400
+                                hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary transition-all duration-300"
                             >
                                 <button
                                     onClick={logoutHandler}
-                                    className="flex w-full py-2 px-8 text-left"
+                                    className="flex w-full py-2 pl-4 gap-2 text-left"
                                 >
+                                    <PowerSettingsNewOutlinedIcon />
                                     Logout
                                 </button>
                             </li>
@@ -129,3 +147,7 @@ export const ProfileButton = () => {
         </div>
     )
 }
+
+ProfileButton.propTypes = {
+isOpen: PropTypes.bool.isRequired,
+};

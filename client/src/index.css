@@ -3,9 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    @apply transition-colors duration-500
+  }
   body {
     font-family: "Lexend Giga", serif;
     min-height: 100vh;
+  }
+  svg, path {
+    transition: fill 0.3s ease-in-out;
+  }
+  .hover\:bg-gradient-blurLite:hover {
+    transition: all 0.3s ease-in-out;
   }
   .link {
     text-decoration: underline;
@@ -25,5 +34,40 @@
   /* .fc-license-message {
     display: none;
   } */
+  .sidebar-tooltip {
+    @apply absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md
+    text-gray-500 bg-white dark:text-white dark:bg-secondary
+    text-xs font-bold 
+    transition-all duration-100 scale-0 origin-left;
+  }
+  .open-button-tooltip {
+    @apply absolute w-auto p-2 m-2 min-w-max top-14 translate-x-1/2 rounded-md shadow-md
+    text-gray-500 bg-white dark:text-white dark:bg-secondary
+    text-xs font-bold transition-all duration-0 scale-0 origin-left;
+  }
+  
+  /* show with delay */
+  .tooltip-show {
+    @apply scale-100 delay-500;
+  }
+
+  .textclip-once {
+  position: relative;
+  display: inline-block;
+  color: inherit;
+  }
+
+  .textclip-once::before {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: linear-gradient(to right, #111827, #9ca3af, #f3f4f6); /* цвета как у тебя */
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textclip 0.5s ease-out forwards;
+    pointer-events: none;
+  }
 }
 
