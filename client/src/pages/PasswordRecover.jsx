@@ -114,6 +114,7 @@ export const PasswordRecover = () => {
                             onChange={(e) => setNewPassword(e.target.value)}
                             required
                             placeholder='*********'
+                            autoComplete="new-password"
                             className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
                         />
                         </div>
@@ -133,6 +134,7 @@ export const PasswordRecover = () => {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                             placeholder='*********'
+                            autoComplete="new-password"
                             className="block w-full rounded-3xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
                         />
                         </div>

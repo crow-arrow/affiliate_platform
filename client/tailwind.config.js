@@ -68,33 +68,6 @@ export default {
         "inset-white-2":
           "inset -2px -2px 4px hsla(0, 0%, 100%, .1), inset 2px 2px 4px rgba(0, 0, 0, .5)",
       },
-      animation: {
-        "slide-left-to-right": "slideLeftToRight 0.5s ease-in-out",
-        textclip: "textclip 0.5s linear forwards",
-        slideRight: "slideRight 0.5s ease-out forwards",
-      },
-      keyframes: {
-        slideLeftToRight: {
-          "0%": {
-            transform: "translateX(-100%)", // Начальная позиция (слева)
-          },
-          "100%": {
-            transform: "translateX(0)", // Конечная позиция (на месте)
-          },
-        },
-        textclip: {
-          from: {
-            backgroundPosition: "200% center",
-          },
-          to: {
-            backgroundPosition: "100% center",
-          },
-        },
-        slideRight: {
-          "0%": { transform: "translateX(-100%)", opacity: "0" },
-          "100%": { transform: "translateX(0)", opacity: "1" },
-        },
-      },
     },
   },
   plugins: [

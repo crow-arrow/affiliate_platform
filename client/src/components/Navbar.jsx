@@ -70,28 +70,30 @@ export const Navbar = ({ isOpen, setIsOpen }) => {
                         to={to}
                         className={({ isActive }) =>
                           `flex group gap-2 w-full items-center text-lg rounded-lg
-                        hover:bg-white dark:hover:bg-secondary hover:text-gray-800 dark:hover:text-gray-100 
-                        transition-colors duration-300 whitespyce
-                        ${isActive && 'animate-textclip bg-white dark:bg-secondary text-gray-800 dark:text-gray-100'}`
+                          hover:bg-white dark:hover:bg-secondary
+                          transition-colors duration-300
+                          ${isActive && 'bg-white dark:bg-secondary'}`
                         }
                       >
                         {({ isActive }) => (
                           <>
                             <div
-                              className={`m-2 rounded-md
-                          ${isActive ? 'bg-primaryLite dark:bg-primary' : 'group-hover:bg-primaryLite dark:group-hover:bg-primary transition-[background-color] duration-300'}`}
+                              className={`
+                                m-2 rounded-md group-hover:bg-primaryLite dark:group-hover:bg-primary 
+                                transition-colors duration-300 group-hover:text-gray-800 dark:group-hover:text-gray-100
+                                ${isActive && 'bg-primaryLite dark:bg-primary text-gray-800 dark:text-gray-100'}`}
                             >
                               {icon}
                             </div>
                             <span
                               className={`
-                            inline-block origin-left whitespace-nowrap
-                            transition-all duration-300 ease-in-out
-                            ${isOpen
+                                inline-block origin-left whitespace-nowrap group-hover:text-gray-800 dark:group-hover:text-gray-100 
+                                transition-all duration-300 ease-in-out ${isActive && 'text-gray-800 dark:text-gray-100'}
+                                ${isOpen
                                 ? 'opacity-100 scale-100 translate-x-0'
                                 : 'opacity-0 scale-50 -translate-x-12 pointer-events-none'
-                              }
-                            `}
+                                }
+                              `}
                             >
                               {label}
                             </span>

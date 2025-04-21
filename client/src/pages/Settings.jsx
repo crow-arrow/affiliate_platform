@@ -94,15 +94,15 @@ export const Settings = () => {
           <span className='text-accentBlue'>Your refferal link:</span>
           <div className="flex flex-col items-start justify-between rounded-xl">
             <label className="relative w-full">
-              <span className="absolute z-10 inset-y-0 left-0 flex items-center px-4">
-                {/* <a href="#" onClick={''}></a> */}
+              <span className="absolute z-10 inset-y-0 left-0 flex items-center px-4 pointer-events-none">
                 <InsertLinkRoundedIcon className="text-accentBlue" />
               </span>
               <button
+                aria-label="Copy link"
                 onClick={() => handleCopy(refLink)}
-                className="absolute z-10 inset-y-0 right-0 flex items-center px-4 hover:text-accentBlue transition-colors duration-300"
+                className="absolute z-10 inset-y-0 right-0 flex items-center px-4"
               >
-                <ContentCopyRoundedIcon className="" />
+                <ContentCopyRoundedIcon className='transition-all duration-300 hover:text-accentBlue' />
               </button>
               <input
                 value={refLink}

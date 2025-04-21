@@ -10,6 +10,7 @@ import resetPasswordRoutes from "./routes/reserPassword.js";
 import userRoutes from "./routes/userRoutes.js";
 import tripsRoutes from "./routes/tripsRoutes.js";
 import User from "./models/User.js";
+import LevelHistory from "./models/LevelHistory.js";
 import fileRoutes from "./routes/fileRoutes.js";
 
 dotenv.config();
@@ -48,11 +49,8 @@ async function start() {
     await sequelize.authenticate();
     console.log("✅ Connected to MySQL");
 
-    // Синхронизируем только модель ReferralUser (например, если вам нужно изменить структуру таблицы)
-    await User.sync({ alter: true }); // Только для этой модели
-
-    // Для других моделей не вызывайте sync(), чтобы избежать изменений в таблицах, которые не должны изменяться
-    // await TourmasterOrder.sync();  // Не нужно вызывать для этой модели
+    await User.sync({ alter: true });
+    await LevelHistory.sync({ alter: true });
 
     app.listen(PORT, () => console.log(`🚀 Server started on port: ${PORT}`));
   } catch (error) {

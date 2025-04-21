@@ -6,7 +6,7 @@ import { fetchTrips } from "../redux/features/users/userSlice"
 
 export const Trips = () => {
 
-  console.log('Render List')
+  // console.log('Render List')
   
   const dispatch = useDispatch()
   const { trips, status, error } = useSelector((state) => state.user)
@@ -36,7 +36,21 @@ export const Trips = () => {
         return '';
       },
     },
-    { field: 'commission', headerName: 'Commission', cellClassName: 'name-column--cell', flex: 1 },
+    { field: 'commission', headerName: 'Commission', cellClassName: 'name-column--cell', flex: 1,
+      renderCell: ({ row: { commission, isCompleted, isCanceled,  } }) => {
+        return (
+                <Box 
+                className={`w-[100%] text-center p-1.5 rounded-md
+                    ${isCompleted ? 'text-green-400' : 
+                      isCanceled ? 'text-red-700 line-through' : 'text-gray-400'}`}
+                >
+                    <Typography>
+                        { commission }
+                    </Typography>
+                </Box>
+        )
+    }
+    },
   ];
 
   if (status === 'loading') {

@@ -45,29 +45,8 @@
     text-gray-500 bg-white dark:text-white dark:bg-secondary
     text-xs font-bold transition-all duration-0 scale-0 origin-left;
   }
-  
-  /* show with delay */
   .tooltip-show {
     @apply scale-100 delay-500;
-  }
-
-  .textclip-once {
-  position: relative;
-  display: inline-block;
-  color: inherit;
-  }
-
-  .textclip-once::before {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: linear-gradient(to right, #111827, #9ca3af, #f3f4f6); /* цвета как у тебя */
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: textclip 0.5s ease-out forwards;
-    pointer-events: none;
   }
 }
 

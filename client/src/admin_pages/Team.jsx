@@ -106,6 +106,7 @@ export const Team = () => {
             }
         },
         { field: 'booked_trips_count', headerName: 'Trips'},
+        { field: 'number_of_travellers', headerName: 'Nº Travellers'},
     ];
 
     if (status === 'loading') {

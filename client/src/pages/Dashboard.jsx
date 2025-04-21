@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchTrips } from "../redux/features/users/userSlice"
 
@@ -6,21 +6,31 @@ import CurrencyExchangeRoundedIcon from '@mui/icons-material/CurrencyExchangeRou
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import StackedBarChartRoundedIcon from '@mui/icons-material/StackedBarChartRounded';
 import AccountTreeRoundedIcon from '@mui/icons-material/AccountTreeRounded';
+import { CircularProgress } from '@mui/material'
 
 export const Dashboard = () => {
   
   console.log("Dashboard render")
 
   const dispatch = useDispatch()
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    dispatch(fetchTrips()).then(() => {
+      setLoading(false)
+    })
+  }, [dispatch])
+
   const { user } = useSelector((state) => state.auth)
   const tripsCount = user?.booked_trips_count
-  const commission = user?.earned_commission
+  const earnings = user?.earnings
+  const commission = user?.total_commission
+  const numberOfTravellers = user?.current_year_travellers
 
   const { trips } = useSelector((state) => state.user)
   const currentUser = useSelector((state) => state.auth.user)
   const userName = currentUser.first_name
   const userLevel = currentUser.level
-  console.log(userLevel)
   
   const formatNumberWithK = (number) => {
     if (number >= 1000) {
@@ -38,9 +48,13 @@ export const Dashboard = () => {
 
   const formatedTotalRevenue = formatNumberWithK(totalRevenue)
 
-    useEffect(() => {
-      dispatch(fetchTrips())
-    }, [dispatch])
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <CircularProgress />
+      </div>
+    )
+  }
 
   return (
     <div className="w-full space-y-6">
@@ -60,7 +74,7 @@ export const Dashboard = () => {
             </div>
             <div className="flex flex-col w-full bg-primaryLite dark:bg-primary p-2 xl:p-4 rounded-xl text-gray-800 dark:text-gray-100">
               <ShoppingCartOutlinedIcon className="text-accentAqua"/>
-              <b className="lg:text-xl xl:text-2xl">{commission}€</b>
+              <b className="lg:text-xl xl:text-2xl">{earnings} / {commission}€</b>
               <span className="text-sm">Earnings</span>
             </div>
             <div className="flex flex-col w-full bg-primaryLite dark:bg-primary p-2 xl:p-4 rounded-xl text-gray-800 dark:text-gray-100">
@@ -107,7 +121,7 @@ export const Dashboard = () => {
                   />
                 </svg>
                 <div className="absolute left-1/2 -translate-x-1/2 bottom-3">
-                  <p className="text-center text-3xl md:text-4xl">5</p>
+                  <p className="text-center text-3xl md:text-4xl">{numberOfTravellers || 0}</p>
                   <p className="text-center text-sm whitespace-nowrap">Travellers reffered</p>
                 </div>
               </div>

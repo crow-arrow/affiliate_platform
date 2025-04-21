@@ -69,13 +69,13 @@ export const SignUpPage = () => {
       </div>
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
         <form noValidate onSubmit={handleSubmit} className="space-y-2">
-          {[{ label: 'Email', type: 'email', placeholder: 'exemple@jinn-travel.com', value: email, setValue: setEmail },
-            { label: 'Phone Number', type: 'phone', placeholder: '+49 (151) 290-175-33', value: phone, setValue: setPhone },
-            { label: 'First Name', type: 'text', placeholder: 'Will', value: firstName, setValue: setFirstName },
-            { label: 'Last Name', type: 'text', placeholder: 'Smith', value: lastName, setValue: setLastName },
-            { label: 'Password', type: 'password', placeholder: '*********', value: password, setValue: setPassword },
-            { label: 'Confirm Password', type: 'password', placeholder: '*********', value: confirmPassword, setValue: setConfirmPassword }]
-            .map(({ label, type, placeholder, value, setValue }, index) => (
+          {[{ label: 'Email', type: 'email', placeholder: 'exemple@jinn-travel.com', autocomplete: '', value: email, setValue: setEmail },
+            { label: 'Phone Number', type: 'phone', placeholder: '+49 (151) 290-175-33', autocomplete: '', value: phone, setValue: setPhone },
+            { label: 'First Name', type: 'text', placeholder: 'Will', autocomplete: '', value: firstName, setValue: setFirstName },
+            { label: 'Last Name', type: 'text', placeholder: 'Smith', autocomplete: '', value: lastName, setValue: setLastName },
+            { label: 'Password', type: 'password', placeholder: '*********', autocomplete: 'new-password', value: password, setValue: setPassword },
+            { label: 'Confirm Password', type: 'password', placeholder: '*********', autocomplete: 'new-password', value: confirmPassword, setValue: setConfirmPassword }]
+            .map(({ label, type, placeholder, autocomplete, value, setValue }, index) => (
               <div key={index}>
                 <label className="block text-sm font-medium text-gray-100">{label}</label>
                 <div className="mt-2">
@@ -84,6 +84,7 @@ export const SignUpPage = () => {
                     value={value}
                     onChange={(e) => setValue(e.target.value)}
                     placeholder={placeholder}
+                    autoComplete={autocomplete}
                     required
                     tabIndex={1}
                     className="

@@ -1,9 +1,8 @@
-import Trips from "./Trips.js";
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
 const User = sequelize.define(
-  "refferal_users",
+  "user",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -51,22 +50,46 @@ const User = sequelize.define(
       type: DataTypes.ENUM("Bronze", "Silver", "Gold"),
       defaultValue: "Bronze",
     },
+    levelChangedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
     booked_trips_count: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
-    earned_commission: {
+    current_year_travellers: {
+      type: DataTypes.SMALLINT.UNSIGNED,
+      allowNull: true,
+    },
+    number_of_travellers: {
+      type: DataTypes.SMALLINT.UNSIGNED,
+      allowNull: true,
+    },
+    earnings: {
       type: DataTypes.FLOAT,
       allowNull: true,
+      defaultValue: 0,
+    },
+    canceled_earnings: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      defaultValue: 0,
+    },
+    total_commission: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+      defaultValue: 0,
     },
     avatarUrl: {
       type: DataTypes.STRING,
       allowNull: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    tableName: "refferal_users",
+  }
 );
-
-User.hasMany(Trips, { foreignKey: "user_id", sourceKey: "id" });
 
 export default User;
