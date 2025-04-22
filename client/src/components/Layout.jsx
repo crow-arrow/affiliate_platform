@@ -7,7 +7,7 @@ export const Layout = () => {
   const [isOpen, setIsOpen] = useState(true)
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(max-width: 767px)')
+    const mediaQuery = window.matchMedia('(max-width: 900px)')
 
     // Функция для обработки изменения ширины экрана
     const handleResize = () => {

@@ -176,17 +176,14 @@ export const getUserTrips = async (req, res) => {
     const earnedFromDeparted = tripsWithCommission.reduce((sum, trip) => {
       return trip.isCompleted ? sum + (trip.commission || 0) : sum;
     }, 0);
-    console.log("earnedFromDeparted:", earnedFromDeparted);
 
     const canceledEarnings = tripsWithCommission.reduce((sum, trip) => {
       return trip.isCanceled ? sum + (trip.commission || 0) : sum;
     }, 0);
-    console.log("canceledEarnings:", canceledEarnings);
 
     const departedTrips = tripsWithCommission.filter(
       (trip) => trip.isCompleted
     );
-    console.log(departedTrips.length);
 
     const travellerAmount = departedTrips.reduce((sum, trip) => {
       return sum + Number(trip.traveller_amount || 0);

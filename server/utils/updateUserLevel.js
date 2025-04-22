@@ -37,7 +37,6 @@ export const updateUserLevel = (user, trips) => {
   const levelYear = lastChangedDate
     ? new Date(lastChangedDate).getFullYear()
     : currentYear;
-  console.log(levelYear);
 
   if (month === 0 && day === 1 && levelYear < currentYear) {
     if (lastYearTravellers >= 25) {

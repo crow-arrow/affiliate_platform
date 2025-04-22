@@ -45,7 +45,7 @@ export const Trips = () => {
                       isCanceled ? 'text-red-700 line-through' : 'text-gray-400'}`}
                 >
                     <Typography>
-                        { commission }
+                        { commission.toFixed(2) }
                     </Typography>
                 </Box>
         )

@@ -52,10 +52,9 @@ export const Navbar = ({ isOpen, setIsOpen }) => {
             <ProfileButton isOpen={!isOpen} />
             <button
               type="button"
-              className="max-md:hidden group/button transition-all duration-500 opacity-0 group-hover/header:opacity-100 z-50 inline-flex items-center justify-end mx-1 text-sm text-gray-500"
+              className="max-[900px]:hidden group/button transition-all duration-500 opacity-0 group-hover/header:opacity-100 z-50 inline-flex items-center justify-end mx-1 text-sm text-gray-500"
               onClick={openNav}
             >
-              <span className="sr-only">Open sidebar</span>
               <ArrowForwardIosIcon className={`transition-all duration-500 ${isOpen ? 'rotate-180' : ''}`} />
               <div className='open-button-tooltip pointer-events-none group-hover/button:tooltip-show'>{isOpen ? "Close sidebar" : "Open sidebar"}</div>
             </button>
