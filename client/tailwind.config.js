@@ -20,6 +20,7 @@ export default {
         bronze: {
           border: "#8c5607",
           text: "rgb(101,67,33)",
+          body: "#ba7552",
         },
         silver: {
           border: "#909090",

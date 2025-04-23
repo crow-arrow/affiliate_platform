@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchTrips } from "../redux/features/users/userSlice"
 import { ProgressBar } from "../components/levelProgressBar";
+import { CommissionChart } from "../components/commissionChart";
 
 import CurrencyExchangeRoundedIcon from '@mui/icons-material/CurrencyExchangeRounded';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
@@ -57,7 +58,7 @@ export const Dashboard = () => {
   return (
     <div className="w-full space-y-6">
       <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-3 flex-wrap gap-4 2xl:w-[1140px]">
-        <div className="flex flex-col col-span-4 lg:col-span-2 flex-1 flex-grow gap-6 px-4 py-6 xl:p-8 rounded-2xl bg-white dark:bg-secondary">
+        <div className="flex flex-col col-span-4 lg:col-span-2 flex-1 flex-grow gap-6 p-4 rounded-2xl bg-white dark:bg-secondary">
           <h1>Overview</h1>
           <div className="grid grid-cols-4 max-[600px]:grid-cols-2 gap-3 xl:gap-6 w-full flex-grow">
             <div className="flex flex-col w-full bg-primaryLite dark:bg-primary p-2 xl:p-4 rounded-xl text-gray-800 dark:text-gray-100">
@@ -90,8 +91,8 @@ export const Dashboard = () => {
         >
           <ProgressBar />
         </div>
-        <div className="flex flex-col max-md:row-start-3 col-span-4 lg:col-span-2 gap-6 w-full max-md:h-52 px-4 py-6 rounded-2xl bg-white dark:bg-secondary">
-          Content long
+        <div className="flex flex-col max-md:row-start-3 col-span-4 lg:col-span-2 gap-6 w-full max-md:h-52 rounded-2xl bg-white dark:bg-secondary">
+          <CommissionChart />
         </div>
       </div>
     </div>

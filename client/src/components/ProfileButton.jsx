@@ -55,7 +55,7 @@ export const ProfileButton = ({ isOpen }) => {
 
     return (
         <div className='w-full'>
-            {isAuth && <div className="relative w-full" ref={dropdownRef}>
+            {isAuth && <div ref={dropdownRef} className="relative w-full">
                 <button
                     className="flex p-2 gap-4 group w-52 rounded-3xl justify-start items-center"
                     onClick={toggleDropdown}
@@ -97,6 +97,7 @@ export const ProfileButton = ({ isOpen }) => {
                                 <Link
                                     to="../settings"
                                     className="flex w-full py-2 pl-4 gap-2 text-left"
+                                    onClick={() => setDropdownOpen(false)}
                                 >
                                     <SettingsOutlinedIcon />
                                     Settings
@@ -109,6 +110,7 @@ export const ProfileButton = ({ isOpen }) => {
                                 <Link
                                     to="../admin/dashboard"
                                     className="flex w-full py-2 pl-4 gap-2 text-left"
+                                    onClick={() => setDropdownOpen(false)}
                                 >
                                     <AdminPanelSettingsOutlinedIcon />
                                     Admin Panel
@@ -122,6 +124,7 @@ export const ProfileButton = ({ isOpen }) => {
                                 <Link
                                     to="../my-account"
                                     className="flex w-full py-2 pl-4 gap-2 text-left"
+                                    onClick={() => setDropdownOpen(false)}
                                 >
                                     <SafetyDividerOutlinedIcon />
                                     Genie Panel

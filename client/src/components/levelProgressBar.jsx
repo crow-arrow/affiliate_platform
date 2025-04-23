@@ -247,14 +247,14 @@ export const ProgressBar = () => {
                                     cx="150" cy="0" r={radius} strokeWidth="12" 
                                     strokeDasharray={circumferenceFullCircle}
                                     strokeDashoffset={offset}
-                                    className="fill-none stroke-bronze-border"
+                                    className="fill-none stroke-bronze-body"
                                     strokeLinecap="round"
                                 />
                                 <circle   
                                     cx={thumbPosition.x}
                                     cy={thumbPosition.y} 
                                     r="13.8"
-                                    className="fill-bronze-border"
+                                    className="fill-bronze-body"
                                 />
                             </svg>
                             <div className="absolute left-1/2 -translate-x-1/2 bottom-0">

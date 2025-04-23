@@ -13,6 +13,10 @@ const Trips = sequelize.define(
       type: DataTypes.SMALLINT.UNSIGNED,
       allowNull: false,
     },
+    booking_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
     travel_date: {
       type: DataTypes.DATEONLY,
       allowNull: false,

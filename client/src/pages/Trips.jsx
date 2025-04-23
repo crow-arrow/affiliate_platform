@@ -18,6 +18,7 @@ export const Trips = () => {
   const columns = [
     { field: 'id', headerName: 'Order ID', flex: 1},
     { field: 'traveller_amount', headerName: 'Traveller Number', flex: 1 },
+    { field: 'booking_date', headerName: 'Booking Date', flex: 1 },
     { field: 'travel_date', headerName: 'Travel Date', flex: 1 },
     { field: 'order_status', headerName: 'Order Status', flex: 1 },
     { 
