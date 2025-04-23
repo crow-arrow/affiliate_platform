@@ -74,26 +74,37 @@ export const ProgressBar = () => {
                             >
                                 <defs>
                                     <linearGradient id="linear-gradient-2" x2="0" y2="1"
-                                    gradientUnits="objectBoundingBox"
-                                    gradientTransform="rotate(135, .5, .5)">
-                                    <stop offset="0.4" stopColor="#acb5cb"/>
-                                    <stop offset="1" stopColor="#d692b3"/>
+                                        gradientUnits="objectBoundingBox"
+                                        gradientTransform="rotate(65, .5, .5)"
+                                    >
+                                        <stop offset="0.2" stopColor="#d8b21d"/>
+                                        <stop offset="0.4" stopColor="#fef1a2"/>
+                                        <stop offset="1" stopColor="#bc881b"/>
                                     </linearGradient>
+                                    <filter id="inset-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feOffset dx="0" dy="1" />
+                                        <feGaussianBlur stdDeviation="3" result="offset-blur" />
+                                        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse" />
+                                        <feFlood floodColor="black" floodOpacity="0.2" result="color" />
+                                        <feComposite operator="in" in="color" in2="inverse" result="shadow" />
+                                        <feComposite operator="over" in="shadow" in2="SourceGraphic" />
+                                    </filter>
                                 </defs>
                                 <circle id="circle-1" cx="150" cy="0" r={radius} 
                                     strokeWidth="10" 
                                     strokeDasharray={circumferenceFullCircle}
                                     strokeDashoffset={circleGoldFirst}
-                                    className="fill-none stroke-gray-800"
+                                    className="fill-none stroke-primaryLite dark:stroke-primary"
                                     strokeLinecap="round"
-                                    
+                                    filter="url(#inset-shadow)"
                                 />
                                 <circle id="circle-2" cx="150" cy="0" r={radius} 
                                     strokeWidth="10" 
                                     strokeDasharray={circumferenceFullCircle}
                                     strokeDashoffset={circleGoldSecond}
-                                    className="fill-none stroke-gray-800"
+                                    className="fill-none stroke-primaryLite dark:stroke-primary"
                                     strokeLinecap="round"
+                                    filter="url(#inset-shadow)"
                                     transform="rotate(50 150 0)"
                                 />
                                 <circle 
@@ -137,26 +148,36 @@ export const ProgressBar = () => {
                             >
                                 <defs>
                                     <linearGradient id="linear-gradient-2" x2="0" y2="1"
-                                    gradientUnits="objectBoundingBox"
-                                    gradientTransform="rotate(135, .5, .5)">
-                                    <stop offset="0.4" stopColor="#acb5cb"/>
-                                    <stop offset="1" stopColor="#d692b3"/>
+                                        gradientUnits="objectBoundingBox"
+                                        gradientTransform="rotate(135, .5, .5)"
+                                    >
+                                        <stop offset="0.4" stopColor="#acb5cb"/>
+                                        <stop offset="1" stopColor="#d692b3"/>
                                     </linearGradient>
+                                    <filter id="inset-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feOffset dx="0" dy="1" />
+                                        <feGaussianBlur stdDeviation="3" result="offset-blur" />
+                                        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse" />
+                                        <feFlood floodColor="black" floodOpacity="0.2" result="color" />
+                                        <feComposite operator="in" in="color" in2="inverse" result="shadow" />
+                                        <feComposite operator="over" in="shadow" in2="SourceGraphic" />
+                                    </filter>
                                 </defs>
                                 <circle id="circle-1" cx="150" cy="0" r={radius} 
                                     strokeWidth="10" 
                                     strokeDasharray={circumferenceFullCircle}
                                     strokeDashoffset={circleSilverFirst}
-                                    className="fill-none stroke-gray-800"
+                                    className="fill-none stroke-primaryLite dark:stroke-primary"
                                     strokeLinecap="round"
-                                    
+                                    filter="url(#inset-shadow)"
                                 />
                                 <circle id="circle-2" cx="150" cy="0" r={radius} 
                                     strokeWidth="10" 
                                     strokeDasharray={circumferenceFullCircle}
                                     strokeDashoffset={circleSilverSecond}
-                                    className="fill-none stroke-gray-800"
+                                    className="fill-none stroke-primaryLite dark:stroke-primary"
                                     strokeLinecap="round"
+                                    filter="url(#inset-shadow)"
                                     transform="rotate(77 150 0)"
                                 />
                                 <circle 
@@ -205,12 +226,21 @@ export const ProgressBar = () => {
                                         <stop offset="0.4" stopColor="#acb5cb"/>
                                         <stop offset="1" stopColor="#d692b3"/>
                                     </linearGradient>
+                                    <filter id="inset-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feOffset dx="0" dy="1" />
+                                        <feGaussianBlur stdDeviation="3" result="offset-blur" />
+                                        <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse" />
+                                        <feFlood floodColor="black" floodOpacity="0.2" result="color" />
+                                        <feComposite operator="in" in="color" in2="inverse" result="shadow" />
+                                        <feComposite operator="over" in="shadow" in2="SourceGraphic" />
+                                    </filter>
                                 </defs>
                                 <circle cx="150" cy="0" r={radius} 
                                     strokeWidth="10" 
                                     strokeDasharray={circumference}
-                                    className="fill-none stroke-gray-800"
+                                    className="fill-none stroke-primaryLite dark:stroke-primary"
                                     strokeLinecap="round"
+                                    filter="url(#inset-shadow)"
                                 />
                                 <circle 
                                     ref={progressPathRef}
