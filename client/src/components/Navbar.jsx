@@ -20,8 +20,8 @@ export const Navbar = ({ isOpen, setIsOpen }) => {
   const navLinks = [
     {
       to: '../my-account',
-      label: 'Overview',
-      tooltip: <div className='sidebar-tooltip group-hover:scale-100'>Overview</div>,
+      label: 'Dashboard',
+      tooltip: <div className='sidebar-tooltip group-hover:scale-100'>Dashboard</div>,
       icon: <RoofingRoundedIcon className='m-1' />,
     },
     {
@@ -31,9 +31,9 @@ export const Navbar = ({ isOpen, setIsOpen }) => {
       icon: <LuggageOutlinedIcon className='m-1' />,
     },
     {
-      to: '../calendar',
-      label: 'Calendar',
-      tooltip: <div className='sidebar-tooltip group-hover:scale-100'>Calendar</div>,
+      to: '../clicks-list',
+      label: 'Clicks list',
+      tooltip: <div className='sidebar-tooltip group-hover:scale-100'>Clicks list</div>,
       icon: <CalendarTodayOutlinedIcon className='m-1 p-0.5' />,
     },
     {

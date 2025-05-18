@@ -4,17 +4,17 @@
 
 @layer base {
   html {
-    @apply transition-colors duration-500
+    @apply transition-colors duration-500;
   }
   body {
     font-family: "Lexend Giga", serif;
     min-height: 100vh;
   }
   svg, path {
-    transition: fill 0.3s ease-in-out;
+    @apply transition-all duration-300 ease-in-out;
   }
   .hover\:bg-gradient-blurLite:hover {
-    transition: all 0.3s ease-in-out;
+    @apply transition-all duration-300 ease-in-out;
   }
   .link {
     text-decoration: underline;
@@ -50,3 +50,30 @@
   }
 }
 
+.apexcharts-tooltip {
+  border-radius: 0.75rem !important;
+  border: none !important;
+  background: none !important;
+  overflow: hidden !important;
+}
+
+.animation {
+  animation: progress 1s ease-in-out;
+}
+
+@keyframes progress {
+  from {
+    stroke-dashoffset: 848
+  }
+}
+/* 
+.animate-thumb {
+  animation: thumbMove 1s ease forwards;
+}
+
+@keyframes thumbMove {
+  from {
+    cx: 290;
+    cy: 0;
+  }
+} */

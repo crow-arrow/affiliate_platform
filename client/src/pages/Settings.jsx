@@ -66,7 +66,7 @@ export const Settings = () => {
     }).catch((err) => {
         toast.error('Failed to copy the link: ' + err)
     })
-}
+  }
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [updateKey, setUpdateKey] = useState(0);
@@ -91,7 +91,7 @@ export const Settings = () => {
           <div className="col-span-full mb-6">
             <h1 className="text-2xl w-content">Profile</h1>
           </div>
-          <span className='text-accentBlue'>Your refferal link:</span>
+          <span className='text-accentBlue'>Your referral link:</span>
           <div className="flex flex-col items-start justify-between rounded-xl">
             <label className="relative w-full">
               <span className="absolute z-10 inset-y-0 left-0 flex items-center px-4 pointer-events-none">
@@ -107,7 +107,7 @@ export const Settings = () => {
               <input
                 value={refLink}
                 type="text"
-                name="refferal link"
+                name="referral link"
                 readOnly
                 className="
                   text-gray-800 dark:text-slate-200

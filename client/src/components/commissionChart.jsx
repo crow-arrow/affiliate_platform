@@ -1,6 +1,9 @@
 import { useMemo, useState, useEffect, useRef } from "react"
 import { useSelector } from "react-redux"
 import Chart from "react-apexcharts"
+import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+import VerifiedIcon from '@mui/icons-material/Verified';
 
 export const CommissionChart = () => {
     const { trips } = useSelector((state) => state.user)
@@ -12,7 +15,12 @@ export const CommissionChart = () => {
     const monthlyCommission = Array(12).fill(0)
     const monthlyCompletedCommission = Array(12).fill(0)
 
-    const filteredTrips = trips?.filter(trip => new Date(trip.booking_date).getFullYear() === selectedYear)
+    const filteredTrips = trips?.filter(trip => new Date(trip.booking_date).getFullYear() === selectedYear) ?? []
+    const filteredLastYearTrips = trips?.filter(trip => new Date(trip.booking_date).getFullYear() === selectedYear - 1) ?? []
+
+    const completedTripsThisYear = filteredTrips?.filter(trip => trip.isCompleted).length
+    const completedTripsLastYear = filteredLastYearTrips?.filter(trip => trip.isCompleted).length
+    const differenceCompletedTrips = completedTripsThisYear - completedTripsLastYear
         
     const yearlyEarnings = filteredTrips?.reduce((sum, trip) => {
         if (trip.isCompleted) {
@@ -39,16 +47,28 @@ export const CommissionChart = () => {
         }
     })
 
-    const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
     const options = useMemo(() => ({
-        colors: ["#A9DFD8", "#FEB95A"],
+        colors: ["#A9DFD8", "#20AEF3"],
         chart: {
             type: "bar",
             height: 320,
             fontFamily: "Inter, sans-serif",
             toolbar: {
                 show: false,
+            },
+            animations: {
+                enabled: true,
+                easing: 'linear', // <-- равномерная скорость
+                speed: 300,        // <-- длительность анимации в мс
+                animateGradually: {
+                    enabled: false,
+                    delay: 0,
+                },
+                dynamicAnimation: {
+                    enabled: true,
+                    speed: 300
+                }
             },
         },
         plotOptions: {
@@ -58,6 +78,11 @@ export const CommissionChart = () => {
                 borderRadiusApplication: "end",
                 borderRadius: 8,
                 borderRadiusWhenStacked: "last",
+                distributed: false,
+                rangeBarGroupRows: false,
+                dataLabels: {
+                    hideOverflowingLabels: false
+                },
             },
         },
         tooltip: {
@@ -66,6 +91,22 @@ export const CommissionChart = () => {
             style: {
                 fontFamily: "Inter, sans-serif",
             },
+            custom: function({ series, dataPointIndex, w }) {
+                const label = w.globals.labels[dataPointIndex];
+                const earned = series[0][dataPointIndex] + " €";
+                const total = series[1][dataPointIndex] + " €";
+                return `
+                        <div>
+                        <div class="block w-full bg-primaryLite dark:bg-primary px-4 py-2">
+                            <strong>${label}</strong><br/>
+                        </div>
+                        <div class="bg-white dark:bg-secondary2 text-gray-700 dark:text-gray-300 p-4">
+                            <span style="color: #A9DFD8;">●</span> Earned: ${earned}<br/>
+                            <span style="color: #FEB95A;">●</span> Total: ${total}
+                        </div>
+                    </div>
+                `;
+            }
         },
         states: {
             hover: {
@@ -111,24 +152,32 @@ export const CommissionChart = () => {
                     show: false,
             },
         },
-            yaxis: {
+        yaxis: {
             show: false,
+            labels: {
+                formatter: function (value) {
+                    return value + " €";
+                }
+            },
         },
         fill: {
             opacity: 1,
         },
     }), [])
 
-    const series = useMemo(() => [
+const series = useMemo(() => {
+    const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return [
         {
-            name: "Completed Commission",
-            data: monthLabels.map((label, i) => ({ x: label, y: monthlyCompletedCommission[i] }))
+            name: "Earned",
+            data: monthLabels.map((label, i) => ({ x: label, y: Math.floor(monthlyCompletedCommission[i]) }))
         },
         {
             name: "Total Commission",
-            data: monthLabels.map((label, i) => ({ x: label, y: monthlyCommission[i] }))
+            data: monthLabels.map((label, i) => ({ x: label, y: Math.floor(monthlyCommission[i]) }))
         },
-    ], [filteredTrips])
+    ];
+}, [monthlyCompletedCommission, monthlyCommission]);
 
     const toggleDropdown = () => {
         setDropdownOpen((prev) => !prev)
@@ -152,38 +201,49 @@ export const CommissionChart = () => {
     },[])
 
     return (
-        <div className="w-full bg-white rounded-lg shadow-sm dark:bg-gray-800 p-4 md:p-6">
+        <div className="w-full rounded-lg shadow-sm  p-4 md:p-6">
             <div className="flex justify-between pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center">
-                <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center me-3">
-                    <svg className="w-6 h-6 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 19">
-                    <path d="M14.5 0A3.987 3.987 0 0 0 11 2.1a4.977 4.977 0 0 1 3.9 5.858A3.989 3.989 0 0 0 14.5 0ZM9 13h2a4 4 0 0 1 4 4v2H5v-2a4 4 0 0 1 4-4Z"/>
-                    <path d="M5 19h10v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2ZM5 7a5.008 5.008 0 0 1 4-4.9 3.988 3.988 0 1 0-3.9 5.859A4.974 4.974 0 0 1 5 7Zm5 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm5-1h-.424a5.016 5.016 0 0 1-1.942 2.232A6.007 6.007 0 0 1 17 17h2a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5ZM5.424 9H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h2a6.007 6.007 0 0 1 4.366-5.768A5.016 5.016 0 0 1 5.424 9Z"/>
-                    </svg>
-                </div>
-                <div>
-                    <h5 className="leading-none text-2xl font-bold text-gray-900 dark:text-white pb-1">3.4k</h5>
-                    <p className="text-sm font-normal text-gray-500 dark:text-gray-400">Leads generated per week</p>
-                </div>
-                </div>
-                <div>
-                <span className="bg-green-100 text-green-800 text-xs font-medium inline-flex items-center px-2.5 py-1 rounded-md dark:bg-green-900 dark:text-green-300">
-                    <svg className="w-2.5 h-2.5 me-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
-                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="24" d="M5 13V1m0 0L1 5m4-4 4 4"/>
-                    </svg>
-                    42.5%
-                </span>
+                <div className="flex flex-1 items-center">
+                    <div className="w-12 h-12 rounded-lg bg-primaryLite dark:bg-primary text-green-800 flex items-center justify-center me-3">
+                        <VerifiedIcon fontSize="medium" />
+                    </div>
+                    <div className="flex flex-col flex-1">
+                        <div className="flex justify-between">
+                            <h5 className="leading-none text-2xl font-bold text-gray-900 dark:text-white py-1">{completedTripsThisYear}</h5>
+                            <div
+                            className="cursor-default group/button relative"
+                        >
+                            {differenceCompletedTrips >= 0 ?
+                                (
+                                <span className="bg-green-100 text-green-800 text-md font-medium inline-flex items-center gap-2 px-2.5 py-1 rounded-md dark:bg-green-900 dark:text-green-300 text-nowrap">
+                                    <TrendingUpRoundedIcon />
+                                    + {differenceCompletedTrips}
+                                </span>
+                                ) : (
+                                <span className="bg-red-100 text-red-800 text-md font-medium inline-flex items-center gap-2 px-2.5 py-1 rounded-md dark:bg-red-900 dark:text-red-300">
+                                    <TrendingDownIcon />
+                                    {differenceCompletedTrips}
+                                </span>
+                                )
+                            }
+                            <div className='open-button-tooltip pointer-events-none group-hover/button:tooltip-show -right-2 top-8 translate-x-0'>
+                                Shows the change in completed trips compared to the previous year
+                            </div>
+                            </div>
+                        </div>
+                        <span className="text-sm max-[450px]:text-xs font-normal text-gray-500 dark:text-gray-400">Completed trips this year</span>
+                    </div>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2">
-                <dl className="flex items-center">
+            <div className="grid grid-cols-2 text-wrap">
+                <dl className="flex max-[450px]:flex-col items-center">
                     <dt className="text-gray-500 dark:text-gray-400 text-sm font-normal me-1">Earnings:</dt>
-                    <dd className="text-gray-900 text-sm dark:text-white font-semibold">{yearlyEarnings?.toFixed(2)}</dd>
+                    <dd className="text-gray-900 text-sm dark:text-white font-semibold">{yearlyEarnings?.toFixed(0)} €</dd>
                 </dl>
-                <dl className="flex items-center justify-end">
+                <dl className="flex max-[450px]:flex-col items-center justify-end">
                     <dt className="text-gray-500 dark:text-gray-400 text-sm font-normal me-1">Total earnings:</dt>
-                    <dd className="text-gray-900 text-sm dark:text-white font-semibold">{yearlyCommission?.toFixed(2)}</dd>
+                    <dd className="text-gray-900 text-sm dark:text-white font-semibold">{yearlyCommission?.toFixed(0)} €</dd>
                 </dl>
             </div>
 
@@ -191,49 +251,52 @@ export const CommissionChart = () => {
                 className="overflow-scroll"
             />
             <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
-            <div ref={dropdownRef} className="relative flex justify-between items-center pt-5">
-                {/* <!-- Button --> */}
-                <button
-                    id="dropdownDefaultButton"
-                    onClick={toggleDropdown}
-                    className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
-                    type="button"
-                >
-                    Year {selectedYear}
-                    <svg className="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
+                <div ref={dropdownRef} className="relative flex justify-between items-center pt-5">
+                    <button
+                        id="dropdownDefaultButton"
+                        onClick={toggleDropdown}
+                        className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
+                        type="button"
+                    >
+                        Year {selectedYear}
+                        <svg className="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4"/>
+                        </svg>
+                    </button>
+                    {dropdownOpen && <div className="absolute bottom-10 z-10 divide-y divide-gray-100 rounded-xl w-44 shadow-custom dark:shadow-custom-white dark:bg-primary/30 backdrop-blur-sm overflow-hidden">
+                        <ul className="text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                            <li>
+                                <a href="#" className="block px-4 py-2 bg-opacity-0 bg-gray-100 dark:bg-secondary/0 text-gray-500 dark:text-gray-400
+                                    hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary2 transition-all duration-300" onClick={() => handleYearChange(2024)}>2024</a>
+                            </li>
+                            <li>
+                                <a href="#" className="block px-4 py-2 bg-opacity-0 bg-gray-100 dark:bg-secondary/0 text-gray-500 dark:text-gray-400
+                                    hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary2 transition-all duration-300" onClick={() => handleYearChange(2025)}>2025</a>
+                            </li>
+                            <li>
+                                <a href="#" className="block px-4 py-2 bg-opacity-0 bg-gray-100 dark:bg-secondary/0 text-gray-500 dark:text-gray-400
+                                    hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary2 transition-all duration-300" onClick={() => handleYearChange(2026)}>2026</a>
+                            </li>
+                            <li>
+                                <a href="#" className="block px-4 py-2 bg-opacity-0 bg-gray-100 dark:bg-secondary/0 text-gray-500 dark:text-gray-400
+                                    hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary2 transition-all duration-300" onClick={() => handleYearChange(2027)}>2027</a>
+                            </li>
+                            <li>
+                                <a href="#" className="block px-4 py-2 bg-opacity-0 bg-gray-100 dark:bg-secondary/0 text-gray-500 dark:text-gray-400
+                                    hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary2 transition-all duration-300" onClick={() => handleYearChange(2028)}>2028</a>
+                            </li>
+                        </ul>
+                    </div>}
+                    <a
+                        href="/trips"
+                        className="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2"
+                    >
+                        Leads Report
+                    <svg className="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>
                     </svg>
-                </button>
-                    {/* <!-- Dropdown menu --> */}
-                {dropdownOpen && <div className="absolute bottom-10 z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
-                    <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-                    <li>
-                        <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onClick={() => handleYearChange(2024)}>2024</a>
-                    </li>
-                    <li>
-                        <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onClick={() => handleYearChange(2025)}>2025</a>
-                    </li>
-                    <li>
-                        <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onClick={() => handleYearChange(2026)}>2026</a>
-                    </li>
-                    <li>
-                        <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onClick={() => handleYearChange(2027)}>2027</a>
-                    </li>
-                    <li>
-                        <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onClick={() => handleYearChange(2028)}>2028</a>
-                    </li>
-                    </ul>
-                </div>}
-                <a
-                    href="#"
-                    className="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2"
-                >
-                    Leads Report
-                <svg className="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 9 4-4-4-4"/>
-                </svg>
-                </a>
-            </div>
+                    </a>
+                </div>
             </div>
         </div>
     )

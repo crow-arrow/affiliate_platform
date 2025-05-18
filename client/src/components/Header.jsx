@@ -1,20 +1,35 @@
 import { useSelector } from 'react-redux'
 import { checkIsAuth } from '../redux/features/auth/authSlice'
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined'
+// import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined'
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
+import InsertLinkRoundedIcon from '@mui/icons-material/InsertLinkRounded';
 import {ThemeSwitcher} from './ThemeSwitcher'
+import { toast } from 'react-toastify';
 
 export const Header = () => {
 
     const isAuth = useSelector(checkIsAuth)
 
+    const handleCopy = (id) => {
+        navigator.clipboard.writeText(id).then(() => {
+            toast.success('Link copied to clipboard!')
+        }).catch((err) => {
+            toast.error('Failed to copy the link: ' + err)
+        })
+    }
+
+    const currentUser = useSelector((state) => state.auth.user)
+    const userAffiliateId = currentUser.affiliate_id
+    const refLink = `https://jinn-travel.com/?affiliateId=${userAffiliateId}`;
+
     return (
         <div>
             {isAuth && <div className="inline-flex w-full h-20 justify-between">
                 <header className="flex md:grid grid-cols-4 lg:grid-cols-3 2xl:flex w-full justify-between items-center">
-                        <label className="relative block mr-4 flex-grow col-span-2 lg:col-span-2 2xl:w-[755px]">
+                        {/* <label className="relative block mr-4 flex-grow col-span-2 lg:col-span-2 2xl:w-[755px]">
                             <span className="sr-only">Search</span>
                             <span className="absolute z-10 inset-y-0 right-0 flex items-center px-4">
-                                {/* <a href="#" onClick={''}></a> */}
+                                <a href="#" onClick={''}></a>
                                 <SearchOutlinedIcon />
                             </span>
                             <input 
@@ -28,7 +43,32 @@ export const Header = () => {
                                     focus:ring-accent focus:ring-1 sm:text-sm" 
                                 placeholder="Search for anything..." type="text" name="search"
                             />
-                        </label>
+                        </label> */}
+                    <div className="flex flex-col items-start justify-between rounded-xl mr-4 flex-grow col-span-2 lg:col-span-2 2xl:w-[755px]">
+                        <label className="relative w-full">
+                        <span className="absolute z-10 inset-y-0 left-0 flex items-center px-4 pointer-events-none">
+                            <InsertLinkRoundedIcon className="text-accent" />
+                        </span>
+                        <button
+                            aria-label="Copy link"
+                            onClick={() => handleCopy(refLink)}
+                            className="absolute z-10 inset-y-0 right-0 flex items-center px-4"
+                        >
+                            <ContentCopyRoundedIcon className='transition-all duration-300 hover:text-accent' />
+                        </button>
+                        <input
+                            value={refLink}
+                            type="text"
+                            name="referral link"
+                            readOnly
+                            className="
+                            text-gray-800 dark:text-slate-200
+                            block bg-primaryLite dark:bg-primary outline-none
+                            w-full shadow-inset-2 rounded-xl
+                            py-2 pl-12 pr-12 sm:text-sm"
+                        />
+                    </label>
+                </div>
                     <div className='flex col-span-2 lg:col-span-1 justify-end items-center'>
                         <div className="flex items-center justify-between gap-x-4">
                             <span className="inset-y-0 left-0 flex items-center md:pr-8 mx-4 md:border-r-2 border-r-gray-400">

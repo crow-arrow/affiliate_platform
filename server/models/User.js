@@ -88,7 +88,7 @@ const User = sequelize.define(
   },
   {
     timestamps: true,
-    tableName: "refferal_users",
+    tableName: "referral_users",
   }
 );
 

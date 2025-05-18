@@ -4,12 +4,13 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 
 import { AdminDashboard } from './admin_pages/AdminDashboard.jsx'
 import { Team } from './admin_pages/Team.jsx'
+import { Calendar } from './pages/Calendar.jsx'
 import { Invoices } from './admin_pages/Invoices.jsx'
 import { AllOrders } from './admin_pages/AllOrders.jsx'
 
 import { Dashboard } from './pages/Dashboard'
 import { Trips } from './pages/Trips.jsx'
-import { Calendar } from './pages/Calendar.jsx'
+import { CklicksList } from './pages/CklicksList.jsx'
 import { Documents } from './pages/Documents.jsx'
 import { Settings } from './pages/Settings.jsx'
 
@@ -69,7 +70,7 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="my-account" element={<Dashboard />} />
           <Route path="trips" element={<Trips />} />
-          <Route path="calendar" element={<Calendar />} />
+          <Route path="clicks-list" element={<CklicksList />} />
           <Route path="documents" element={<Documents />} />
           <Route path="settings" element={<Settings />} />
           <Route path="crop-avatar" element={<CropAvatar />} />

@@ -47,7 +47,7 @@ export const Layout = () => {
             <Header />
           </header>
           {/* Scrollable Main Section */}
-          <main className="flex-1 w-full overflow-auto my-4">
+          <main className="flex-1 w-full overflow-auto py-4 mb-8">
             <Outlet />
           </main>
         </div>
