@@ -25,7 +25,9 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(
   express.json({
-    origin: "http://localhost:5173",
+    // origin: "http://localhost:5173",
+    origin: "https://partner.jinn-travel.com",
+    credentials: true,
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type,Authorization",
   })

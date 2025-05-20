@@ -5,7 +5,7 @@ import RoofingRoundedIcon from '@mui/icons-material/RoofingRounded'
 import LuggageOutlinedIcon from '@mui/icons-material/LuggageOutlined'
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined'
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined'
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import LastPageIcon from '@mui/icons-material/LastPage';
 import LogoGoldXS from '../assets/LogoGoldXS.png'
 import { ProfileButton } from './ProfileButton'
 import PropTypes from 'prop-types'
@@ -55,8 +55,8 @@ export const Navbar = ({ isOpen, setIsOpen }) => {
               className="max-[900px]:hidden group/button transition-all duration-500 opacity-0 group-hover/header:opacity-100 z-50 inline-flex items-center justify-end mx-1 text-sm text-gray-500"
               onClick={openNav}
             >
-              <ArrowForwardIosIcon className={`transition-all duration-500 ${isOpen ? 'rotate-180' : ''}`} />
-              <div className='open-button-tooltip pointer-events-none group-hover/button:tooltip-show'>{isOpen ? "Close sidebar" : "Open sidebar"}</div>
+              <LastPageIcon className={`transition-all duration-500 ${isOpen ? 'rotate-180' : ''}`} />
+              <div className='open-button-tooltip pointer-events-none group-hover/button:tooltip-show'>{isOpen ? "Shrink sidebar" : "Expand sidebar"}</div>
             </button>
           </header>
           <nav>

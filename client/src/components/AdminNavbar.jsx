@@ -7,7 +7,7 @@ import AirplanemodeActiveOutlinedIcon from '@mui/icons-material/AirplanemodeActi
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined'
 import LocalActivityOutlinedIcon from '@mui/icons-material/LocalActivityOutlined'
 import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined'
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import LastPageIcon from '@mui/icons-material/LastPage';
 import LogoGoldXS from '../assets/LogoGoldXS.png'
 import {ProfileButton} from './ProfileButton'
 import PropTypes from 'prop-types'
@@ -72,9 +72,8 @@ export const AdminNavbar = ({ isOpen, setIsOpen }) => {
                         className="max-md:hidden group/button transition-all duration-500 opacity-0 group-hover/header:opacity-100 z-50 inline-flex items-center justify-end mx-1 text-sm text-gray-500"
                         onClick={openNav}
                     >
-                        <span className="sr-only">Open sidebar</span>
-                        <ArrowForwardIosIcon className={`transition-all duration-500 ${isOpen ? 'rotate-180' : ''}`} />
-                        <div className='open-button-tooltip pointer-events-none group-hover/button:tooltip-show'>{isOpen ? "Close sidebar" : "Open sidebar"}</div>
+                        <LastPageIcon className={`transition-all duration-500 ${isOpen ? 'rotate-180' : ''}`} />
+                        <div className='open-button-tooltip pointer-events-none group-hover/button:tooltip-show'>{isOpen ? "Shrink sidebar" : "Expand sidebar"}</div>
                     </button>
                 </header>
                 <nav>

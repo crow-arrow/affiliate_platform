@@ -55,7 +55,7 @@ export const SignUpPage = () => {
     } catch (errors) {
       if (errors && Array.isArray(errors) && errors.length > 0) {
 
-        toast.error(errors[0].message || "Unknown error");
+        toast.error(errors[0].message || "Server error");
         dispatch(clearErrors());
       }
     }
