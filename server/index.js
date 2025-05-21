@@ -22,16 +22,16 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
 app.use(
-  express.json({
-    // origin: "http://localhost:5173",
+  cors({
     origin: "https://partner.jinn-travel.com",
     credentials: true,
-    methods: "GET,POST,PUT,DELETE",
-    allowedHeaders: "Content-Type,Authorization",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
