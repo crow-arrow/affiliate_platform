@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import notFoundImage from "../assets/404.jpg"
+import notFoundImage from "../assets/404.avif"
 
 export const NotFound = () => (
     <div     
