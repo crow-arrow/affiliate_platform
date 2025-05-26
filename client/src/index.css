@@ -10,7 +10,8 @@
     font-family: "Lexend Giga", serif;
     min-height: 100vh;
   }
-  svg, path {
+  svg,
+  path {
     @apply transition-all duration-300 ease-in-out;
   }
   .hover\:bg-gradient-blurLite:hover {
@@ -20,30 +21,32 @@
     text-decoration: underline;
     color: inherit; /* Наследует цвет родительского элемента */
   }
-  
+
   .link:hover {
     color: #d8b21d; /* Замените на ваш цвет акцента */
   }
   .material-symbols-outlined {
-    font-variation-settings:
-    'FILL' 0,
-    'wght' 100,
-    'GRAD' 0,
-    'opsz' 24
+    font-variation-settings: "FILL" 0, "wght" 100, "GRAD" 0, "opsz" 24;
   }
   /* .fc-license-message {
     display: none;
   } */
   .sidebar-tooltip {
     @apply absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md
-    text-gray-500 bg-white dark:text-white dark:bg-secondary
+    text-gray-500 bg-white dark:text-white dark:bg-secondary2
     text-xs font-bold 
     transition-all duration-100 scale-0 origin-left;
   }
   .open-button-tooltip {
     @apply absolute w-auto p-2 m-2 min-w-max top-14 translate-x-1/2 rounded-md shadow-md
-    text-gray-500 bg-white dark:text-white dark:bg-secondary
+    text-gray-500 bg-white dark:text-white dark:bg-secondary2
     text-xs font-bold transition-all duration-0 scale-0 origin-left;
+  }
+  .info-tooltip {
+    @apply absolute z-50 left-1/2 mt-2 max-[500px]:-translate-x-1/2 
+    w-40 max-[400px]:w-fit p-2 rounded-md shadow-md drop-shadow-xl max-[500px]:origin-top
+    text-gray-500 bg-white dark:text-white dark:bg-secondary2
+    text-xs transition-all duration-100 scale-0 origin-top-left;
   }
   .tooltip-show {
     @apply scale-100 delay-500;
@@ -63,7 +66,7 @@
 
 @keyframes progress {
   from {
-    stroke-dashoffset: 848
+    stroke-dashoffset: 848;
   }
 }
 /* 
@@ -77,3 +80,8 @@
     cy: 0;
   }
 } */
+
+.my-svg-icon {
+  transform: rotate(180deg);
+  transform-origin: center;
+}

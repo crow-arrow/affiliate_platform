@@ -1,8 +1,8 @@
 import { useEffect } from "react"
-import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 import { Box, Typography, CircularProgress } from '@mui/material'
 import { useDispatch, useSelector } from "react-redux"
 import { getAllTrips } from "../redux/features/trips/tripSlice"
+import { ThemedDataGrid } from "../data_grid_theme/ThemedDataGrid"
 
 export const AllOrders = () => {
   console.log('Render List')
@@ -55,54 +55,12 @@ export const AllOrders = () => {
   }
 
   return (
-    <Box 
-      sx={{
-        "& .MuiDataGrid-root": {
-            padding: "16px",
-            border: "none",
-        },
-        "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-cell": {
-            margin: "auto",
-            color: "white",
-            borderTop: "none",
-        },
-        "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-row--borderBottom .MuiDataGrid-columnHeader": {
-          borderBottom: "none",
-          borderTop: "none",
-        },
-        "& .css-1tdeh38": {
-          borderTop: "none",
-        },
-        "& .MuiDataGrid-columnSeparator": {
-          width: "0.5px"
-        },
-        "& .MuiDataGrid-filler": {
-          borderTop: "none",
-          border: "none",
-        },
-        "& .MuiDataGrid-container--top": {
-            backgroundColor: (theme) => `${theme.palette.background.default} !important`,
-            color: "#87888C",
-        },
-        "& .MuiDataGrid-footerContainer": {
-          borderTop: "none",
-        },
-        "& .css-1hr2sou-MuiTablePagination-root, .MuiButtonBase-root > svg, .MuiTablePagination-actions > button, .MuiInputBase-root > svg": {
-          color: "#87888C",
-          fill: "#87888C",
-        },
-      }} 
-      style={{ height: '100%', width: '100%' }}
-      className="p-4 rounded-2xl bg-secondary"
-    >
-      <DataGrid 
-        rows={trips}
-        columns={columns}
-        checkboxSelection
-        disableRowSelectionOnClick
-        slots={{ toolbar: GridToolbar }}
-        getRowId={(row) => row.id}
-      />
-    </Box>
+  <ThemedDataGrid 
+    rows={trips}
+    columns={columns}
+    checkboxSelection
+    disableRowSelectionOnClick
+    getRowId={(row) => row.id}
+  />
   )
 }

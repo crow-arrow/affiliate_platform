@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 import { Box, Typography, Avatar, CircularProgress } from '@mui/material'
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import { useDispatch, useSelector } from 'react-redux'
@@ -7,6 +6,7 @@ import { fetchUsers } from '../redux/features/users/userSlice'
 import { toast } from 'react-toastify';
 import {API_URL} from "../config"
 import avatarLogo from '../assets/avatar.png'
+import { ThemedDataGrid } from '../data_grid_theme/ThemedDataGrid';
 
 export const Team = () => {
     console.log('Render List')
@@ -139,54 +139,12 @@ export const Team = () => {
     }
 
     return (
-        <Box 
-            sx={{
-                "& .MuiDataGrid-root": {
-                    padding: "16px",
-                    border: "none",
-                },
-                "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-cell": {
-                    margin: "auto",
-                    color: "white",
-                    borderTop: "none",
-                },
-                "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-row--borderBottom .MuiDataGrid-columnHeader": {
-                    borderBottom: "none",
-                    borderTop: "none",
-                },
-                "& .css-1tdeh38": {
-                    borderTop: "none",
-                },
-                "& .MuiDataGrid-columnSeparator": {
-                    width: "0.5px"
-                },
-                "& .MuiDataGrid-filler": {
-                    borderTop: "none",
-                    border: "none",
-                },
-                "& .MuiDataGrid-container--top": {
-                    backgroundColor: (theme) => `${theme.palette.background.default} !important`,
-                    color: "#87888C",
-                },
-                "& .MuiDataGrid-footerContainer": {
-                    borderTop: "none",
-                },
-                "& .css-1hr2sou-MuiTablePagination-root, .MuiButtonBase-root > svg, .MuiTablePagination-actions > button, .MuiInputBase-root > svg": {
-                    color: "#87888C",
-                    fill: "#87888C",
-                },
-            }} 
-            style={{ height: '100%', width: '100%' }}
-            className="p-4 rounded-2xl bg-secondary"
-        >
-        <DataGrid 
+        <ThemedDataGrid 
             rows={users}
             columns={columns}
             checkboxSelection
             disableRowSelectionOnClick
-            slots={{ toolbar: GridToolbar }}
             getRowId={(row) => row.id}
         />
-        </Box>
     )
 }

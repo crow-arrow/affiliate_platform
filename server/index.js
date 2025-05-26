@@ -20,11 +20,12 @@ const app = express();
 
 // Constants
 const PORT = process.env.PORT || 3001;
+const URL = process.env.CLIENT_URL;
 
 // Middleware
 app.use(
   cors({
-    origin: "https://partner.jinn-travel.com",
+    origin: URL,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],

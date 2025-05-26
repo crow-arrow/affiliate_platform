@@ -65,9 +65,8 @@ export const ProgressBar = () => {
                             viewBox="0 0 300 140"
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
-                            className="w-full h-full"
+                            className="w-full h-full my-svg-icon"
                             preserveAspectRatio="xMidYMid meet"
-                            transform="rotate(-180)"
                         >
                             <defs>
                                 <linearGradient id="linear-gradient-2" x2="0" y2="1"
@@ -138,9 +137,8 @@ export const ProgressBar = () => {
                                 viewBox="0 0 300 140"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="w-full h-full"
+                                className="w-full h-full my-svg-icon"
                                 preserveAspectRatio="xMidYMid meet"
-                                transform="rotate(-180)"
                             >
                                 <defs>
                                     <linearGradient id="linear-gradient-2" x2="0" y2="1"
@@ -210,9 +208,8 @@ export const ProgressBar = () => {
                                 viewBox="0 0 300 140"
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="w-full h-full"
+                                className="w-full h-full my-svg-icon"
                                 preserveAspectRatio="xMidYMid meet"
-                                transform="rotate(-180)"
                                 style={{ transition: 'transform 0.3s ease-in-out' }}
                             >
                                 <defs>

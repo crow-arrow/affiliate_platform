@@ -1,13 +1,11 @@
 import { useEffect } from "react"
-import { DataGrid, GridToolbar } from '@mui/x-data-grid'
 import { Box, CircularProgress, Typography } from '@mui/material'
 import { useDispatch, useSelector } from "react-redux"
 import { fetchTrips } from "../redux/features/users/userSlice"
+import { ThemedDataGrid } from "../data_grid_theme/ThemedDataGrid"
 
 export const Trips = () => {
 
-  // console.log('Render List')
-  
   const dispatch = useDispatch()
   const { trips, status, error } = useSelector((state) => state.user)
 
@@ -84,68 +82,11 @@ export const Trips = () => {
   }
 
   return (
-    <Box 
-        sx={{
-          flex: 1,
-          minWidth: 0,
-          "& .MuiDataGrid-root": {
-              padding: "16px",
-              border: "none",
-          },
-          "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-cell": {
-              margin: "auto",
-              color: "gray",
-              borderTop: "none",
-          },
-          "& .css-1bcfz0k-MuiDataGrid-root .MuiDataGrid-row--borderBottom .MuiDataGrid-columnHeader": {
-            borderBottom: "none",
-            borderTop: "none",
-          },
-          "& .css-1tdeh38": {
-            borderTop: "none",
-          },
-          "& .MuiDataGrid-columnSeparator": {
-            width: "0.5px"
-          },
-          "& .MuiDataGrid-filler": {
-            borderTop: "none",
-            border: "none",
-          },
-          "& .MuiDataGrid-container--top": {
-              backgroundColor: (theme) => `${theme.palette.background.default} !important`,
-              color: "#87888C",
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-          },
-          "& .css-1hr2sou-MuiTablePagination-root, .MuiButtonBase-root > svg, .MuiTablePagination-actions > button, .MuiInputBase-root > svg": {
-            color: "#87888C",
-            fill: "#87888C",
-          },
-          "& .name-column--cell": {
-            color: (theme) => `${theme.palette.secondary.main} !important`,
-            backgroundColor: (theme) => `${theme.custom.gradient} !important`,
-          },
-          "& .MuiDataGrid-toolbarContainer .MuiButtonText": {
-            color: "#ffffff",
-            backgroundColor: "black",
-          },
-          "& .css-1gtchvp-MuiPaper-root, .css-1ws6qdq-MuiPaper-root-MuiDataGrid-paper": {
-            color: "#ffffff",
-            backgroundColor: "#000000 !important",
-            borderRadius: "20px",
-          },
-        }} 
-        style={{ height: '100%', width: '100%' }}
-        className="p-4 rounded-2xl bg-white dark:bg-secondary"
-      >
-      <DataGrid 
-        rows={trips}
-        columns={columns}
-        disableRowSelectionOnClick
-        slots={{ toolbar: GridToolbar }}
-        getRowId={(row) => row.id}
-      />
-    </Box>
+    <ThemedDataGrid 
+      rows={trips}
+      columns={columns}
+      getRowId={(row) => row.id}
+      disableRowSelectionOnClick
+    />
   )
 }

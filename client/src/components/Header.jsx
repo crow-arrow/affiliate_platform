@@ -65,7 +65,7 @@ export const Header = () => {
                             text-gray-800 dark:text-slate-200
                             block bg-primaryLite dark:bg-primary outline-none
                             w-full shadow-inset-2 rounded-xl
-                            py-2 pl-12 pr-12 sm:text-sm"
+                            py-2 pl-12 pr-12 sm:text-sm transition-colors duration-300"
                         />
                     </label>
                 </div>

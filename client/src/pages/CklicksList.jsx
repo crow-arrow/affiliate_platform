@@ -18,8 +18,8 @@
 //     { field: 'booking_date', headerName: 'Booking Date', flex: 1 },
 //     { field: 'travel_date', headerName: 'Travel Date', flex: 1 },
 //     { field: 'order_status', headerName: 'Order Status', flex: 1 },
-//     { 
-//         field: 'total_price', 
+//     {
+//         field: 'total_price',
 //         headerName: 'Total Price in EUR',
 //         flex: 1,
 //         renderCell: (params) => {
@@ -37,9 +37,9 @@
 //     { field: 'commission', headerName: 'Commission', cellClassName: 'name-column--cell', flex: 1,
 //         renderCell: ({ row: { commission, isCompleted, isCanceled,  } }) => {
 //         return (
-//                 <Box 
+//                 <Box
 //                 className={`w-[100%] text-center p-1.5 rounded-md
-//                     ${isCompleted ? 'text-green-400' : 
+//                     ${isCompleted ? 'text-green-400' :
 //                         isCanceled ? 'text-red-700 line-through' : 'text-gray-400'}`}
 //                 >
 //                     <Typography>
@@ -81,7 +81,7 @@
 //     }
 
 //     return (
-//     <Box 
+//     <Box
 //         sx={{
 //             flex: 1,
 //             minWidth: 0,
@@ -132,11 +132,11 @@
 //             backgroundColor: "#000000 !important",
 //             borderRadius: "20px",
 //             },
-//         }} 
+//         }}
 //         style={{ height: '100%', width: '100%' }}
 //         className="p-4 rounded-2xl bg-white dark:bg-secondary"
 //         >
-//         <DataGrid 
+//         <DataGrid
 //         rows={trips}
 //         columns={columns}
 //         disableRowSelectionOnClick
@@ -149,9 +149,9 @@
 
 export const CklicksList = () => {
   return (
-    <div className="flex flex-col justify-between items-center gap-y-5">
-        <h2>CklicksList</h2>
-        <p>Coming soon...</p>
+    <div className="flex flex-col justify-between gap-y-5">
+      <h2 className="flex self-start">CklicksList</h2>
+      <p className="flex self-center text-3xl font-bold">Coming soon...</p>
     </div>
-  )
-}
+  );
+};

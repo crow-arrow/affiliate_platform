@@ -8,7 +8,7 @@ export default {
         primary: "#171821",
         primaryLite: "#EDEDF1",
         secondary: "rgba(255,255,255,0.1)",
-        secondary2: "#333440",
+        secondary2: "#2f3038",
         accent: "#d8b21d",
         accentGreen: "rgba(79,124,130,1)",
         accentAqua: "#A9DFD8",
