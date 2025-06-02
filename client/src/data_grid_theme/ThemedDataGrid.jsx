@@ -137,11 +137,8 @@ export const ThemedDataGrid = ({
       {globalMenuStyles} {/* Вставляем глобальные стили */}
       <Box
         sx={{
-          display: "flex",
-          flex: 1,
           minWidth: 0,
           height: "100%",
-          maxWidth: "100%",
           "& .MuiDataGrid-root": {
             padding: "16px",
             border: "none",
@@ -197,7 +194,15 @@ export const ThemedDataGrid = ({
           }}
           sx={{
             display: "grid",
-            gridTemplateRows: "auto 1f auto",
+            gridTemplateRows: "56px 1fr 48px",
+            "& .MuiDataGrid-toolbarContainer": {
+              minHeight: "56px",
+              maxHeight: "56px",
+            },
+            "& .MuiDataGrid-footerContainer": {
+              minHeight: "48px",
+              maxHeight: "48px",
+            },
           }}
         />
       </Box>

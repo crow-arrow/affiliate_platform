@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTrips, fetchUsers } from "../redux/features/users/userSlice";
+import { fetchClicks } from "../redux/features/clicks/clicksSlice";
 import { ProgressBar } from "../components/levelProgressBar";
 import { CommissionChart } from "../components/commissionChart";
 import { AnimatedNumber } from "../components/AnimatedNumber";
@@ -12,13 +13,15 @@ import AccountTreeRoundedIcon from "@mui/icons-material/AccountTreeRounded";
 import { CircularProgress } from "@mui/material";
 
 export const Dashboard = () => {
-  console.log("Dashboard render");
-
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([dispatch(fetchTrips()), dispatch(fetchUsers())]).then(() => {
+    Promise.all([
+      dispatch(fetchTrips()),
+      dispatch(fetchClicks()),
+      dispatch(fetchUsers()),
+    ]).then(() => {
       setLoading(false);
     });
   }, [dispatch]);
@@ -31,12 +34,14 @@ export const Dashboard = () => {
 
   const { trips } = useSelector((state) => state.user);
 
+  const { clicks } = useSelector((state) => state.clicks);
+  const clicksNumber = clicks.length;
+
   const lastThreeTrips = trips
     ?.slice()
     .sort((a, b) => new Date(b.booking_date) - new Date(a.booking_date))
     .slice(0, 3)
     .reverse();
-  console.log("Last 3 Orders", lastThreeTrips);
 
   const formatNumberWithCommas = (number) => {
     return new Intl.NumberFormat("en-US").format(number);
@@ -101,7 +106,7 @@ export const Dashboard = () => {
                 <AccountTreeRoundedIcon className="text-accentOrange" />
                 <b className="lg:text-xl xl:text-2xl">
                   <AnimatedNumber
-                    value={54}
+                    value={clicksNumber}
                     formatValue={(n) => formatNumberWithCommas(n)}
                   />
                 </b>

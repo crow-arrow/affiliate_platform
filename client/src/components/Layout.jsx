@@ -31,12 +31,11 @@ export const Layout = () => {
   }, []);
 
   return (
-    <div className="flex relative h-screen w-screen overflow-hidden px-4 lg:px-8">
+    <div className="relative h-screen overflow-hidden px-4 lg:px-8">
       {/* Background */}
       <div className="absolute inset-0 bg-primaryLite dark:bg-primary before:absolute before:inset-0 transition-colors duration-500"></div>
-
       {/* Content */}
-      <div className="relative z-10 flex flex-1 h-full text-gray-800 dark:text-gray-200">
+      <div className="relative z-10 flex h-full text-gray-800 dark:text-gray-200">
         {/* Sticky Navbar */}
         <aside
           className={`sticky top-0 z-20 self-start mr-8 mb-4 box-border text-gray-500 transition-[width] duration-300 ${
@@ -45,13 +44,13 @@ export const Layout = () => {
         >
           <Navbar isOpen={isOpen} setIsOpen={setIsOpen} />
         </aside>
-        <div className="flex flex-col flex-1 min-w-0 duration-300">
+        <div className="flex flex-col transition-[width] duration-300 flex-1">
           {/* Sticky Header */}
           <header className="sticky w-full h-20 top-0 z-20">
             <Header />
           </header>
           {/* Scrollable Main Section */}
-          <main className="flex flex-1 overflow-auto py-4 mb-8 min-w-0">
+          <main className="flex-1 w-full overflow-auto py-4 mb-8">
             <Outlet />
           </main>
         </div>

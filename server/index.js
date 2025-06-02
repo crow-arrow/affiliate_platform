@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import sequelize from "./config/database.js";
+import "./models/associations.js";
 import authRoutes from "./routes/auth.js";
 import resetPasswordRoutes from "./routes/reserPassword.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -38,7 +39,6 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/trips", tripsRoutes);
-// app.use("/api/assign-coupon", assignCouponRoute);
 app.use("/api/uploads", fileRoutes);
 app.use("/api/password", resetPasswordRoutes);
 app.use("/clicks-data", saveClickData);

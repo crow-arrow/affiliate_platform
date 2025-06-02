@@ -3,49 +3,66 @@ import sequelize from "../config/database.js";
 import User from "./User.js";
 
 const ClicksData = sequelize.define(
-  "referral_link_clicks",
+  "wp_affiliate_analytics",
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       primaryKey: true,
       autoIncrement: true,
     },
     affiliate_id: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    referer: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    ip_address: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    user_agent: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    timestamp: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      defaultValue: DataTypes.NOW,
+    },
+    referral_user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: User,
-        key: "affiliate_id",
+        key: "id",
       },
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
     },
     type: {
-      type: DataTypes.STRING,
-      allowNull: false,
+      type: DataTypes.STRING(20),
+      allowNull: true,
     },
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    ip_address: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    referrer: {
-      type: DataTypes.STRING,
+    device_type: {
+      type: DataTypes.STRING(20),
       allowNull: true,
     },
   },
   {
-    tableName: "referral_link_clicks",
+    tableName: "wp_affiliate_analytics",
     timestamps: false,
     indexes: [
       {
         fields: ["affiliate_id"],
       },
       {
-        fields: ["date"],
+        fields: ["ip_address"],
+      },
+      {
+        fields: ["referral_user_id"],
+        name: "fk_referral_user_id",
       },
     ],
   }

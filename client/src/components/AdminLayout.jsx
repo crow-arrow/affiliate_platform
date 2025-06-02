@@ -39,13 +39,13 @@ export const AdminLayout = () => {
       <div className="relative z-10 flex h-full text-gray-800 dark:text-gray-200">
         {/* Sticky Navbar */}
         <aside
-          className={`sticky top-0 self-start mr-8 mb-4 box-border text-gray-500 transition-[width] duration-300 ${
+          className={`sticky top-0 z-20 self-start mr-8 mb-4 box-border text-gray-500 transition-[width] duration-300 ${
             isOpen ? "w-64" : "w-12"
           }`}
         >
           <AdminNavbar isOpen={isOpen} setIsOpen={setIsOpen} />
         </aside>
-        <div className="flex flex-col transition-[width] duration-300 flex-1">
+        <div className="flex flex-col flex-1 transition-[width] duration-300">
           {/* Sticky Header */}
           <header className="sticky h-20 top-0 z-20">
             <Header />

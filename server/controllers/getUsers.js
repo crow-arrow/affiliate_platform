@@ -81,6 +81,7 @@ export const getUserTrips = async (req, res) => {
         {
           model: LevelHistory,
           as: "levelHistory",
+          separate: true,
           order: [["changed_at", "ASC"]],
         },
       ],
