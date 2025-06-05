@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { ThemedDataGrid } from "../data_grid_theme/ThemedDataGrid";
 import { Box, CircularProgress, Typography } from "@mui/material";
+import { ThemedDataGrid } from "../data_grid_theme/ThemedDataGrid";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchClicks } from "../redux/features/clicks/clicksSlice";
 

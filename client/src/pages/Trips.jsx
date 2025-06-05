@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { Box, CircularProgress, Typography } from "@mui/material";
+import { ThemedDataGrid } from "../data_grid_theme/ThemedDataGrid";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTrips } from "../redux/features/users/userSlice";
-import { ThemedDataGrid } from "../data_grid_theme/ThemedDataGrid";
 
 export const Trips = () => {
   const dispatch = useDispatch();

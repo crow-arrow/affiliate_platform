@@ -2,7 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { signUpSchema, loginSchema } from "../validations/validationSchemas.js";
-import { sendVerificationEmail } from "../controllers/emailController.js";
+import { sendVerificationEmail } from "../utils/mailer.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -53,13 +53,13 @@ export const signUp = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "30m" }
     );
-    sendVerificationEmail(newUser.email, token);
+    sendVerificationEmail(newUser.email, newUser.first_name, token);
 
     res.status(201).json({
       user: { id: newUser.id, email: newUser.email },
       token,
       message:
-        "Account successfully created. Please check your email to verify your account.",
+        "Account created successfully. Please check your email to verify your account.",
     });
   } catch (error) {
     res.status(500).json({ message: "User creation error" });

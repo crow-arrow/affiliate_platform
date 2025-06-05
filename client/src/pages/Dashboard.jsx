@@ -4,7 +4,7 @@ import { fetchTrips, fetchUsers } from "../redux/features/users/userSlice";
 import { fetchClicks } from "../redux/features/clicks/clicksSlice";
 import { ProgressBar } from "../components/levelProgressBar";
 import { CommissionChart } from "../components/commissionChart";
-import { AnimatedNumber } from "../components/AnimatedNumber";
+import { AnimatedNumber } from "../components/utils/AnimatedNumber";
 
 import CurrencyExchangeRoundedIcon from "@mui/icons-material/CurrencyExchangeRounded";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";

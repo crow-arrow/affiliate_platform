@@ -115,7 +115,7 @@ export const CommissionChart = () => {
                         <div class="block w-full bg-primaryLite dark:bg-primary px-4 py-2">
                             <strong>${label}</strong><br/>
                         </div>
-                        <div class="bg-white dark:bg-secondary2 text-gray-700 dark:text-gray-300 p-4">
+                        <div class="bg-white dark:bg-primary/70 backdrop-blur-sm text-gray-700 dark:text-gray-300 p-4">
                             <span style="color: #A9DFD8;">●</span> Earned: ${earned}<br/>
                             <span style="color: #FEB95A;">●</span> Total: ${total}
                         </div>
