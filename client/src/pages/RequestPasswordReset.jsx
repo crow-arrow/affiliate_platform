@@ -87,11 +87,12 @@ export const RequestPasswordReset = () => {
               type="submit"
               disabled={loading}
               tabIndex={2}
-              className="flex w-full justify-center rounded-3xl bg-accent mt-10 px-3 py-1.5 
-                                text-sm font-semibold text-gray-100 shadow-sm hover:bg-accentDark 
-                                focus-visible:outline focus-visible:outline-2 
-                                focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-95 transition-all
-                                disabled:scale-100 disabled:shadow-inset-2 disabled:bg-accentDark disabled:animate-pulse disabled:cursor-progress"
+              className="
+                flex w-full justify-center rounded-3xl bg-accent mt-10 px-3 py-1.5 
+                text-sm font-semibold text-gray-100 shadow-sm hover:bg-accentDark 
+                focus-visible:outline focus-visible:outline-2 
+                focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-95 transition-all
+                disabled:scale-100 disabled:shadow-inset-2 disabled:bg-accentDark disabled:animate-pulse disabled:cursor-progress"
             >
               {loading ? (
                 <>
