@@ -6,7 +6,7 @@ export const fetchClicks = createAsyncThunk(
   "clicks/fetchClicks",
   async (userId, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get(`/users/${userId}/clicks`); // <--- Исправлено
+      const { data } = await axios.get(`/users/${userId}/clicks`);
       return data;
     } catch (error) {
       return rejectWithValue(

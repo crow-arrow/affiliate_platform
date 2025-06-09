@@ -12,7 +12,6 @@ const router = new Router();
 router.get("/get-users", getAllUsers); // Все пользователи
 router.get("/get-user/:id", checkAuth, getUserById); // Один пользователь
 router.get("/:id/trips", checkAuth, getUserTrips);
-console.log("Defining route /:id/clicks");
 router.get("/:id/clicks", checkAuth, getUserClicks);
 router.get("/:id/edit-profile", checkAuth, getUserTrips);
 
