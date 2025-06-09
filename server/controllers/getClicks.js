@@ -1,6 +1,9 @@
 import { ClicksData, User } from "../models/models.js";
 
 export const getUserClicks = async (req, res) => {
+  console.log("getUserClicks controller reached!");
+  console.log("req.params.id:", req.params.id); // Убедитесь, что здесь реальный ID, а не ":id"
+  console.log("req.user.id:", req.user?.id);
   try {
     const user = await User.findByPk(req.user.id, {
       include: [
