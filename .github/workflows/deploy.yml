@@ -28,7 +28,7 @@ jobs:
 
       - name: 📦 Installing dependencies
         working-directory: client
-        run: npm install --omit=dev
+        run: npm ci --only=production
 
       - name: ⚙️ Build project
         run: npm run build
