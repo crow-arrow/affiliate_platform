@@ -76,7 +76,7 @@ export const getAllUsers = async (req, res) => {
 // Get User Trips
 export const getUserTrips = async (req, res) => {
   try {
-    const user = await User.findByPk(req.userId, {
+    const user = await User.findByPk(req.user.id, {
       include: [
         {
           model: LevelHistory,

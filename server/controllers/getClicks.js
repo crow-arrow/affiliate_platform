@@ -2,7 +2,7 @@ import { ClicksData, User } from "../models/models.js";
 
 export const getUserClicks = async (req, res) => {
   try {
-    const user = await User.findByPk(req.userId, {
+    const user = await User.findByPk(req.user.id, {
       include: [
         {
           model: ClicksData,
@@ -23,6 +23,6 @@ export const getUserClicks = async (req, res) => {
     res.json({ userId: user.id, clicks });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ massege: "Server error", error: error.massege });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };

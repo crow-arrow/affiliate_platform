@@ -12,7 +12,7 @@ export const checkAuth = (req, res, next) => {
   try {
     const decoded = verify(token, process.env.JWT_SECRET);
 
-    req.userId = decoded.id;
+    req.user = decoded;
     return next();
   } catch (error) {
     console.error("JWT Verification Error:", error);

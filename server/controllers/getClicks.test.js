@@ -12,7 +12,7 @@ vi.mock("../models/models.js", () => ({
 }));
 
 describe("getUserClicks", () => {
-  const mockReq = { userId: 1 };
+  const mockReq = { user: { id: 1 } };
   const mockRes = {
     status: vi.fn().mockReturnThis(),
     json: vi.fn(),
@@ -60,8 +60,8 @@ describe("getUserClicks", () => {
 
     expect(mockRes.status).toHaveBeenCalledWith(500);
     expect(mockRes.json).toHaveBeenCalledWith({
-      massege: "Server error",
-      error: error.massege,
+      message: "Server error",
+      error: error.message,
     });
   });
 });
