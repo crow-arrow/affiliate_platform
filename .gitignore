@@ -41,3 +41,8 @@ yarn.lock
 
 # Gitignore
 .gitignore
+
+# lints
+.stylelintrc.json
+.eslintrc.json
+eslint.config.js

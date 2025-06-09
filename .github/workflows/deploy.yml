@@ -31,6 +31,7 @@ jobs:
         run: npm install --omit=dev --legacy-peer-deps
 
       - name: ⚙️ Build project
+        working-directory: client
         run: npm run build
 
       - name: 🧹 Clean target directory on server
