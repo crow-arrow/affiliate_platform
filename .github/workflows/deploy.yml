@@ -28,7 +28,7 @@ jobs:
 
       - name: 📦 Installing dependencies
         working-directory: client
-        run: npm ci --only=production
+        run: npm install --omit=dev --legacy-peer-deps
 
       - name: ⚙️ Build project
         run: npm run build
