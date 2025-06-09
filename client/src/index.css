@@ -10,10 +10,10 @@
     font-family: "Lexend Giga", serif;
     min-height: 100vh;
   }
-  svg,
+  /* svg,
   path {
     @apply transition-all duration-300 ease-in-out;
-  }
+  } */
   .hover\:bg-gradient-blurLite:hover {
     @apply transition-all duration-300 ease-in-out;
   }

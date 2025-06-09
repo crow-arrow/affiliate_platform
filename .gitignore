@@ -46,3 +46,7 @@ yarn.lock
 .stylelintrc.json
 .eslintrc.json
 eslint.config.js
+
+# uploads
+/uploads/*
+!/uploads/.gitkeep
