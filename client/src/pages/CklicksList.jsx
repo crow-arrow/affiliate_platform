@@ -7,10 +7,11 @@ import { fetchClicks } from "../redux/features/clicks/clicksSlice";
 export const CklicksList = () => {
   const dispatch = useDispatch();
   const { clicks, status, error } = useSelector((state) => state.clicks);
+  const currentUser = useSelector((state) => state.auth.user);
 
   useEffect(() => {
-    dispatch(fetchClicks());
-  }, [dispatch]);
+    dispatch(fetchClicks(currentUser.id));
+  }, [dispatch, currentUser.id]);
 
   const columns = [
     { field: "id", headerName: "Order ID" },

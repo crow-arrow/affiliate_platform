@@ -19,7 +19,7 @@ export const Dashboard = () => {
   useEffect(() => {
     Promise.all([
       dispatch(fetchTrips()),
-      dispatch(fetchClicks()),
+      dispatch(fetchClicks(currentUser.id)),
       dispatch(fetchUsers()),
     ]).then(() => {
       setLoading(false);

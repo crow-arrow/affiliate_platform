@@ -4,9 +4,9 @@ import axios from "../../../utils/axios";
 // Get User Clicks
 export const fetchClicks = createAsyncThunk(
   "clicks/fetchClicks",
-  async (_, { rejectWithValue }) => {
+  async (userId, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get("/users/:id/clicks");
+      const { data } = await axios.get(`/users/${userId}/clicks`); // <--- Исправлено
       return data;
     } catch (error) {
       return rejectWithValue(
