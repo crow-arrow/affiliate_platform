@@ -50,7 +50,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "dist/*"
+          source: "client/dist/*"
           target: "/var/www/partners.jinn-travel.com"
 
       - name: 🔄 Restart nginx
