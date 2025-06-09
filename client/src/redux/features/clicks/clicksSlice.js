@@ -3,7 +3,7 @@ import axios from "../../../utils/axios";
 
 // Get User Clicks
 export const fetchClicks = createAsyncThunk(
-  "trips/fetchClicks",
+  "clicks/fetchClicks",
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await axios.get("/users/:id/clicks");
