@@ -50,9 +50,8 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "client/dist"
+          source: "client/dist/*"
           target: "/var/www/partners.jinn-travel.com"
-          strip_components: 1
 
       - name: 🔄 Restart nginx
         uses: appleboy/ssh-action@v0.1.10
@@ -65,5 +64,9 @@ jobs:
       - name: 📩 Notify in Telegram
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-            -d text="✅ Frontend deployed successfully!\n👤 Author: ${{ github.actor }}\n💬 Message: ${{ github.event.head_commit.message }}"
+            -H "Content-Type: application/json" \
+            -d '{
+              "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
+              "text": "✅ Frontend deployed successfully!\n👤 Author: ${{ github.actor }}\n💬 Message: ${{ github.event.head_commit.message }}",
+              "parse_mode": "Markdown"
+            }'
