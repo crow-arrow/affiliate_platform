@@ -1,0 +1,67 @@
+name: Build and Deploy Affiliate Platform
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔄 Git clone
+        uses: actions/checkout@v3
+
+      - name: 🧩 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: ♻️ Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: 📦 Installing dependencies
+        working-directory: client
+        run: npm install --omit=dev
+
+      - name: ⚙️ Build project
+        run: npm run build
+
+      - name: 🧹 Clean target directory on server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            find /var/www/partners.jinn-travel.com/ -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.map' \) -delete
+            rm -rf /var/www/partners.jinn-travel.com/assets
+
+      - name: 🚀 Deploy to the server with SSH
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "dist/*"
+          target: "/var/www/partners.jinn-travel.com"
+
+      - name: 🔄 Restart nginx
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: sudo systemctl restart nginx
+
+      - name: 📩 Notify in Telegram
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="✅ Frontend deployed successfully!\n👤 Author: ${{ github.actor }}\n💬 Message: ${{ github.event.head_commit.message }}"
