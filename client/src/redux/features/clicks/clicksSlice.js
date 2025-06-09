@@ -10,7 +10,7 @@ export const fetchClicks = createAsyncThunk(
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Error clicks loading"
+        error.response?.data?.massage || "Error clicks loading"
       );
     }
   }

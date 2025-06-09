@@ -13,7 +13,6 @@ import tripsRoutes from "./routes/tripsRoutes.js";
 import User from "./models/User.js";
 import LevelHistory from "./models/LevelHistory.js";
 import fileRoutes from "./routes/fileRoutes.js";
-import saveClickData from "./routes/saveClickData.js";
 
 dotenv.config();
 
@@ -41,7 +40,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/trips", tripsRoutes);
 app.use("/api/uploads", fileRoutes);
 app.use("/api/password", resetPasswordRoutes);
-app.use("/clicks-data", saveClickData);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
