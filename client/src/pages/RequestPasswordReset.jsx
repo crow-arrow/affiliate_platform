@@ -27,7 +27,7 @@ export const RequestPasswordReset = () => {
       toast.error(requestResetError);
       dispatch(clearErrors());
     }
-  }, [status, message, requestResetError, dispatch, navigate]);
+  }, [status, message, requestResetError]);
 
   const loading = status === "loading";
 

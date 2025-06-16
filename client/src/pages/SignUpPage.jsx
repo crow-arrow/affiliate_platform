@@ -25,7 +25,7 @@ export const SignUpPage = () => {
 
   useEffect(() => {
     dispatch(logout());
-  }, [dispatch]);
+  }, []);
 
   const loading = status === "loading";
 
@@ -54,7 +54,7 @@ export const SignUpPage = () => {
       setPassword("");
       setConfirmPassword("");
 
-      navigate("/sent-message", { state: { email } });
+      navigate("/email-verification", { state: { email } });
     } catch (errors) {
       if (errors && Array.isArray(errors) && errors.length > 0) {
         toast.error(errors[0].message || "Server error");

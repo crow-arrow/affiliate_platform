@@ -10,7 +10,7 @@ export const Trips = () => {
 
   useEffect(() => {
     dispatch(fetchTrips());
-  }, [dispatch]);
+  }, []);
 
   const columns = [
     { field: "id", headerName: "Order ID" },

@@ -24,7 +24,7 @@ export const Dashboard = () => {
     ]).then(() => {
       setLoading(false);
     });
-  }, [dispatch]);
+  }, []);
 
   const currentUser = useSelector((state) => state.auth.user);
   const tripsCount = currentUser?.booked_trips_count;

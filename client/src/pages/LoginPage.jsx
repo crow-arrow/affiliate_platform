@@ -31,7 +31,7 @@ export const LoginPage = () => {
         navigate("/my-account");
       }
     }
-  }, [status, message, errors, isAuth, user, role, navigate]);
+  }, [status, message, errors, isAuth, user, role]);
 
   const loading = status === "loading";
 

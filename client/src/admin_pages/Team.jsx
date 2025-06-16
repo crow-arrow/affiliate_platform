@@ -14,7 +14,7 @@ export const Team = () => {
 
   useEffect(() => {
     dispatch(fetchUsers());
-  }, [dispatch]);
+  }, []);
 
   const handleCopy = (id) => {
     navigator.clipboard

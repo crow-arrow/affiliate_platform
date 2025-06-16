@@ -1,5 +1,10 @@
 import express from "express";
-import { signUp, login, getMe } from "../controllers/auth.js";
+import {
+  signUp,
+  sendVerificationEmail,
+  login,
+  getMe,
+} from "../controllers/auth.js";
 import { passwordResetLimiter } from "../middleware/rateLimiter.js";
 import {
   verifyEmail,
@@ -12,9 +17,6 @@ const router = express.Router();
 //Register
 // http://localhost:3002/api/auth/signup
 router.post("/signup", signUp);
-
-// Email Confirmation
-router.post("/send-verification-email", signUp);
 
 // http://localhost:3002/api/auth/verify-email
 router.get("/verify-email/:token", verifyEmail);

@@ -21,7 +21,7 @@ export const signUp = async (req, res) => {
     }
 
     const { email, phone, first_name, last_name, password } = req.body;
-    const isUsed = await User.findOne({ where: { email } });
+    const isUsed = await User.findOne({ email });
 
     if (isUsed) {
       return res.status(409).json({ message: "Email already exists" });

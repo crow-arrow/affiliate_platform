@@ -43,7 +43,7 @@ function App() {
 
   useEffect(() => {
     dispatch(getMe()).finally(() => setIsLoaded(true));
-  }, [dispatch]);
+  }, []);
 
   if (!isLoaded) {
     return (
@@ -69,7 +69,7 @@ function App() {
         <Route path="/verify-email/:token" element={<EmailVerification />} />
         <Route path="/reset-password/:token" element={<PasswordRecover />} />
         <Route path="/request-reset" element={<RequestPasswordReset />} />
-        <Route path="/sent-message" element={<EmailSentMessage />} />
+        <Route path="/email-verification" element={<EmailSentMessage />} />
 
         <Route
           path="/"

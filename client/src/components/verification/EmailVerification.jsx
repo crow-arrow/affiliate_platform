@@ -18,7 +18,7 @@ export const EmailVerification = () => {
     if (token) {
       dispatch(verifyEmail(token));
     }
-  }, [token, dispatch]);
+  }, [token]);
 
   useEffect(() => {
     if (status === "succeeded") {
@@ -27,7 +27,7 @@ export const EmailVerification = () => {
     } else if (status === "failed") {
       toast.error(error || "An error occurred");
     }
-  }, [status, message, error, navigate]);
+  }, [status, message, error]);
 
   return (
     <div className="flex flex-col w-full h-screen bg-gradient-primary justify-center items-center">

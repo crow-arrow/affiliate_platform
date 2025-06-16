@@ -22,7 +22,7 @@ export const EmailSentMessage = () => {
     if (status === "failed") {
       setTimeout(() => navigate("/login"), 2000);
     }
-  }, [status, navigate]);
+  }, [status]);
 
   useEffect(() => {
     if (location.state?.email) {
