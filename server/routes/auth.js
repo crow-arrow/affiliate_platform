@@ -1,10 +1,5 @@
 import express from "express";
-import {
-  signUp,
-  sendVerificationEmail,
-  login,
-  getMe,
-} from "../controllers/auth.js";
+import { signUp, login, getMe } from "../controllers/auth.js";
 import { passwordResetLimiter } from "../middleware/rateLimiter.js";
 import {
   verifyEmail,
