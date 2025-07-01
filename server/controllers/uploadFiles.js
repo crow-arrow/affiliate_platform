@@ -16,10 +16,11 @@ export const uploadAvatar = async (req, res) => {
     }
 
     const oldAvatar = user.avatarUrl
-      ? path.join("uploads/", path.basename(user.avatarUrl))
+      ? path.join("/var/www/uploads", path.basename(user.avatarUrl))
       : null;
 
     user.avatarUrl = `uploads/${req.file.filename}`;
+    console.log("🧾 req.file:", req.file);
     await user.save();
 
     if (
