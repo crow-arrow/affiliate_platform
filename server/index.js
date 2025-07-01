@@ -36,8 +36,15 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/me", meRoutes);
-console.log("✅ /api/me route hit:", req.method, req.url);
+// app.use("/api/me", meRoutes);
+app.use(
+  "/api/me",
+  (req, res, next) => {
+    console.log("✅ /api/me route hit:", req.method, req.url);
+    next();
+  },
+  meRoutes
+);
 app.use("/api/users", userRoutes);
 app.use("/api/trips", tripsRoutes);
 app.use("/api/password", resetPasswordRoutes);
