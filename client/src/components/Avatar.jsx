@@ -57,7 +57,7 @@ export const CropAvatar = ({ isOpen, onClose }) => {
     setLoading(true);
 
     const blob = await fetch(preview).then((res) => res.blob());
-    const file = new File([blob], "avatar.png", { type: "image/png" });
+    const file = new File([blob], "avatar.webp", { type: "image/webp" });
 
     const formData = new FormData();
     formData.append("avatar", file);

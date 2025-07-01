@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../redux/features/users/userSlice";
 import { toast } from "react-toastify";
 import { API_URL } from "../config";
-import avatarLogo from "../assets/avatar.png";
+import avatarLogo from "../assets/avatar.webp";
 import { ThemedDataGrid } from "../data_grid_theme/ThemedDataGrid";
 
 export const Team = () => {

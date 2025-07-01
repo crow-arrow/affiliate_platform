@@ -6,7 +6,7 @@ export const uploadAvatar = createAsyncThunk(
   "user/uploadAvatar",
   async (formData, { dispatch, rejectWithValue }) => {
     try {
-      const { data } = await axios.patch("/uploads/avatar", formData, {
+      const { data } = await axios.patch("/me/upload-avatar", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -39,6 +39,21 @@ export const fetchUsers = createAsyncThunk(
 // Get User Trips
 export const fetchTrips = createAsyncThunk(
   "trips/fetchTrips",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get("/me/trips");
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Error trips loading"
+      );
+    }
+  }
+);
+
+// Get User Trips
+export const teamTrips = createAsyncThunk(
+  "trips/teamTrips",
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await axios.get("/users/:id/trips");
@@ -118,6 +133,21 @@ const userSlice = createSlice({
         state.tripsError = null;
       })
       .addCase(fetchTrips.rejected, (state, action) => {
+        state.tripsStatus = "failed";
+        state.tripsError = action.payload;
+      })
+
+      // Get User Trips for Admin
+      .addCase(teamTrips.pending, (state) => {
+        state.tripsStatus = "loading";
+        state.tripsError = null;
+      })
+      .addCase(teamTrips.fulfilled, (state, action) => {
+        state.tripsStatus = "succeeded";
+        state.trips = action.payload.trips;
+        state.tripsError = null;
+      })
+      .addCase(teamTrips.rejected, (state, action) => {
         state.tripsStatus = "failed";
         state.tripsError = action.payload;
       });

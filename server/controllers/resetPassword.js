@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { resetPasswordValidation } from "../validations/validationSchemas.js";
+import { resetPasswordValidation } from "../middleware/validationSchemas.js";
 import { sendPasswordResetEmail } from "../utils/mailer.js";
 import User from "../models/User.js";
 import dotenv from "dotenv";

@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { getMe, registerUser } from "../redux/features/auth/authSlice";
 import { CropAvatar } from "../components/Avatar";
-import avatarLogo from "../assets/avatar.png";
+import avatarLogo from "../assets/avatar.webp";
 import { API_URL } from "../config";
 
 import PartyModeOutlinedIcon from "@mui/icons-material/PartyModeOutlined";

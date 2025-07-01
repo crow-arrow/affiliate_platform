@@ -41,6 +41,8 @@ const User = sequelize.define(
     affiliate_id: {
       type: DataTypes.STRING,
       allowNull: true,
+      charset: "utf8mb4",
+      collate: "utf8mb4_unicode_520_ci",
     },
     role: {
       type: DataTypes.STRING,
@@ -89,6 +91,8 @@ const User = sequelize.define(
   {
     timestamps: true,
     tableName: "referral_users",
+    charset: "utf8mb4",
+    collate: "utf8mb4_unicode_520_ci",
   }
 );
 

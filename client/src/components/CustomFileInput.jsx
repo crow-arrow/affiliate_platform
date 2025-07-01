@@ -5,7 +5,7 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import PropTypes from "prop-types";
 import { Cropper, CircleStencil } from "react-advanced-cropper";
 import "react-advanced-cropper/dist/themes/corners.css";
-import profileBlank from "../assets/profile_blank.webp";
+import profileBlank from "../assets/avatar.webp";
 
 export const CustomFileInput = ({
   width = 390,

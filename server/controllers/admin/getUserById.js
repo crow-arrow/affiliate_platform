@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import User from "../../models/User.js";
 
 export const getUserById = async (req, res) => {
   try {
@@ -10,18 +10,23 @@ export const getUserById = async (req, res) => {
 
     const user = await User.findByPk(userId, {
       attributes: { exclude: ["password"] },
+      include: [
+        { association: "levelHistory", as: "levelHistory" },
+        { association: "clicksData", as: "clicksData" },
+        { association: "affiliateTrips", as: "affiliateTrips" },
+      ],
     });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Проверяем доступ: либо сам пользователь, либо админ
-    if (req.user?.id !== user.id && req.user?.role !== "admin") {
-      return res.status(403).json({ message: "Access denied" });
-    }
-
-    res.json(user);
+    res.json({
+      user,
+      levelHistory: user.levelHistory,
+      clicksData: user.clicksData,
+      affiliateTrips: user.affiliateTrips,
+    });
   } catch (error) {
     console.error("Error loading user:", error);
     res.status(500).json({ message: "Error loading data" });

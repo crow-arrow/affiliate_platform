@@ -5,7 +5,7 @@ import {
   verifyEmail,
   resendEmailController,
 } from "../controllers/emailController.js";
-import { checkAuth } from "../utils/checkAuth.js";
+import { checkAuth } from "../middleware/checkAuth.js";
 
 const router = express.Router();
 

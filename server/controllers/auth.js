@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { signUpSchema, loginSchema } from "../validations/validationSchemas.js";
+import { signUpSchema, loginSchema } from "../middleware/validationSchemas.js";
 import { sendVerificationEmail } from "../utils/mailer.js";
 import dotenv from "dotenv";
 dotenv.config();
@@ -21,7 +21,7 @@ export const signUp = async (req, res) => {
     }
 
     const { email, phone, first_name, last_name, password } = req.body;
-    const isUsed = await User.findOne({ email });
+    const isUsed = await User.findOne({ where: { email } });
 
     if (isUsed) {
       return res.status(409).json({ message: "Email already exists" });

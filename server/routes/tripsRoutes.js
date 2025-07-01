@@ -1,10 +1,10 @@
-import express from "express"
-import { getAllTrips } from "../controllers/getTrips.js"
+import express from "express";
+import { getAllTrips } from "../controllers/admin/getTrips.js";
+import { checkAuth, checkRole } from "../middleware/checkAuth.js";
 
-const router = express.Router()
+const router = express.Router();
 
 // http://localhost:3002/api/trips
-router.get("/get-all-trips", getAllTrips)
+router.get("/get-all-trips", checkAuth, checkRole(["Admin"]), getAllTrips);
 
-
-export default router
+export default router;
