@@ -62,6 +62,34 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: sudo systemctl restart nginx
 
+      - name: 🚛 Upload backend (server/)
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "server"
+          target: "/root/partner-api/affiliate_platform"
+
+      - name: 📦 Install backend dependencies
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /root/partner-api/affiliate_platform/server
+            npm install --production
+
+      - name: 🔁 Restart PM2 backend process
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            pm2 restart affiliate_server
+
       - name: 📩 Notify in Telegram
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \

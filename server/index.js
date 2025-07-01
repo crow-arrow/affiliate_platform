@@ -36,15 +36,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
-// app.use("/api/me", meRoutes);
-app.use(
-  "/api/me",
-  (req, res, next) => {
-    console.log("✅ /api/me route hit:", req.method, req.url);
-    next();
-  },
-  meRoutes
-);
+app.use("/api/me", meRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/trips", tripsRoutes);
 app.use("/api/password", resetPasswordRoutes);
@@ -53,16 +45,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const uploadPath = path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadPath));
-
-app.use((req, res, next) => {
-  console.log("💬 Incoming request:", req.method, req.url);
-  next();
-});
-
-app.use((req, res, next) => {
-  console.log(`📥 [${new Date().toISOString()}] ${req.method} ${req.url}`);
-  next();
-});
 
 // Start Server
 async function start() {
