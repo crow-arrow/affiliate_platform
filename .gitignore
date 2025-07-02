@@ -50,3 +50,6 @@ eslint.config.js
 # uploads
 /uploads/*
 !/uploads/.gitkeep
+
+# config
+client/src/config.js
