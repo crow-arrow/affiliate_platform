@@ -79,7 +79,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /root/partner-api/affiliate_platform/server
-            npm install --omit=dev
+            npm install --production --legacy-peer-deps
 
       - name: 🔁 Restart PM2 backend process
         uses: appleboy/ssh-action@v0.1.10
