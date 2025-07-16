@@ -88,7 +88,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            pm2 restart affiliate_server
+            sudo pm2 restart affiliate_server
 
       - name: 📩 Notify in Telegram
         run: |
