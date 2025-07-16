@@ -11,8 +11,8 @@ import meRoutes from "./routes/me.js";
 import resetPasswordRoutes from "./routes/reserPassword.js";
 import userRoutes from "./routes/userRoutes.js";
 import tripsRoutes from "./routes/tripsRoutes.js";
-// import User from "./models/User.js";
-// import LevelHistory from "./models/LevelHistory.js";
+import User from "./models/User.js";
+import LevelHistory from "./models/LevelHistory.js";
 
 dotenv.config();
 
