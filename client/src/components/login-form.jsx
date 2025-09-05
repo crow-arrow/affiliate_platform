@@ -64,6 +64,8 @@ export function LoginForm({ className, ...props }) {
     try {
       await signIn.authenticateWithRedirect({
         strategy,
+        redirectUrl: window.location.origin + "/sso-callback",
+        redirectUrlComplete: window.location.origin + "/my-account",
       });
     } catch (err) {
       console.error("OAuth error:", err);
