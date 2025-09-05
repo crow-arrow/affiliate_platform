@@ -30,6 +30,11 @@ jobs:
         working-directory: client
         run: npm install --legacy-peer-deps
 
+      - name: 📄 Create .env.production
+        working-directory: client
+        run: |
+          echo "VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.CLERK_PUBLISHABLE_KEY }}" >> .env.production
+
       - name: ⚙️ Build project
         working-directory: client
         run: npm run build
