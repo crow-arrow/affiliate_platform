@@ -27,13 +27,16 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { getMe, checkIsAuth } from "./redux/features/auth/authSlice.js";
+import {
+  getMe,
+  checkIsAuth,
+  loginUser,
+} from "./redux/features/auth/authSlice.js";
 import { CropAvatar } from "./components/Avatar.jsx";
 import { Box, CircularProgress } from "@mui/material";
+import { useUser } from "@clerk/clerk-react";
 
 function App() {
-  console.log("App rendered");
-
   const dispatch = useDispatch();
   const isAuth = useSelector(checkIsAuth);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -41,9 +44,36 @@ function App() {
   const emailVerified = user?.emailVerified === true;
   const showAppLayout = isLoaded && isAuth && user && emailVerified;
 
+  const { isSignedIn, user: clerkUser } = useUser();
+
+  console.log("isSignedIn:", isSignedIn);
+  console.log("user:", user);
+
   useEffect(() => {
-    dispatch(getMe()).finally(() => setIsLoaded(true));
-  }, []);
+    const runAuthFlow = async () => {
+      if (isSignedIn && clerkUser && !isAuth) {
+        const email = clerkUser.primaryEmailAddress?.emailAddress;
+        if (email) {
+          try {
+            await dispatch(loginUser({ email, viaOAuth: true })).unwrap();
+          } catch (e) {
+            console.error("OAuth login error:", e);
+          } finally {
+            setIsLoaded(true);
+          }
+        } else {
+          setIsLoaded(true);
+        }
+      } else if (!isAuth) {
+        await dispatch(getMe());
+        setIsLoaded(true);
+      } else {
+        setIsLoaded(true);
+      }
+    };
+
+    runAuthFlow();
+  }, [isSignedIn, clerkUser, isAuth, dispatch]);
 
   if (!isLoaded) {
     return (
@@ -74,14 +104,16 @@ function App() {
         <Route
           path="/"
           element={
-            showAppLayout ? (
-              <AdminProtectedRoute allowedRoles={["Admin", "Genie"]}>
-                <Layout />
-              </AdminProtectedRoute>
-            ) : isLoaded ? (
-              <Navigate to="/login" />
+            isLoaded ? (
+              showAppLayout ? (
+                <AdminProtectedRoute allowedRoles={["Admin", "Genie"]}>
+                  <Layout />
+                </AdminProtectedRoute>
+              ) : (
+                <Navigate to="/login" />
+              )
             ) : (
-              <div>Загрузка...</div>
+              <div>Loading...</div>
             )
           }
         >

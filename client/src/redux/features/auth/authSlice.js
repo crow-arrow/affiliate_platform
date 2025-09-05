@@ -33,12 +33,21 @@ export const registerUser = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password, viaOAuth }, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post("/auth/login", {
-        email,
-        password,
-      });
+      console.log("loginUser payload:", { email, viaOAuth });
+      let response;
+
+      if (viaOAuth) {
+        response = await axios.post("/auth/oauth-login", { email });
+      } else {
+        response = await axios.post("/auth/login", { email, password });
+      }
+
+      const { data } = response;
+
+      console.log("LOGIN RESPONSE DATA:", data);
+
       if (data.token) {
         window.localStorage.setItem("token", data.token);
         return { user: data.user, token: data.token, message: data.message };

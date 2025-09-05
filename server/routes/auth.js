@@ -1,5 +1,5 @@
 import express from "express";
-import { signUp, login, getMe } from "../controllers/auth.js";
+import { signUp, login, oauthLogin, getMe } from "../controllers/auth.js";
 import { passwordResetLimiter } from "../middleware/rateLimiter.js";
 import {
   verifyEmail,
@@ -22,6 +22,10 @@ router.post("/resend-email", passwordResetLimiter, resendEmailController);
 // Login
 // http://localhost:3002/api/auth/login
 router.post("/login", login);
+
+// OAuth Login with Clerk
+// http://localhost:3002/api/auth/clerk-login
+router.post("/oauth-login", oauthLogin);
 
 // Get Me
 // http://localhost:3002/api/auth/me
