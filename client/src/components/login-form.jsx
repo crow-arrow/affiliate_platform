@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2Icon } from "lucide-react";
 
 import { useSignIn } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 
 export function LoginForm({ className, ...props }) {
   const [email, setEmail] = useState("");
@@ -28,6 +29,9 @@ export function LoginForm({ className, ...props }) {
   const navigate = useNavigate();
 
   const { signIn } = useSignIn();
+
+  const { User } = useUser();
+  console.log(User?.primaryEmailAddress?.emailAddress);
 
   useEffect(() => {
     if (status === "succeeded") toast(message);
@@ -64,7 +68,7 @@ export function LoginForm({ className, ...props }) {
     try {
       await signIn.authenticateWithRedirect({
         strategy,
-        redirectUrl: window.location.origin + "/sso-callback",
+        redirectUrl: window.location.origin + "/login",
         redirectUrlComplete: window.location.origin + "/my-account",
       });
     } catch (err) {

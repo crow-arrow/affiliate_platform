@@ -137,7 +137,7 @@ export const oauthLogin = async (req, res) => {
         email,
         role: "Genie",
         emailVerified: true,
-        password: randomPassword, // Store the random password
+        password: randomPassword,
       });
     }
 
