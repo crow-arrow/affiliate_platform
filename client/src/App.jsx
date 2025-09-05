@@ -46,33 +46,16 @@ function App() {
 
   const { isSignedIn, user: clerkUser } = useUser();
 
-  console.log("isSignedIn:", isSignedIn);
-  console.log("user:", user);
-
   useEffect(() => {
-    const runAuthFlow = async () => {
-      if (isSignedIn && clerkUser && !isAuth) {
-        const email = clerkUser.primaryEmailAddress?.emailAddress;
-        if (email) {
-          try {
-            await dispatch(loginUser({ email, viaOAuth: true })).unwrap();
-          } catch (e) {
-            console.error("OAuth login error:", e);
-          } finally {
-            setIsLoaded(true);
-          }
-        } else {
-          setIsLoaded(true);
-        }
-      } else if (!isAuth) {
-        await dispatch(getMe());
-        setIsLoaded(true);
-      } else {
-        setIsLoaded(true);
-      }
-    };
+    if (isSignedIn && clerkUser && !isAuth) {
+      const email = clerkUser.primaryEmailAddress?.emailAddress;
 
-    runAuthFlow();
+      dispatch(loginUser({ email, viaOAuth: true })).finally(() =>
+        setIsLoaded(true)
+      );
+    } else {
+      dispatch(getMe()).finally(() => setIsLoaded(true));
+    }
   }, [isSignedIn, clerkUser, isAuth, dispatch]);
 
   if (!isLoaded) {

@@ -5,6 +5,7 @@ import {
   loginUser,
   checkIsAuth,
   clearErrors,
+  getMe,
 } from "../redux/features/auth/authSlice";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
@@ -45,6 +46,35 @@ export function LoginForm({ className, ...props }) {
     }
   }, [status, message, errors, isAuth, user, role]);
 
+  const { isSignedIn, user: clerkUser } = useUser();
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const runAuthFlow = async () => {
+      if (isSignedIn && clerkUser && !isAuth) {
+        const email = clerkUser.primaryEmailAddress?.emailAddress;
+        if (email) {
+          try {
+            await dispatch(loginUser({ email, viaOAuth: true })).unwrap();
+          } catch (e) {
+            console.error("OAuth login error:", e);
+          } finally {
+            setIsLoaded(true);
+          }
+        } else {
+          setIsLoaded(true);
+        }
+      } else if (!isAuth) {
+        await dispatch(getMe());
+        setIsLoaded(true);
+      } else {
+        setIsLoaded(true);
+      }
+    };
+
+    runAuthFlow();
+  }, [isSignedIn, clerkUser, isAuth, dispatch]);
+
   const loading = status === "loading";
 
   const handleSubmit = async (e) => {
@@ -75,6 +105,15 @@ export function LoginForm({ className, ...props }) {
       console.error("OAuth error:", err);
     }
   };
+
+  if (!isLoaded) {
+    return (
+      <div className="flex justify-center items-center min-h-[300px]">
+        <Loader2Icon className="animate-spin mr-2" />
+        Checking authentication...
+      </div>
+    );
+  }
 
   return (
     <form
