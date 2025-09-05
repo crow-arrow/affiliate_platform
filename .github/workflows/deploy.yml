@@ -35,6 +35,12 @@ jobs:
         run: |
           echo "VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.CLERK_PUBLISHABLE_KEY }}" >> .env.production
 
+      - name: 🐛 Debug Clerk key
+        working-directory: client
+        run: echo "Key present? ${VITE_CLERK_PUBLISHABLE_KEY:0:5}..."
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY }}
+
       - name: ⚙️ Build project
         working-directory: client
         run: npm run build
