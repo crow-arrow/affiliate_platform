@@ -75,6 +75,11 @@ function App() {
 
   return (
     <>
+      {import.meta.env.VITE_SHOW_DEV_BANNER === "true" && (
+        <div className="bg-yellow-500 text-black p-2 text-center">
+          🛠 You are in development environment
+        </div>
+      )}
       <Routes>
         {/* Публичные страницы */}
         <Route path="/login" element={<LoginPage />} />
