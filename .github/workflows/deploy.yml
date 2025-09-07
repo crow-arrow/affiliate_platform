@@ -33,7 +33,10 @@ jobs:
 
       - name: 📄 Write .env.production
         working-directory: client
-        run: echo "${{ secrets.ENV_FILE }}" > .env.production
+        run: |
+          echo "VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}" > .env.production
+          echo "VITE_API_URL=${{ vars.VITE_API_URL }}" >> .env.production
+          echo "VITE_SHOW_DEV_BANNER=${{ vars.VITE_SHOW_DEV_BANNER }}" >> .env.production
 
       - name: ⚙️ Build project
         working-directory: client
