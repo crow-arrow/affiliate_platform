@@ -101,6 +101,8 @@ export function LoginForm({ className, ...props }) {
         redirectUrl: window.location.origin + "/login",
         redirectUrlComplete: window.location.origin + "/my-account",
       });
+      console.log("OAuth redirect initiated");
+      console.log(clerkUser?.primaryEmailAddress?.emailAddress);
     } catch (err) {
       console.error("OAuth error:", err);
     }
@@ -187,7 +189,7 @@ export function LoginForm({ className, ...props }) {
           <Button
             variant="outline"
             className="w-full bg-transparent"
-            onClick={() => handleOAuth("oauth_apple")}
+            onClick={() => handleOAuth("oauth_linkedIn")}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path

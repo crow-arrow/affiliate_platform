@@ -3,8 +3,8 @@
 server/node_modules/
 client/node_modules/
 
-# dotenv environment variables file
-.env
+# dotenv environment variables files
+.env*
 .DS_Store
 
 # Logs
