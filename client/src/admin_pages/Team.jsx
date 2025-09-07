@@ -4,7 +4,6 @@ import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../redux/features/users/userSlice";
 import { toast } from "react-toastify";
-import { API_URL } from "../config";
 import avatarLogo from "../assets/avatar.webp";
 import { ThemedDataGrid } from "../data_grid_theme/ThemedDataGrid";
 
@@ -42,7 +41,11 @@ export const Team = () => {
           }}
         >
           <Avatar
-            src={params.value ? `${API_URL}${params.value}` : avatarLogo}
+            src={
+              params.value
+                ? `${import.meta.env.VITE_API_URL}${params.value}`
+                : avatarLogo
+            }
             alt={params.row.first_name}
             onError={(e) => {
               console.error("Error Avatar rendering:", params.value, e);

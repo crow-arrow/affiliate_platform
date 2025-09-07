@@ -8,6 +8,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: 🔄 Git clone
@@ -30,6 +31,10 @@ jobs:
         working-directory: client
         run: npm install --legacy-peer-deps
 
+      - name: 📄 Write .env.production
+        working-directory: client
+        run: echo "${{ secrets.ENV_FILE }}" > .env.production
+
       - name: ⚙️ Build project
         working-directory: client
         run: npm run build
@@ -41,8 +46,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            find /var/www/partners.jinn-travel.com/ -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.map' \) -delete
-            rm -rf /var/www/partners.jinn-travel.com/assets
+            find /var/www/partner.jinn-travel.com/ -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.map' \) -delete
+            rm -rf /var/www/partner.jinn-travel.com/assets
 
       - name: 🚀 Deploy to the server with SSH
         uses: appleboy/scp-action@v0.1.4
@@ -51,7 +56,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           source: "client/dist"
-          target: "/var/www/partners.jinn-travel.com"
+          target: "/var/www/partner.jinn-travel.com"
           strip_components: 2
 
       - name: 🔄 Restart nginx
@@ -61,6 +66,34 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: sudo systemctl restart nginx
+
+      - name: 🚛 Upload backend (server/)
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "server"
+          target: "/opt/partner.jinn-travel.com/server"
+
+      - name: 📦 Install backend dependencies
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /opt/partner.jinn-travel.com/server
+            npm install --production --legacy-peer-deps
+
+      - name: 🔁 Restart PM2 backend process
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            sudo pm2 restart affiliate_server
 
       - name: 📩 Notify in Telegram
         run: |

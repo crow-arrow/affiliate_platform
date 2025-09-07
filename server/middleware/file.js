@@ -3,7 +3,7 @@ import path from "path";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    cb(null, "/var/www/uploads");
   },
   filename: (req, file, cb) => {
     const userId = req.user.id || "default";

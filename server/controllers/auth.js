@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { signUpSchema, loginSchema } from "../middleware/validationSchemas.js";
 import { sendVerificationEmail } from "../utils/mailer.js";
+import crypto from "crypto";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -116,6 +117,47 @@ export const login = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(400).json({ message: "Login failed. Please try again" });
+  }
+};
+
+// POST /auth/oauth-login
+export const oauthLogin = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const randomPassword = crypto.randomBytes(32).toString("hex");
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    let user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      user = await User.create({
+        email,
+        role: "Genie",
+        emailVerified: true,
+        password: randomPassword,
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" }
+    );
+
+    res.status(200).json({
+      token,
+      user: {
+        ...user.toJSON(),
+        password: undefined,
+      },
+      message: "Welcome via OAuth",
+    });
+  } catch (error) {
+    console.error("OAuth login error:", error);
+    res.status(500).json({ message: "OAuth login failed" });
   }
 };
 

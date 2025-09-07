@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { getMe, registerUser } from "../redux/features/auth/authSlice";
 import { CropAvatar } from "../components/Avatar";
 import avatarLogo from "../assets/avatar.webp";
-import { API_URL } from "../config";
 
 import PartyModeOutlinedIcon from "@mui/icons-material/PartyModeOutlined";
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
@@ -16,7 +15,7 @@ export const Settings = () => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.user);
   const avatar = currentUser.avatarUrl
-    ? `${API_URL}${currentUser.avatarUrl}`
+    ? `${import.meta.env.VITE_API_URL}${currentUser.avatarUrl}`
     : avatarLogo;
 
   const { status } = useSelector((state) => state.auth);

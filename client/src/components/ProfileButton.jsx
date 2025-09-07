@@ -13,7 +13,6 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import PowerSettingsNewOutlinedIcon from "@mui/icons-material/PowerSettingsNewOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import SafetyDividerOutlinedIcon from "@mui/icons-material/SafetyDividerOutlined";
-import { API_URL } from "../config";
 import PropTypes from "prop-types";
 
 export const ProfileButton = ({ isOpen }) => {
@@ -45,7 +44,7 @@ export const ProfileButton = ({ isOpen }) => {
   const firstName = useSelector((state) => state.auth.user?.first_name);
   const currentUser = useSelector((state) => state.auth.user);
   const avatar = currentUser.avatarUrl
-    ? `${API_URL}${currentUser.avatarUrl}`
+    ? `${import.meta.env.VITE_API_URL}${currentUser.avatarUrl}`
     : avatarLogo;
   const isAdminPage = location.pathname.startsWith("/admin");
 
