@@ -1,0 +1,106 @@
+name: Deploy Affiliate Platform (dev)
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: 🔄 Git clone
+        uses: actions/checkout@v3
+
+      - name: 🧩 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: ♻️ Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: 📦 Installing dependencies
+        working-directory: client
+        run: npm install --legacy-peer-deps
+
+      - name: 📄 Write .env.production
+        working-directory: client
+        run: echo "${{ secrets.ENV_FILE }}" > .env.production
+
+      - name: ⚙️ Build project
+        working-directory: client
+        run: npm run build
+
+      - name: 🧹 Clean target directory on server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            find /var/www/dev.jinn-travel.com/ -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.map' \) -delete
+            rm -rf /var/www/dev.jinn-travel.com/assets
+
+      - name: 🚀 Deploy frontend to dev server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "client/dist"
+          target: "/var/www/dev.jinn-travel.com"
+          strip_components: 2
+
+      - name: 🔄 Restart nginx
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: sudo systemctl restart nginx
+
+      - name: 🚛 Upload backend (server/)
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "server"
+          target: "/opt/dev.jinn-travel.com/server"
+
+      - name: 📦 Install backend dependencies
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd "/opt/dev.jinn-travel.com/server"
+            npm install --production --legacy-peer-deps
+
+      - name: 🔁 Restart PM2 backend process
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            sudo pm2 restart affiliate_server_dev
+
+      - name: 📩 Notify in Telegram
+        run: |
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }} \
+            -H "Content-Type: application/json" \
+            -d '{
+              "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
+              "text": "🚧 *Dev* Frontend deployed successfully!\n👤 Author: ${{ github.actor }}\n💬 Message: ${{ github.event.head_commit.message }}",
+              "parse_mode": "Markdown"
+            }'
