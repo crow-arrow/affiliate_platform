@@ -46,8 +46,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            find /var/www/dev.jinn-travel.com/ -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.map' \) -delete
-            rm -rf /var/www/dev.jinn-travel.com/assets
+            sudo find /var/www/dev.jinn-travel.com/ -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.map' \) -delete
+            sudo rm -rf /var/www/dev.jinn-travel.com/assets
 
       - name: 🚀 Deploy frontend to dev server
         uses: appleboy/scp-action@v0.1.4
@@ -83,8 +83,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd "/opt/dev.jinn-travel.com/server"
-            npm install --production --legacy-peer-deps
+            sudo cd "/opt/dev.jinn-travel.com/server"
+            sudo npm install --production --legacy-peer-deps
 
       - name: 🔁 Restart PM2 backend process
         uses: appleboy/ssh-action@v0.1.10
