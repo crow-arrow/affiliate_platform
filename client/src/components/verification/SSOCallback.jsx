@@ -18,8 +18,9 @@ export const SSOCallback = () => {
           console.log("➡️ Clerk session set:", result.createdSessionId);
           navigate("/my-account");
         } else {
-          console.warn("⚠️ No createdSessionId in result");
-          navigate("/sign-in");
+          console.log("➡️ No new session, maybe already signed in");
+          // Просто проверяем, авторизован ли пользователь через Clerk
+          navigate("/my-account");
         }
       } catch (err) {
         console.error("OAuth callback error:", err);
