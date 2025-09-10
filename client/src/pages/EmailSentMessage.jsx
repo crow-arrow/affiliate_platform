@@ -20,7 +20,7 @@ export const EmailSentMessage = () => {
 
   useEffect(() => {
     if (status === "failed") {
-      setTimeout(() => navigate("/login"), 2000);
+      setTimeout(() => navigate("/sign-in"), 2000);
     }
   }, [status]);
 

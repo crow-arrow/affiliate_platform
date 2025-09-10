@@ -8,7 +8,7 @@ export const registerUser = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const { data } = await axios.post("/auth/signup", {
+      const { data } = await axios.post("/auth/sign-up", {
         email,
         phone,
         first_name,
@@ -43,7 +43,7 @@ export const loginUser = createAsyncThunk(
           headers: { Authorization: `Bearer ${viaOAuth}` },
         });
       } else {
-        response = await axios.post("/auth/login", { email, password });
+        response = await axios.post("/auth/sign-in", { email, password });
       }
 
       const { data } = response;

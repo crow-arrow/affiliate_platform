@@ -28,7 +28,7 @@ export const PasswordRecover = () => {
   useEffect(() => {
     if (status === "succeeded" && message) {
       toast.success(message);
-      navigate("/login");
+      navigate("/sign-in");
     }
   }, [status, errors, message]);
 
@@ -65,7 +65,7 @@ export const PasswordRecover = () => {
   if (!linkValid === true) {
     return (
       <div className="flex flex-col w-full h-screen bg-gradient-primary justify-center items-center">
-        <Link to="/login">
+        <Link to="/sign-in">
           <img
             alt="Jinn community"
             src={logo}

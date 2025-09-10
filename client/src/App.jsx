@@ -47,14 +47,18 @@ function App() {
   const { isSignedIn, user: clerkUser } = useUser();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
     if (isSignedIn && clerkUser && !isAuth) {
       const email = clerkUser.primaryEmailAddress?.emailAddress;
 
       dispatch(loginUser({ email, viaOAuth: true })).finally(() =>
         setIsLoaded(true)
       );
-    } else {
+    } else if (token && !isAuth) {
       dispatch(getMe()).finally(() => setIsLoaded(true));
+    } else {
+      setIsLoaded(true);
     }
   }, [isSignedIn, clerkUser, isAuth, dispatch]);
 
@@ -82,8 +86,8 @@ function App() {
       )}
       <Routes>
         {/* Публичные страницы */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/sign-in" element={<LoginPage />} />
+        <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/verify-email/:token" element={<EmailVerification />} />
         <Route path="/reset-password/:token" element={<PasswordRecover />} />
         <Route path="/request-reset" element={<RequestPasswordReset />} />
@@ -98,7 +102,7 @@ function App() {
                   <Layout />
                 </AdminProtectedRoute>
               ) : (
-                <Navigate to="/login" />
+                <Navigate to="/sign-in" />
               )
             ) : (
               <div>Loading...</div>

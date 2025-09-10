@@ -62,7 +62,10 @@ export function LoginForm({ className, ...props }) {
           setIsLoaded(true);
         }
       } else if (!isAuth) {
-        await dispatch(getMe());
+        const token = localStorage.getItem("token");
+        if (token) {
+          await dispatch(getMe());
+        }
         setIsLoaded(true);
       } else {
         setIsLoaded(true);
@@ -227,7 +230,7 @@ export function LoginForm({ className, ...props }) {
       </div>
       <div className="text-center text-sm">
         {"Don't have an account? "}
-        <Link to="/signup" className="underline underline-offset-4">
+        <Link to="/sign-up" className="underline underline-offset-4">
           Sign up
         </Link>
       </div>

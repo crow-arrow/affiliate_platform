@@ -23,7 +23,7 @@ export const EmailVerification = () => {
   useEffect(() => {
     if (status === "succeeded") {
       localStorage.removeItem("email");
-      setTimeout(() => navigate("/login"), 2000);
+      setTimeout(() => navigate("/sign-in"), 2000);
     } else if (status === "failed") {
       toast.error(error || "An error occurred");
     }
@@ -31,7 +31,7 @@ export const EmailVerification = () => {
 
   return (
     <div className="flex flex-col w-full h-screen bg-gradient-primary justify-center items-center">
-      <Link to="/login">
+      <Link to="/sign-in">
         <img alt="Jinn community" src={logo} className="mx-auto h-20 w-auto" />
       </Link>
       <div className="flex flex-col bg-gray-100 relative w-1/3 h-1/4 p-8 mt-10 justify-between items-center rounded-xl shadow-custom">

@@ -22,7 +22,7 @@ export const RequestPasswordReset = () => {
     if (status === "succeeded" && message) {
       toast.success(message);
       dispatch(clearErrors());
-      navigate("/login");
+      navigate("/sign-in");
     } else if (status === "failed" && requestResetError) {
       toast.error(requestResetError);
       dispatch(clearErrors());
@@ -43,7 +43,7 @@ export const RequestPasswordReset = () => {
   return (
     <div className="flex flex-col flex-1 h-screen bg-gradient-primary justify-center px-6 mx-auto lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <Link to={"/login"} tabIndex={-1}>
+        <Link to={"/sign-in"} tabIndex={-1}>
           <img
             alt="Jinn community"
             src={logo}

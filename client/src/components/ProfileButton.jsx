@@ -54,7 +54,7 @@ export const ProfileButton = ({ isOpen }) => {
     toast("You are out");
 
     await new Promise((resolve) => setTimeout(resolve, 0));
-    navigate("/login");
+    navigate("/sign-in");
   };
 
   return (

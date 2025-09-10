@@ -11,8 +11,8 @@ import { checkAuth } from "../middleware/checkAuth.js";
 const router = express.Router();
 
 //Register
-// http://localhost:3002/api/auth/signup
-router.post("/signup", signUp);
+// http://localhost:3002/api/auth/sign-up
+router.post("/sign-up", signUp);
 
 // http://localhost:3002/api/auth/verify-email
 router.get("/verify-email/:token", verifyEmail);
@@ -21,8 +21,8 @@ router.get("/verify-email/:token", verifyEmail);
 router.post("/resend-email", passwordResetLimiter, resendEmailController);
 
 // Login
-// http://localhost:3002/api/auth/login
-router.post("/login", login);
+// http://localhost:3002/api/auth/sign-in
+router.post("/sign-in", login);
 
 // OAuth Login with Clerk
 // http://localhost:3002/api/auth/clerk-login
