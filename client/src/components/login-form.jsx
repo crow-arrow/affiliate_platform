@@ -31,9 +31,6 @@ export function LoginForm({ className, ...props }) {
 
   const { signIn } = useSignIn();
 
-  const { User } = useUser();
-  console.log(User?.primaryEmailAddress?.emailAddress);
-
   useEffect(() => {
     if (status === "succeeded") toast(message);
 
@@ -98,11 +95,9 @@ export function LoginForm({ className, ...props }) {
     try {
       await signIn.authenticateWithRedirect({
         strategy,
-        redirectUrl: window.location.origin + "/login",
-        redirectUrlComplete: window.location.origin + "/my-account",
+        redirectUrl: `${window.location.origin}/sso-callback`,
+        redirectUrlComplete: `${window.location.origin}/my-account`,
       });
-      console.log("OAuth redirect initiated");
-      console.log(clerkUser?.primaryEmailAddress?.emailAddress);
     } catch (err) {
       console.error("OAuth error:", err);
     }
@@ -187,9 +182,10 @@ export function LoginForm({ className, ...props }) {
         </div>
         <div className="grid grid-cols-3 gap-4">
           <Button
+            type="button"
             variant="outline"
             className="w-full bg-transparent"
-            onClick={() => handleOAuth("oauth_linkedIn")}
+            onClick={() => handleOAuth("oauth_linkedin")}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
@@ -200,6 +196,7 @@ export function LoginForm({ className, ...props }) {
             <span className="sr-only">Login with Apple</span>
           </Button>
           <Button
+            type="button"
             variant="outline"
             className="w-full bg-transparent"
             onClick={() => handleOAuth("oauth_google")}
@@ -213,6 +210,7 @@ export function LoginForm({ className, ...props }) {
             <span className="sr-only">Login with Google</span>
           </Button>
           <Button
+            type="button"
             variant="outline"
             className="w-full bg-transparent"
             onClick={() => handleOAuth("oauth_facebook")}

@@ -1,3 +1,4 @@
+import { requireAuth } from "@clerk/express";
 import express from "express";
 import { signUp, login, oauthLogin, getMe } from "../controllers/auth.js";
 import { passwordResetLimiter } from "../middleware/rateLimiter.js";
@@ -25,7 +26,7 @@ router.post("/login", login);
 
 // OAuth Login with Clerk
 // http://localhost:3002/api/auth/clerk-login
-router.post("/oauth-login", oauthLogin);
+router.post("/oauth-login", requireAuth(), oauthLogin);
 
 // Get Me
 // http://localhost:3002/api/auth/me

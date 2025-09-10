@@ -39,7 +39,9 @@ export const loginUser = createAsyncThunk(
       let response;
 
       if (viaOAuth) {
-        response = await axios.post("/auth/oauth-login", { email });
+        response = await axios.post("/auth/oauth-login", null, {
+          headers: { Authorization: `Bearer ${viaOAuth}` },
+        });
       } else {
         response = await axios.post("/auth/login", { email, password });
       }

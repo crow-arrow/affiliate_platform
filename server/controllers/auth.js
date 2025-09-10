@@ -1,3 +1,4 @@
+import { clerkClient } from "@clerk/express";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -123,21 +124,45 @@ export const login = async (req, res) => {
 // POST /auth/oauth-login
 export const oauthLogin = async (req, res) => {
   try {
-    const { email } = req.body;
-    const randomPassword = crypto.randomBytes(32).toString("hex");
-
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+    const clerkId = req.auth?.userId;
+    if (!clerkId) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    let user = await User.findOne({ where: { email } });
+    // Fetch user profile from Clerk
+    const clerkUser = await clerkClient.users.getUser(clerkId);
+    const email = clerkUser?.primaryEmailAddress?.emailAddress;
+    const firstName = clerkUser?.firstName || "NoName";
+    const lastName = clerkUser?.lastName || "NoName";
+    const imageUrl = clerkUser?.imageUrl || null;
 
+    // Try to find by clerkId first
+    let user = await User.findOne({ where: { clerkId } });
+
+    // If not found by clerkId, try by email to link existing account
+    if (!user && email) {
+      user = await User.findOne({ where: { email } });
+      if (user) {
+        user.clerkId = clerkId;
+        await user.save();
+      }
+    }
+
+    // If still not found — create a new user
     if (!user) {
+      const randomPassword = crypto.randomBytes(32).toString("hex");
+      const salt = bcrypt.genSaltSync(10);
+      const hash = bcrypt.hashSync(randomPassword, salt);
+
       user = await User.create({
+        clerkId,
         email,
+        first_name: firstName,
+        last_name: lastName,
+        avatarUrl: imageUrl,
         role: "Genie",
         emailVerified: true,
-        password: randomPassword,
+        password: hash,
       });
     }
 
