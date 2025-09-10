@@ -9,11 +9,18 @@ export const SSOCallback = () => {
   useEffect(() => {
     async function completeAuth() {
       try {
+        console.log("➡️ SSOCallback mounted");
         const result = await signIn?.handleRedirectCallback();
+        console.log("➡️ handleRedirectCallback result:", result);
+
         if (result?.createdSessionId) {
           await setActive({ session: result.createdSessionId });
+          console.log("➡️ Clerk session set:", result.createdSessionId);
+          navigate("/my-account");
+        } else {
+          console.warn("⚠️ No createdSessionId in result");
+          navigate("/sign-in");
         }
-        navigate("/my-account");
       } catch (err) {
         console.error("OAuth callback error:", err);
         navigate("/sign-in");
