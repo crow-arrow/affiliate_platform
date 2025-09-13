@@ -32,7 +32,7 @@ import { CropAvatar } from "./components/Avatar.jsx";
 
 function App() {
   const isAuth = useSelector(checkIsAuth);
-  const { user, status } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const emailVerified = user?.emailVerified === true;
   const showAppLayout = isAuth && user && emailVerified;
 

@@ -13,6 +13,7 @@ export const OAuthCallback = () => {
   const navigate = useNavigate();
   const isAuth = useSelector(checkIsAuth);
   const [isLoaded, setIsLoaded] = useState(false);
+  const { status } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const run = async () => {
@@ -30,15 +31,21 @@ export const OAuthCallback = () => {
         } catch (e) {
           toast.error("Authentication failed. Please log in again.");
           navigate("/sign-in");
-          setIsLoaded(true);
         } finally {
           setIsLoaded(true);
-          navigate("/my-account");
         }
+      } else {
+        setIsLoaded(true);
       }
     };
     run();
   }, [isSignedIn, clerkUser, isAuth, dispatch]);
+
+  useEffect(() => {
+    if (status === "succeeded") {
+      navigate("/my-account");
+    }
+  }, [status, navigate]);
 
   if (!isLoaded) {
     return (
