@@ -175,7 +175,6 @@ export const checkRole = (state) => {
   return role;
 };
 
-export const { clearErrors } = authSlice.actions;
-export const { logout } = authSlice.actions;
+export const { clearErrors, logout, updateUserAvatar } = authSlice.actions;
 
 export default authSlice.reducer;

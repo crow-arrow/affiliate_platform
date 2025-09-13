@@ -22,7 +22,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { NotFound } from "./pages/NotFound.jsx";
 import AdminProtectedRoute from "./components/protected-routes/AdminProtectedRoute";
-// import { SSOCallback } from "./components/verification/SSOCallback.jsx";
+import { OAuthCallback } from "./components/verification/OAuthCallback.jsx";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -103,7 +103,7 @@ function App() {
         <Route path="/reset-password/:token" element={<PasswordRecover />} />
         <Route path="/request-reset" element={<RequestPasswordReset />} />
         <Route path="/email-verification" element={<EmailSentMessage />} />
-        {/* <Route path="/sso-callback" element={<SSOCallback />} /> */}
+        <Route path="/auth/callback" element={<OAuthCallback />} />
 
         <Route
           path="/"
