@@ -8,7 +8,6 @@ import {
 } from "../../redux/features/auth/authSlice.js";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { co } from "@fullcalendar/core/internal-common.js";
 
 export const OAuthCallback = () => {
   const { isSignedIn, user: clerkUser } = useUser();
@@ -20,18 +19,36 @@ export const OAuthCallback = () => {
   // Когда Clerk закончит редирект, isSignedIn станет true
   useEffect(() => {
     const run = async () => {
+      console.log("=== OAuth useEffect ===");
+      console.log("isSignedIn:", isSignedIn);
+      console.log("clerkUser:", clerkUser);
+      console.log("isAuth:", isAuth);
+
       if (isSignedIn && clerkUser && !isAuth) {
         try {
+          console.log("✅ Условия выполнены, получаем токен...");
+
           const token = await window.Clerk.session?.getToken();
-          console.log("OAuth token:", token);
-          console.log("Clerk user:", clerkUser);
+          console.log("Raw token:", token);
+          console.log("Token type:", typeof token);
+          console.log("Token length:", token?.length);
+
           if (token) {
-            await dispatch(loginWithOAuth(token)).unwrap();
+            console.log("🚀 Вызываем loginWithOAuth...");
+            const result = await dispatch(
+              loginWithOAuth({ viaOAuth: token })
+            ).unwrap();
+            console.log("✅ loginWithOAuth result:", result);
+          } else {
+            console.error("❌ Токен не получен");
           }
         } catch (e) {
+          console.error("❌ Error in OAuth flow:", e);
           toast.error("Authentication failed. Please log in again.");
           navigate("/sign-in");
         }
+      } else {
+        console.log("⏳ Условия не выполнены");
       }
     };
     run();
