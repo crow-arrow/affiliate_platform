@@ -24,7 +24,6 @@ export const OAuthCallback = () => {
             await dispatch(
               loginUser({
                 viaOAuth: token,
-                email: clerkUser?.primaryEmailAddress?.emailAddress,
               })
             ).unwrap();
           }
