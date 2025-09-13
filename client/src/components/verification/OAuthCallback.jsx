@@ -50,9 +50,7 @@ export const OAuthCallback = () => {
           alignItems="center"
           height="100vh"
         >
-          <CircularProgress size={80}>
-            <img src="./src/assets/Genie.png" alt="Logo" />
-          </CircularProgress>
+          <CircularProgress size={80} />
         </Box>
       </>
     );

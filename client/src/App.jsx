@@ -29,7 +29,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { checkIsAuth } from "./redux/features/auth/authSlice.js";
 import { CropAvatar } from "./components/Avatar.jsx";
-import { Box, CircularProgress } from "@mui/material";
 
 function App() {
   const isAuth = useSelector(checkIsAuth);
@@ -57,21 +56,12 @@ function App() {
         <Route
           path="/"
           element={
-            status === "authenticated" && showAppLayout ? (
+            showAppLayout ? (
               <AdminProtectedRoute allowedRoles={["Admin", "Genie"]}>
                 <Layout />
               </AdminProtectedRoute>
-            ) : status === "succeeded" ? (
-              <Navigate to="/sign-in" />
             ) : (
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                height="100vh"
-              >
-                <CircularProgress size={80} />
-              </Box>
+              <Navigate to="/sign-in" />
             )
           }
         >
