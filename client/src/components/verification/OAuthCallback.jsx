@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../redux/features/auth/authSlice";
 import { Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
-const OAuthCallback = () => {
+export const OAuthCallback = () => {
   const dispatch = useDispatch();
   const [status, setStatus] = useState("processing"); // processing, success, error
   const [message, setMessage] = useState("Обработка авторизации...");
@@ -253,5 +253,3 @@ const OAuthCallback = () => {
     </div>
   );
 };
-
-export default OAuthCallback;
