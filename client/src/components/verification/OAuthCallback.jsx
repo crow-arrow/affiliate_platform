@@ -54,12 +54,6 @@ export const OAuthCallback = () => {
     run();
   }, [isSignedIn, clerkUser, isAuth, dispatch, navigate]);
 
-  useEffect(() => {
-    if (status === "succeeded") {
-      navigate("/my-account");
-    }
-  }, [status, navigate]);
-
   // Показываем прогресс пока Clerk обрабатывает коллбэк
   if (!isSignedIn && !isAuth) {
     return (
