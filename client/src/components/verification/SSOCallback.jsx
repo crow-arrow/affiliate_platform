@@ -1,34 +1,37 @@
-import { useSignIn } from "@clerk/clerk-react";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+// import { useSignIn } from "@clerk/clerk-react";
+// import { useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
 
-export const SSOCallback = () => {
-  const navigate = useNavigate();
-  const { signIn, setActive } = useSignIn();
+// export const SSOCallback = () => {
+//   const navigate = useNavigate();
+//   const { isLoaded, signIn, setActive } = useSignIn();
 
-  useEffect(() => {
-    async function completeAuth() {
-      try {
-        console.log("➡️ SSOCallback mounted");
-        const result = await signIn?.handleRedirectCallback();
-        console.log("➡️ handleRedirectCallback result:", result);
+//   useEffect(() => {
+//     if (!isLoaded) return; // <-- ключевой момент
 
-        if (result?.createdSessionId) {
-          await setActive({ session: result.createdSessionId });
-          console.log("➡️ Clerk session set:", result.createdSessionId);
-          navigate("/my-account");
-        } else {
-          console.log("➡️ No new session, maybe already signed in");
-          // Просто проверяем, авторизован ли пользователь через Clerk
-          navigate("/my-account");
-        }
-      } catch (err) {
-        console.error("OAuth callback error:", err);
-        navigate("/sign-in");
-      }
-    }
-    completeAuth();
-  }, [signIn, setActive, navigate]);
+//     (async () => {
+//       try {
+//         console.log("➡️ SSOCallback mounted");
+//         const result = await signIn.handleRedirectCallback();
+//         console.log("➡️ handleRedirectCallback result:", result);
 
-  return <div>Finishing login...</div>;
-};
+//         if (result?.createdSessionId) {
+//           await setActive({ session: result.createdSessionId });
+//           console.log("➡️ Clerk session set:", result.createdSessionId);
+//           navigate("/my-account", { replace: true });
+//         } else if (window.Clerk?.session) {
+//           // сессия уже активна
+//           navigate("/my-account", { replace: true });
+//         } else {
+//           // не получилось — на signin
+//           navigate("/sign-in", { replace: true });
+//         }
+//       } catch (err) {
+//         console.error("OAuth callback error:", err);
+//         navigate("/sign-in", { replace: true });
+//       }
+//     })();
+//   }, [isLoaded, signIn, setActive, navigate]);
+
+//   return <div>Finishing login...</div>;
+// };

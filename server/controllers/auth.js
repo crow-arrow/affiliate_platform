@@ -1,4 +1,4 @@
-import { clerkClient } from "@clerk/express";
+import { getAuth, clerkClient } from "@clerk/express";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -124,13 +124,13 @@ export const login = async (req, res) => {
 // POST /auth/oauth-login
 export const oauthLogin = async (req, res) => {
   try {
-    const clerkId = req.auth?.userId;
-    if (!clerkId) {
+    const { userId } = getAuth(req); // <-- вместо req.auth.userId
+    if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+    console.log("OAuth login attempt for Clerk userId:", userId);
 
-    // Fetch user profile from Clerk
-    const clerkUser = await clerkClient.users.getUser(clerkId);
+    const clerkUser = await clerkClient.users.getUser(userId);
     const email = clerkUser?.primaryEmailAddress?.emailAddress;
     const firstName = clerkUser?.firstName || "NoName";
     const lastName = clerkUser?.lastName || "NoName";

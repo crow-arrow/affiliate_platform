@@ -40,6 +40,7 @@ app.use(
     authorizedParties: [URL],
   })
 );
+console.log("Clerk middleware configured with URL:", URL);
 
 // Routes
 app.use("/api/auth", authRoutes);

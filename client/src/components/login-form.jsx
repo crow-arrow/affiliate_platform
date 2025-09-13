@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2Icon } from "lucide-react";
 
 import { useSignIn } from "@clerk/clerk-react";
-import { useUser, useAuth } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 
 export function LoginForm({ className, ...props }) {
   const [email, setEmail] = useState("");
@@ -31,50 +31,20 @@ export function LoginForm({ className, ...props }) {
 
   const { signIn } = useSignIn();
 
-  useEffect(() => {
-    if (status === "succeeded") toast(message);
+  const { User } = useUser();
+  console.log(User?.primaryEmailAddress?.emailAddress);
 
-    if (isAuth && user) {
-      if (role === "Admin") {
-        navigate("/admin/dashboard");
-      } else {
-        navigate("/my-account");
-      }
+  useEffect(() => {
+    if (status === "succeeded" && isAuth && user) {
+      toast(message);
+      navigate("/my-account");
+    } else if (status === "failed" && errors.length > 0) {
+      toast.error(errors[0].message || "Server error");
+      dispatch(clearErrors());
     }
   }, [status, message, errors, isAuth, user, role]);
 
-  const { isSignedIn, user: clerkUser } = useUser();
   const [isLoaded, setIsLoaded] = useState(false);
-  const { getToken } = useAuth();
-
-  useEffect(() => {
-    const runAuthFlow = async () => {
-      if (isSignedIn && clerkUser && !isAuth) {
-        const token = await getToken();
-        if (token) {
-          try {
-            await dispatch(loginUser({ viaOAuth: token })).unwrap();
-          } catch (e) {
-            console.error("OAuth login error:", e);
-          } finally {
-            setIsLoaded(true);
-          }
-        } else {
-          setIsLoaded(true);
-        }
-      } else if (!isAuth) {
-        const token = localStorage.getItem("token");
-        if (token) {
-          await dispatch(getMe());
-        }
-        setIsLoaded(true);
-      } else {
-        setIsLoaded(true);
-      }
-    };
-
-    runAuthFlow();
-  }, [isSignedIn, clerkUser, isAuth, dispatch]);
 
   const loading = status === "loading";
 
@@ -99,8 +69,9 @@ export function LoginForm({ className, ...props }) {
     try {
       await signIn.authenticateWithRedirect({
         strategy,
-        redirectUrl: `${window.location.origin}/sso-callback`,
       });
+      console.log("OAuth redirect initiated");
+      console.log(clerkUser?.primaryEmailAddress?.emailAddress);
     } catch (err) {
       console.error("OAuth error:", err);
     }

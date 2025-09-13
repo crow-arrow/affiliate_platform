@@ -26,7 +26,7 @@ router.post("/sign-in", login);
 
 // OAuth Login with Clerk
 // http://localhost:3002/api/auth/clerk-login
-router.post("/oauth-login", requireAuth(), oauthLogin);
+router.post("/oauth-login", oauthLogin);
 
 // Get Me
 // http://localhost:3002/api/auth/me
