@@ -19,6 +19,7 @@ export const OAuthCallback = () => {
   // Когда Clerk закончит редирект, isSignedIn станет true
   useEffect(() => {
     const run = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       console.log("=== OAuth useEffect ===");
       console.log("isSignedIn:", isSignedIn);
       console.log("clerkUser:", clerkUser);

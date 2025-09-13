@@ -21,7 +21,11 @@ const AppProvider = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY} navigate={navigate}>
+      <ClerkProvider
+        publishableKey={PUBLISHABLE_KEY}
+        domain="jinn-travel.com"
+        navigate={navigate}
+      >
         <CssBaseline />
         <App />
       </ClerkProvider>
