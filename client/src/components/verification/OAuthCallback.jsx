@@ -36,9 +36,9 @@ export const OAuthCallback = () => {
         if (error) {
           setStatus("error");
           setMessage(`Ошибка авторизации: ${error}`);
-          setTimeout(() => {
-            window.location.href = "/login";
-          }, 3000);
+          // setTimeout(() => {
+          //   window.location.href = "/sign-in";
+          // }, 3000);
           return;
         }
 
@@ -56,7 +56,7 @@ export const OAuthCallback = () => {
             setMessage("Токен авторизации не найден в URL параметрах");
             console.error("No token found in URL or hash");
             setTimeout(() => {
-              window.location.href = "/login";
+              window.location.href = "/sign-in";
             }, 3000);
             return;
           }
@@ -97,7 +97,7 @@ export const OAuthCallback = () => {
 
         setMessage(errorMessage);
         setTimeout(() => {
-          window.location.href = "/login";
+          window.location.href = "/sign-in";
         }, 3000);
       }
     };
@@ -145,11 +145,11 @@ export const OAuthCallback = () => {
   };
 
   const handleReturnToLogin = () => {
-    window.location.href = "/login";
+    window.location.href = "/sign-in";
   };
 
   const handleCancel = () => {
-    window.location.href = "/login";
+    window.location.href = "/sign-in";
   };
 
   return (
