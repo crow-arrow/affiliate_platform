@@ -124,25 +124,32 @@ export const login = async (req, res) => {
 // POST /auth/oauth-login
 export const oauthLogin = async (req, res) => {
   try {
-    const { userId } = getAuth(req); // <-- вместо req.auth.userId
+    const { userId } = getAuth(req);
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     console.log("OAuth login attempt for Clerk userId:", userId);
 
     const clerkUser = await clerkClient.users.getUser(userId);
-    const email = clerkUser?.primaryEmailAddress?.emailAddress;
+    if (!clerkUser) {
+      return res.status(400).json({ message: "Clerk user not found" });
+    }
+    const email =
+      clerkUser?.primaryEmailAddress?.emailAddress ||
+      clerkUser?.emailAddresses?.[0]?.emailAddress ||
+      clerkUser?.externalAccounts?.[0]?.emailAddress ||
+      null;
     const firstName = clerkUser?.firstName || "NoName";
     const lastName = clerkUser?.lastName || "NoName";
     const imageUrl = clerkUser?.imageUrl || null;
 
     console.log("Clerk user data:", { email, firstName, lastName, imageUrl });
 
-    if (!email) {
-      return res
-        .status(400)
-        .json({ message: "Email is missing from OAuth provider" });
-    }
+    // if (!email) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Email is missing from OAuth provider" });
+    // }
 
     // Try to find by clerkId first
     let user = await User.findOne({ where: { clerkId: userId } });
