@@ -1,8 +1,7 @@
-import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
+import { AuthenticateWithRedirectCallback, useUser } from "@clerk/clerk-react";
 import { Box, CircularProgress } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useUser } from "@clerk/clerk-react";
 import {
   loginWithOAuth,
   checkIsAuth,
@@ -15,33 +14,25 @@ export const OAuthCallback = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isAuth = useSelector(checkIsAuth);
-  const [isLoaded, setIsLoaded] = useState(false);
   const { status } = useSelector((state) => state.auth);
 
+  // Когда Clerk закончит редирект, isSignedIn станет true
   useEffect(() => {
     const run = async () => {
       if (isSignedIn && clerkUser && !isAuth) {
         try {
           const token = await window.Clerk.session?.getToken();
           if (token) {
-            await dispatch(
-              loginWithOAuth({
-                viaOAuth: token,
-              })
-            ).unwrap();
+            await dispatch(loginWithOAuth(token)).unwrap();
           }
         } catch (e) {
           toast.error("Authentication failed. Please log in again.");
           navigate("/sign-in");
-        } finally {
-          setIsLoaded(true);
         }
-      } else {
-        setIsLoaded(true);
       }
     };
     run();
-  }, [isSignedIn, clerkUser, isAuth, dispatch]);
+  }, [isSignedIn, clerkUser, isAuth, dispatch, navigate]);
 
   useEffect(() => {
     if (status === "succeeded") {
@@ -49,7 +40,8 @@ export const OAuthCallback = () => {
     }
   }, [status, navigate]);
 
-  if (!isLoaded) {
+  // Показываем прогресс пока Clerk обрабатывает коллбэк
+  if (!isSignedIn && !isAuth) {
     return (
       <>
         <AuthenticateWithRedirectCallback />
