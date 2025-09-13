@@ -37,19 +37,6 @@ function App() {
   const emailVerified = user?.emailVerified === true;
   const showAppLayout = isAuth && user && emailVerified;
 
-  if (status === "loading") {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <CircularProgress size={80} />
-      </Box>
-    );
-  }
-
   return (
     <>
       {import.meta.env.VITE_SHOW_DEV_BANNER === "true" && (
