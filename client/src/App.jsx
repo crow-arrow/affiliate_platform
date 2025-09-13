@@ -53,7 +53,12 @@ function App() {
         try {
           const token = await window.Clerk.session?.getToken();
           if (token) {
-            await dispatch(loginUser({ viaOAuth: token })).unwrap();
+            await dispatch(
+              loginUser({
+                viaOAuth: token,
+                email: clerkUser?.primaryEmailAddress?.emailAddress,
+              })
+            ).unwrap();
           }
         } catch (e) {
           console.error("OAuth login error in App:", e);
