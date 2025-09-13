@@ -66,7 +66,7 @@ export function LoginForm({ className, ...props }) {
     try {
       await signIn.authenticateWithRedirect({
         strategy,
-        redirectUrl: `${window.location.origin}/sso-callback`,
+        redirectUrl: `${window.location.origin}/auth/callback`,
       });
       console.log("OAuth redirect initiated");
       console.log(clerkUser?.primaryEmailAddress?.emailAddress);
