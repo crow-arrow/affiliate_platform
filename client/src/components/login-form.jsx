@@ -30,9 +30,8 @@ export function LoginForm({ className, ...props }) {
   const navigate = useNavigate();
 
   const { signIn } = useSignIn();
-
-  const { User } = useUser();
-  console.log(User?.primaryEmailAddress?.emailAddress);
+  const { user: clerkUser, isSignedIn } = useUser();
+  console.log(clerkUser?.primaryEmailAddress?.emailAddress);
 
   useEffect(() => {
     if (status === "succeeded" && isAuth && user) {
@@ -43,8 +42,6 @@ export function LoginForm({ className, ...props }) {
       dispatch(clearErrors());
     }
   }, [status, message, errors, isAuth, user, role]);
-
-  const [isLoaded, setIsLoaded] = useState(false);
 
   const loading = status === "loading";
 
@@ -77,7 +74,7 @@ export function LoginForm({ className, ...props }) {
     }
   };
 
-  if (!isLoaded) {
+  if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[300px]">
         <Loader2Icon className="animate-spin mr-2" />
