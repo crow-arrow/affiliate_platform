@@ -57,7 +57,7 @@ export const loginUser = createAsyncThunk(
 
 export const loginWithOAuth = createAsyncThunk(
   "auth/loginWithOAuth",
-  async (viaOAuth, { rejectWithValue }) => {
+  async ({ viaOAuth }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
         "/auth/oauth-login",

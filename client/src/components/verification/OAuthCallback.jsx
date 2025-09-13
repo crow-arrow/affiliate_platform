@@ -8,6 +8,7 @@ import {
 } from "../../redux/features/auth/authSlice.js";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { co } from "@fullcalendar/core/internal-common.js";
 
 export const OAuthCallback = () => {
   const { isSignedIn, user: clerkUser } = useUser();
@@ -22,6 +23,8 @@ export const OAuthCallback = () => {
       if (isSignedIn && clerkUser && !isAuth) {
         try {
           const token = await window.Clerk.session?.getToken();
+          console.log("OAuth token:", token);
+          console.log("Clerk user:", clerkUser);
           if (token) {
             await dispatch(loginWithOAuth(token)).unwrap();
           }
