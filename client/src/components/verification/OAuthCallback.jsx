@@ -1,25 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../redux/features/auth/authSlice"; // Путь к вашему auth slice
+import { loginUser } from "../../redux/features/auth/authSlice";
 import { Loader2, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
-export const OAuthCallback = () => {
+const OAuthCallback = () => {
   const dispatch = useDispatch();
   const [status, setStatus] = useState("processing"); // processing, success, error
   const [message, setMessage] = useState("Обработка авторизации...");
 
-  const { loading, error } = useSelector((state) => state.auth);
+  const {
+    isLoading,
+    status: authStatus,
+    errors,
+    message: authMessage,
+  } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const processOAuthCallback = async () => {
       try {
         // Получаем параметры из URL
         const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get("token");
+        let token = urlParams.get("token");
         const error = urlParams.get("error");
         const provider = urlParams.get("provider");
+        const hash = window.location.hash;
 
-        console.log("OAuth callback params:", { token, error, provider });
+        console.log("OAuth callback params:", {
+          token,
+          error,
+          provider,
+          hash,
+          fullUrl: window.location.href,
+        });
 
         if (error) {
           setStatus("error");
@@ -31,13 +43,26 @@ export const OAuthCallback = () => {
         }
 
         if (!token) {
-          setStatus("error");
-          setMessage("Токен авторизации не найден");
-          setTimeout(() => {
-            window.location.href = "/login";
-          }, 3000);
-          return;
+          // Проверим также hash для токена (некоторые OAuth провайдеры используют hash)
+          const hashParams = new URLSearchParams(hash.replace("#", ""));
+          const hashToken =
+            hashParams.get("token") || hashParams.get("access_token");
+
+          if (hashToken) {
+            token = hashToken;
+            console.log("Found token in hash:", hashToken);
+          } else {
+            setStatus("error");
+            setMessage("Токен авторизации не найден в URL параметрах");
+            console.error("No token found in URL or hash");
+            setTimeout(() => {
+              window.location.href = "/login";
+            }, 3000);
+            return;
+          }
         }
+
+        console.log("Using token for OAuth login:", token);
 
         // Используем существующий loginUser thunk с параметром viaOAuth
         const result = await dispatch(
@@ -61,11 +86,16 @@ export const OAuthCallback = () => {
       } catch (error) {
         console.error("OAuth callback error:", error);
         setStatus("error");
-        setMessage(
-          error?.message ||
-            error?.[0]?.message ||
-            "Произошла ошибка при авторизации"
-        );
+
+        // Правильная обработка ошибок из вашего slice
+        let errorMessage = "Произошла ошибка при авторизации";
+        if (Array.isArray(error) && error.length > 0) {
+          errorMessage = error[0]?.message || errorMessage;
+        } else if (error?.message) {
+          errorMessage = error.message;
+        }
+
+        setMessage(errorMessage);
         setTimeout(() => {
           window.location.href = "/login";
         }, 3000);
@@ -199,13 +229,19 @@ export const OAuthCallback = () => {
               {JSON.stringify(
                 {
                   url: window.location.href,
+                  search: window.location.search,
+                  hash: window.location.hash,
                   params: Object.fromEntries(
                     new URLSearchParams(window.location.search)
                   ),
-                  status,
-                  authStatus: status,
+                  hashParams: Object.fromEntries(
+                    new URLSearchParams(window.location.hash.replace("#", ""))
+                  ),
+                  componentStatus: status,
+                  authStatus: authStatus,
                   isLoading,
                   errors,
+                  authMessage,
                 },
                 null,
                 2
@@ -217,3 +253,5 @@ export const OAuthCallback = () => {
     </div>
   );
 };
+
+export default OAuthCallback;

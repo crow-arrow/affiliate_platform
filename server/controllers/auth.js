@@ -136,15 +136,18 @@ export const oauthLogin = async (req, res) => {
     const lastName = clerkUser?.lastName || "NoName";
     const imageUrl = clerkUser?.imageUrl || null;
 
+    console.log("Clerk user data:", { email, firstName, lastName, imageUrl });
+
     // Try to find by clerkId first
-    let user = await User.findOne({ where: { clerkId } });
+    let user = await User.findOne({ where: { clerkId: userId } });
 
     // If not found by clerkId, try by email to link existing account
     if (!user && email) {
       user = await User.findOne({ where: { email } });
       if (user) {
-        user.clerkId = clerkId;
+        user.clerkId = userId;
         await user.save();
+        console.log("Linked existing user with Clerk ID");
       }
     }
 
@@ -155,7 +158,7 @@ export const oauthLogin = async (req, res) => {
       const hash = bcrypt.hashSync(randomPassword, salt);
 
       user = await User.create({
-        clerkId,
+        clerkId: userId,
         email,
         first_name: firstName,
         last_name: lastName,
@@ -164,12 +167,14 @@ export const oauthLogin = async (req, res) => {
         emailVerified: true,
         password: hash,
       });
+
+      console.log("Created new user from Clerk data");
     }
 
     const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "30m" }
     );
 
     res.status(200).json({
@@ -182,7 +187,9 @@ export const oauthLogin = async (req, res) => {
     });
   } catch (error) {
     console.error("OAuth login error:", error);
-    res.status(500).json({ message: "OAuth login failed" });
+    res
+      .status(500)
+      .json({ message: "OAuth login failed", error: error.message });
   }
 };
 
