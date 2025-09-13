@@ -48,19 +48,29 @@ function App() {
   const { isSignedIn, user: clerkUser } = useUser();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    if (isSignedIn && clerkUser && !isAuth) {
-      const email = clerkUser.primaryEmailAddress?.emailAddress;
-
-      dispatch(loginUser({ email, viaOAuth: true })).finally(() =>
-        setIsLoaded(true)
-      );
-    } else if (token && !isAuth) {
-      dispatch(getMe()).finally(() => setIsLoaded(true));
-    } else {
-      setIsLoaded(true);
-    }
+    const run = async () => {
+      if (isSignedIn && clerkUser && !isAuth) {
+        try {
+          const token = await window.Clerk.session?.getToken();
+          if (token) {
+            await dispatch(loginUser({ viaOAuth: token })).unwrap();
+          }
+        } catch (e) {
+          console.error("OAuth login error in App:", e);
+        } finally {
+          setIsLoaded(true);
+        }
+      } else if (!isAuth) {
+        const token = localStorage.getItem("token");
+        if (token) {
+          await dispatch(getMe());
+        }
+        setIsLoaded(true);
+      } else {
+        setIsLoaded(true);
+      }
+    };
+    run();
   }, [isSignedIn, clerkUser, isAuth, dispatch]);
 
   if (!isLoaded) {

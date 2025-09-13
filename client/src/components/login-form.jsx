@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2Icon } from "lucide-react";
 
 import { useSignIn } from "@clerk/clerk-react";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useAuth } from "@clerk/clerk-react";
 
 export function LoginForm({ className, ...props }) {
   const [email, setEmail] = useState("");
@@ -45,14 +45,15 @@ export function LoginForm({ className, ...props }) {
 
   const { isSignedIn, user: clerkUser } = useUser();
   const [isLoaded, setIsLoaded] = useState(false);
+  const { getToken } = useAuth();
 
   useEffect(() => {
     const runAuthFlow = async () => {
       if (isSignedIn && clerkUser && !isAuth) {
-        const email = clerkUser.primaryEmailAddress?.emailAddress;
-        if (email) {
+        const token = await getToken();
+        if (token) {
           try {
-            await dispatch(loginUser({ email, viaOAuth: true })).unwrap();
+            await dispatch(loginUser({ viaOAuth: token })).unwrap();
           } catch (e) {
             console.error("OAuth login error:", e);
           } finally {

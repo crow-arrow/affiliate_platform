@@ -48,7 +48,7 @@ export const loginUser = createAsyncThunk(
 
       const { data } = response;
 
-      console.log("LOGIN RESPONSE DATA:", email);
+      console.log("LOGIN RESPONSE DATA:", data);
 
       if (data.token) {
         window.localStorage.setItem("token", data.token);
@@ -84,7 +84,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
-    token: null,
+    token: window.localStorage.getItem("token") || null,
     isLoading: false,
     status: "idle",
     errors: [],
@@ -164,12 +164,6 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         window.localStorage.removeItem("token");
-      })
-      .addCase("@init", (state) => {
-        const token = window.localStorage.getItem("token");
-        if (token) {
-          state.token = token;
-        }
       });
   },
 });
