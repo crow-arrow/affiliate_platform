@@ -6,6 +6,7 @@ import { useUser } from "@clerk/clerk-react";
 import { loginUser, checkIsAuth } from "../../redux/features/auth/authSlice.js";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { Box, CircularProgress } from "@mui/material";
 
 export const OAuthCallback = () => {
   const { isSignedIn, user: clerkUser } = useUser();

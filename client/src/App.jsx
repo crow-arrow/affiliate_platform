@@ -27,15 +27,28 @@ import { OAuthCallback } from "./components/verification/OAuthCallback.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
-import { useState } from "react";
 import { checkIsAuth } from "./redux/features/auth/authSlice.js";
 import { CropAvatar } from "./components/Avatar.jsx";
+import { Box, CircularProgress } from "@mui/material";
 
 function App() {
   const isAuth = useSelector(checkIsAuth);
-  const { user } = useSelector((state) => state.auth);
+  const { user, status } = useSelector((state) => state.auth);
   const emailVerified = user?.emailVerified === true;
   const showAppLayout = isAuth && user && emailVerified;
+
+  if (status === "loading") {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <CircularProgress size={80} />
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -57,12 +70,21 @@ function App() {
         <Route
           path="/"
           element={
-            showAppLayout ? (
+            status === "authenticated" && showAppLayout ? (
               <AdminProtectedRoute allowedRoles={["Admin", "Genie"]}>
                 <Layout />
               </AdminProtectedRoute>
-            ) : (
+            ) : status === "succeeded" ? (
               <Navigate to="/sign-in" />
+            ) : (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                height="100vh"
+              >
+                <CircularProgress size={80} />
+              </Box>
             )
           }
         >
