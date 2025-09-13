@@ -11,7 +11,7 @@ export const requestPasswordReset = async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-      return res.status(401).json({ message: "Email is required" });
+      return res.status(400).json({ message: "Email is required" });
     }
 
     const user = await User.findOne({ where: { email } });
@@ -86,6 +86,8 @@ export const resetPassword = async (req, res) => {
 
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(400).json({ message: "Token has expired" });
+    } else {
+      return res.status(500).json({ valid: false, message: "Server error" });
     }
   }
 };

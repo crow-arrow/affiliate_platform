@@ -138,6 +138,12 @@ export const oauthLogin = async (req, res) => {
 
     console.log("Clerk user data:", { email, firstName, lastName, imageUrl });
 
+    if (!email) {
+      return res
+        .status(400)
+        .json({ message: "Email is missing from OAuth provider" });
+    }
+
     // Try to find by clerkId first
     let user = await User.findOne({ where: { clerkId: userId } });
 

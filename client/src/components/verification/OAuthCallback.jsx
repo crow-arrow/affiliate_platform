@@ -3,7 +3,10 @@ import { Box, CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useUser } from "@clerk/clerk-react";
-import { loginUser, checkIsAuth } from "../../redux/features/auth/authSlice.js";
+import {
+  loginWithOAuth,
+  checkIsAuth,
+} from "../../redux/features/auth/authSlice.js";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -22,7 +25,7 @@ export const OAuthCallback = () => {
           const token = await window.Clerk.session?.getToken();
           if (token) {
             await dispatch(
-              loginUser({
+              loginWithOAuth({
                 viaOAuth: token,
               })
             ).unwrap();

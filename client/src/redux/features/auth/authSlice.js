@@ -35,16 +35,7 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ email, password, viaOAuth }, { rejectWithValue }) => {
     try {
-      console.log("loginUser payload:", { email, viaOAuth });
-      let response;
-
-      if (viaOAuth) {
-        response = await axios.post("/auth/oauth-login", null, {
-          headers: { Authorization: `Bearer ${viaOAuth}` },
-        });
-      } else {
-        response = await axios.post("/auth/sign-in", { email, password });
-      }
+      const response = await axios.post("/auth/sign-in", { email, password });
 
       const { data } = response;
 
@@ -59,6 +50,28 @@ export const loginUser = createAsyncThunk(
         error.response?.data?.errors || [
           { message: error.response?.data?.message },
         ]
+      );
+    }
+  }
+);
+
+export const loginWithOAuth = createAsyncThunk(
+  "auth/loginWithOAuth",
+  async (viaOAuth, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        "/auth/oauth-login",
+        {},
+        { headers: { Authorization: `Bearer ${viaOAuth}` } }
+      );
+      const { data } = response;
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        return { user: data.user, token: data.token, message: data.message };
+      }
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || { message: "OAuth failed" }
       );
     }
   }
@@ -141,6 +154,24 @@ const authSlice = createSlice({
         state.errors = [];
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.status = "failed";
+        state.errors = action.payload;
+      })
+      // Login with OAuth
+      .addCase(loginWithOAuth.pending, (state) => {
+        state.isLoading = true;
+        state.status = "loading";
+      })
+      .addCase(loginWithOAuth.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.status = "succeeded";
+        state.message = action.payload.message;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.errors = [];
+      })
+      .addCase(loginWithOAuth.rejected, (state, action) => {
         state.isLoading = false;
         state.status = "failed";
         state.errors = action.payload;
