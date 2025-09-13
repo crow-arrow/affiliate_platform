@@ -18,48 +18,16 @@ export const OAuthCallback = () => {
   useEffect(() => {
     const processOAuthCallback = async () => {
       try {
-        // Получаем параметры из URL
-        const urlParams = new URLSearchParams(window.location.search);
-        let token = urlParams.get("token");
-        const error = urlParams.get("error");
-        const provider = urlParams.get("provider");
-        const hash = window.location.hash;
-
-        console.log("OAuth callback params:", {
-          token,
-          error,
-          provider,
-          hash,
-          fullUrl: window.location.href,
-        });
-
-        if (error) {
-          setStatus("error");
-          setMessage(`Ошибка авторизации: ${error}`);
-          // setTimeout(() => {
-          //   window.location.href = "/sign-in";
-          // }, 3000);
-          return;
-        }
+        const token = await window.Clerk?.session?.getToken();
 
         if (!token) {
-          // Проверим также hash для токена (некоторые OAuth провайдеры используют hash)
-          const hashParams = new URLSearchParams(hash.replace("#", ""));
-          const hashToken =
-            hashParams.get("token") || hashParams.get("access_token");
-
-          if (hashToken) {
-            token = hashToken;
-            console.log("Found token in hash:", hashToken);
-          } else {
-            setStatus("error");
-            setMessage("Токен авторизации не найден в URL параметрах");
-            console.error("No token found in URL or hash");
-            setTimeout(() => {
-              window.location.href = "/sign-in";
-            }, 3000);
-            return;
-          }
+          setStatus("error");
+          setMessage("Не удалось получить сессию от Clerk");
+          console.error("No token found from Clerk session");
+          setTimeout(() => {
+            window.location.href = "/sign-in";
+          }, 3000);
+          return;
         }
 
         console.log("Using token for OAuth login:", token);
@@ -75,8 +43,7 @@ export const OAuthCallback = () => {
 
         setStatus("success");
         setMessage(
-          result.message ||
-            `Успешная авторизация через ${provider || "социальную сеть"}`
+          result.message || `Успешная авторизация через социальную сеть`
         );
 
         // Перенаправляем на главную страницу через 2 секунды
