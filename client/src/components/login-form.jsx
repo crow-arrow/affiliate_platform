@@ -66,6 +66,7 @@ export function LoginForm({ className, ...props }) {
     try {
       await signIn.authenticateWithRedirect({
         strategy,
+        redirectUrl: "https://clerk.jinn-travel.com/v1/oauth_callback",
       });
       console.log("OAuth redirect initiated");
       console.log(clerkUser?.primaryEmailAddress?.emailAddress);
