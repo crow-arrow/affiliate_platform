@@ -26,72 +26,16 @@ import { OAuthCallback } from "./components/verification/OAuthCallback.jsx";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import {
-  getMe,
-  checkIsAuth,
-  loginUser,
-} from "./redux/features/auth/authSlice.js";
+import { useSelector } from "react-redux";
+import { useState } from "react";
+import { checkIsAuth } from "./redux/features/auth/authSlice.js";
 import { CropAvatar } from "./components/Avatar.jsx";
-import { Box, CircularProgress } from "@mui/material";
-import { useUser } from "@clerk/clerk-react";
 
 function App() {
-  const dispatch = useDispatch();
   const isAuth = useSelector(checkIsAuth);
-  const [isLoaded, setIsLoaded] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const emailVerified = user?.emailVerified === true;
-  const showAppLayout = isLoaded && isAuth && user && emailVerified;
-
-  const { isSignedIn, user: clerkUser } = useUser();
-
-  useEffect(() => {
-    const run = async () => {
-      if (isSignedIn && clerkUser && !isAuth) {
-        try {
-          const token = await window.Clerk.session?.getToken();
-          if (token) {
-            await dispatch(
-              loginUser({
-                viaOAuth: token,
-                email: clerkUser?.primaryEmailAddress?.emailAddress,
-              })
-            ).unwrap();
-          }
-        } catch (e) {
-          console.error("OAuth login error in App:", e);
-        } finally {
-          setIsLoaded(true);
-        }
-      } else if (!isAuth) {
-        const token = localStorage.getItem("token");
-        if (token) {
-          await dispatch(getMe());
-        }
-        setIsLoaded(true);
-      } else {
-        setIsLoaded(true);
-      }
-    };
-    run();
-  }, [isSignedIn, clerkUser, isAuth, dispatch]);
-
-  if (!isLoaded) {
-    return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <CircularProgress size={80}>
-          <img src="./src/assets/Genie.png" alt="Logo" />
-        </CircularProgress>
-      </Box>
-    );
-  }
+  const showAppLayout = isAuth && user && emailVerified;
 
   return (
     <>
@@ -113,16 +57,12 @@ function App() {
         <Route
           path="/"
           element={
-            isLoaded ? (
-              showAppLayout ? (
-                <AdminProtectedRoute allowedRoles={["Admin", "Genie"]}>
-                  <Layout />
-                </AdminProtectedRoute>
-              ) : (
-                <Navigate to="/sign-in" />
-              )
+            showAppLayout ? (
+              <AdminProtectedRoute allowedRoles={["Admin", "Genie"]}>
+                <Layout />
+              </AdminProtectedRoute>
             ) : (
-              <div>Loading...</div>
+              <Navigate to="/sign-in" />
             )
           }
         >
