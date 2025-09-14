@@ -1,4 +1,3 @@
-import { requireAuth } from "@clerk/express";
 import express from "express";
 import { signUp, login, oauthLogin, getMe } from "../controllers/auth.js";
 import { passwordResetLimiter } from "../middleware/rateLimiter.js";

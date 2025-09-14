@@ -1,4 +1,3 @@
-import { clerkMiddleware } from "@clerk/express";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -34,13 +33,6 @@ app.use(
 );
 
 app.use(express.json());
-
-app.use(
-  clerkMiddleware({
-    authorizedParties: [URL],
-  })
-);
-console.log("Clerk middleware configured with URL:", URL);
 
 // Routes
 app.use("/api/auth", authRoutes);
