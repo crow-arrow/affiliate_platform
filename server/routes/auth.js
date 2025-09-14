@@ -25,6 +25,14 @@ router.post("/resend-email", passwordResetLimiter, resendEmailController);
 router.post("/sign-in", login);
 
 // OAuth Login with Clerk
+router.use("/oauth-login", (req, res, next) => {
+  console.log("=== HIT OAUTH-LOGIN ROUTE ===");
+  console.log("Method:", req.method);
+  console.log("URL:", req.url);
+  console.log("Body:", req.body);
+  console.log("Headers:", req.headers);
+  next();
+});
 // http://localhost:3002/api/auth/clerk-login
 router.post("/oauth-login", oauthLogin);
 

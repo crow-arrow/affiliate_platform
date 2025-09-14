@@ -123,6 +123,9 @@ export const login = async (req, res) => {
 
 // POST /auth/oauth-login
 export const oauthLogin = async (req, res) => {
+  console.log("🎯 INSIDE oauthLogin FUNCTION");
+  console.log("Request method:", req.method);
+  console.log("Request body:", req.body);
   try {
     const { userId } = getAuth(req);
     if (!userId) {
