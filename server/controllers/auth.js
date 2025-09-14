@@ -107,12 +107,11 @@ export const login = async (req, res) => {
       { expiresIn: "15m" }
     );
 
+    const { password: _, ...safeUser } = user.toJSON();
+
     res.status(200).json({
       token,
-      user: {
-        ...user.toJSON(),
-        password: undefined,
-      },
+      user: safeUser,
       message: "You are in",
     });
   } catch (error) {
@@ -193,12 +192,11 @@ export const oauthLogin = async (req, res) => {
       { expiresIn: "30m" }
     );
 
+    const { password: _, ...safeUser } = user.toJSON();
+
     res.status(200).json({
       token,
-      user: {
-        ...user.toJSON(),
-        password: undefined,
-      },
+      user: safeUser,
       message: "Welcome via OAuth",
     });
   } catch (error) {
