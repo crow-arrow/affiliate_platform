@@ -1,56 +1,67 @@
 import { useEffect, useRef } from "react";
-import { useClerk, useAuth, useUser } from "@clerk/clerk-react";
+import { useAuth, useUser, useClerk } from "@clerk/clerk-react";
 import { useDispatch } from "react-redux";
 import { loginWithOAuth } from "../../redux/features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export const OAuthCallback = () => {
+  const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { handleRedirectCallback } = useClerk();
-  const { getToken } = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // чтобы не запускалось дважды
   const calledRef = useRef(false);
 
   useEffect(() => {
     const run = async () => {
-      if (calledRef.current) return;
-
       try {
-        // 1️⃣ Обрабатываем редирект (ставим сессию)
+        // ⚡ шаг 1: обработать редирект сразу
         await handleRedirectCallback();
 
-        // 2️⃣ Получаем токен
-        const token = await getToken();
-        console.log("Получен токен:", token);
-
-        if (token) {
-          calledRef.current = true;
-
-          // 3️⃣ Диспатчим в бэкенд
-          await dispatch(loginWithOAuth({ token }));
-          toast.success("Login successful!");
-          navigate("/my-account");
-        } else {
-          console.error("❌ Clerk не вернул токен");
-          toast.error("OAuth login failed. No token received.");
-          navigate("/sign-in");
+        if (!isLoaded || !userId || !sessionId || calledRef.current) {
+          console.log("⏳ Clerk ещё не готов:", {
+            isLoaded,
+            userId,
+            sessionId,
+          });
+          return;
         }
-      } catch (e) {
-        console.error("❌ Ошибка Clerk callback:", e);
-        toast.error("OAuth login failed.");
+
+        // ⚡ шаг 2: получить токен
+        const token = await getToken({ template: "backend" });
+        console.log("🔑 Получен токен:", token);
+
+        if (!token) {
+          console.warn("⚠️ Clerk вернул null вместо токена");
+          return;
+        }
+
+        calledRef.current = true;
+        await dispatch(loginWithOAuth({ token }));
+        toast.success("Login successful!");
+        navigate("/my-account");
+      } catch (err) {
+        console.error("❌ Ошибка при handleRedirectCallback/login:", err);
+        toast.error("OAuth login failed. Please try again.");
         navigate("/sign-in");
       }
     };
 
     run();
-  }, [handleRedirectCallback, getToken, dispatch, navigate]);
+  }, [
+    isLoaded,
+    userId,
+    sessionId,
+    getToken,
+    dispatch,
+    navigate,
+    handleRedirectCallback,
+  ]);
 
   return (
-    <div className="flex items-center justify-center min-h-[300px]">
-      <p>Processing OAuth login...</p>
+    <div className="flex justify-center items-center min-h-[300px]">
+      <p>Finishing OAuth login, please wait…</p>
     </div>
   );
 };
