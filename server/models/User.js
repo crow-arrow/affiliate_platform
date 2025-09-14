@@ -10,6 +10,11 @@ const User = sequelize.define(
       primaryKey: true,
       unique: true,
     },
+    clerkId: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: true,
+    },
     email: {
       type: DataTypes.STRING,
       allowNull: false,

@@ -6,6 +6,7 @@ import {
   resendEmailController,
 } from "../controllers/emailController.js";
 import { checkAuth } from "../middleware/checkAuth.js";
+import { clerkMiddleware } from "@clerk/express";
 
 const router = express.Router();
 
@@ -33,7 +34,7 @@ router.use("/oauth-login", (req, res, next) => {
   next();
 });
 // http://localhost:3002/api/auth/clerk-login
-router.post("/oauth-login", oauthLogin);
+router.post("/oauth-login", clerkMiddleware(), oauthLogin);
 
 // Get Me
 // http://localhost:3002/api/auth/me
