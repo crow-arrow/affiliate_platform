@@ -1,23 +1,15 @@
+import { AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 import { useEffect } from "react";
-import { useClerk } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const SSOCallback = () => {
-  const { handleRedirectCallback } = useClerk();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const run = async () => {
-      try {
-        await handleRedirectCallback();
-        navigate("/oauth-done");
-      } catch (err) {
-        console.error("❌ Ошибка при handleRedirectCallback:", err);
-        navigate("/sign-in");
-      }
-    };
-    run();
-  }, [handleRedirectCallback, navigate]);
+    toast.info("Redirecting to complete sign-in...");
+    navigate("/sign-in/oauth-done");
+  }, [navigate]);
 
-  return <p>Обработка OAuth редиректа…</p>;
+  return <AuthenticateWithRedirectCallback />;
 };
