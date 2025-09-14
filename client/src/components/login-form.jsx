@@ -30,10 +30,18 @@ export function LoginForm({ className, ...props }) {
   const navigate = useNavigate();
 
   const { signIn } = useSignIn();
-  if (!signIn) return null;
 
   const { user: clerkUser, isSignedIn } = useUser();
   console.log(clerkUser?.primaryEmailAddress?.emailAddress);
+
+  if (!signIn) {
+    return (
+      <div className="flex justify-center items-center min-h-[300px]">
+        <Loader2Icon className="animate-spin mr-2" />
+        Loading sign-in...
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (status === "succeeded" && isAuth && user) {
