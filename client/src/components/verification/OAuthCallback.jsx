@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 
 export const OAuthCallback = () => {
   const { isSignedIn } = useUser();
+  const { clerkUser } = useUser();
   const { getToken } = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -21,7 +22,6 @@ export const OAuthCallback = () => {
   console.log("=== OAuthCallback effect ===");
   console.log("isSignedIn:", isSignedIn);
   console.log("clerkUser:", clerkUser);
-  console.log("isAuth:", isAuth);
 
   useEffect(() => {
     if (!isSignedIn || calledRef.current) return;
