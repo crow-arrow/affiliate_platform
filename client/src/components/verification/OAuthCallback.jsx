@@ -31,6 +31,10 @@ export const OAuthCallback = () => {
         const token = await getToken();
         if (token) {
           calledRef.current = true;
+          console.log("🔥 Перед диспатчем loginWithOAuth", {
+            isSignedIn,
+            clerkUser,
+          });
           await dispatch(loginWithOAuth({ token }));
           toast("Login successful!");
           navigate("/my-account");
