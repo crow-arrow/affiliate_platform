@@ -29,6 +29,7 @@ export const OAuthCallback = () => {
     const run = async () => {
       try {
         const token = await getToken();
+        console.log("Получен токен:", token);
         if (token) {
           calledRef.current = true;
           console.log("🔥 Перед диспатчем loginWithOAuth", {
