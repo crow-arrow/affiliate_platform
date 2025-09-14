@@ -37,7 +37,7 @@ app.use(express.json());
 
 app.use(
   clerkMiddleware({
-    authorizedParties: "jinn-travel.com",
+    authorizedParties: [URL],
   })
 );
 console.log("Clerk middleware configured with URL:", URL);
