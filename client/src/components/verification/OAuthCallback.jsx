@@ -23,27 +23,26 @@ export const OAuthCallback = () => {
   const calledRef = useRef(false);
 
   useEffect(() => {
+    console.log("=== OAuthCallback effect ===");
+    console.log("isSignedIn:", isSignedIn);
+    console.log("clerkUser:", clerkUser);
+    console.log("isAuth:", isAuth);
+
     const run = async () => {
-      if (calledRef.current) return;
+      if (calledRef.current) {
+        console.log("⏭️ Уже вызывали, пропускаем");
+        return;
+      }
       if (isSignedIn && clerkUser && !isAuth) {
+        console.log("✅ Условия выполнены, идем за токеном");
         calledRef.current = true;
-
         try {
-          console.log("✅ Условия выполнены, получаем токен...");
-          const token = await getToken(); // правильный способ
-          console.log("Raw token:", token);
-
-          if (token) {
-            console.log("🚀 Вызываем loginWithOAuth...");
-            const result = await dispatch(loginWithOAuth({ token })).unwrap();
-            console.log("✅ loginWithOAuth result:", result);
-          } else {
-            console.error("❌ Токен не получен");
-          }
+          const token = await getToken();
+          console.log("Token:", token?.substring(0, 20), "...");
+          await dispatch(loginWithOAuth({ token })).unwrap();
+          console.log("✅ loginWithOAuth вызван");
         } catch (e) {
-          console.error("❌ Error in OAuth flow:", e);
-          toast.error("Authentication failed. Please log in again.");
-          navigate("/sign-in");
+          console.error("❌ Ошибка:", e);
         }
       } else {
         console.log("⏳ Условия не выполнены");
@@ -51,7 +50,7 @@ export const OAuthCallback = () => {
     };
 
     run();
-  }, [isSignedIn, clerkUser, isAuth, getToken, dispatch, navigate]);
+  }, [isSignedIn, clerkUser, isAuth, getToken, dispatch]);
 
   // Эта страница всегда должна рендерить компонент коллбэка
   return <AuthenticateWithRedirectCallback />;
