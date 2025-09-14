@@ -30,6 +30,8 @@ export function LoginForm({ className, ...props }) {
   const navigate = useNavigate();
 
   const { signIn } = useSignIn();
+  if (!signIn) return null;
+
   const { user: clerkUser, isSignedIn } = useUser();
   console.log(clerkUser?.primaryEmailAddress?.emailAddress);
 
@@ -62,17 +64,21 @@ export function LoginForm({ className, ...props }) {
     }
   };
 
-  const handleOAuth = async (strategy) => {
-    try {
-      await signIn.authenticateWithRedirect({
+  const handleOAuth = (strategy) => {
+    return signIn
+      .authenticateWithRedirect({
         strategy,
-        redirectUrl: `${window.location.origin}/auth/callback`,
+        redirectUrl: "/sign-in/sso-callback",
+        redirectUrlComplete: "/",
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err.errors);
+        console.error(err, null, 2);
+        toast.error("OAuth sign-in failed. Please try again.");
       });
-      console.log("OAuth redirect initiated");
-      console.log(clerkUser?.primaryEmailAddress?.emailAddress);
-    } catch (err) {
-      console.error("OAuth error:", err);
-    }
   };
 
   if (loading) {

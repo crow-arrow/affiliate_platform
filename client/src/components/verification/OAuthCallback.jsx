@@ -1,6 +1,9 @@
-import { AuthenticateWithRedirectCallback, useUser } from "@clerk/clerk-react";
-import { Box, CircularProgress } from "@mui/material";
-import { useEffect } from "react";
+import {
+  AuthenticateWithRedirectCallback,
+  useUser,
+  useAuth,
+} from "@clerk/clerk-react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   loginWithOAuth,
@@ -11,34 +14,28 @@ import { toast } from "react-toastify";
 
 export const OAuthCallback = () => {
   const { isSignedIn, user: clerkUser } = useUser();
+  const { getToken } = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const isAuth = useSelector(checkIsAuth);
-  const { status } = useSelector((state) => state.auth);
 
-  // Когда Clerk закончит редирект, isSignedIn станет true
+  // Чтобы не запускать useEffect несколько раз
+  const calledRef = useRef(false);
+
   useEffect(() => {
     const run = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("=== OAuth useEffect ===");
-      console.log("isSignedIn:", isSignedIn);
-      console.log("clerkUser:", clerkUser);
-      console.log("isAuth:", isAuth);
-
+      if (calledRef.current) return;
       if (isSignedIn && clerkUser && !isAuth) {
+        calledRef.current = true;
+
         try {
           console.log("✅ Условия выполнены, получаем токен...");
-
-          const token = await window.Clerk.session?.getToken();
+          const token = await getToken(); // правильный способ
           console.log("Raw token:", token);
-          console.log("Token type:", typeof token);
-          console.log("Token length:", token?.length);
 
           if (token) {
             console.log("🚀 Вызываем loginWithOAuth...");
-            const result = await dispatch(
-              loginWithOAuth({ viaOAuth: token })
-            ).unwrap();
+            const result = await dispatch(loginWithOAuth({ token })).unwrap();
             console.log("✅ loginWithOAuth result:", result);
           } else {
             console.error("❌ Токен не получен");
@@ -52,25 +49,10 @@ export const OAuthCallback = () => {
         console.log("⏳ Условия не выполнены");
       }
     };
+
     run();
-  }, [isSignedIn, clerkUser, isAuth, dispatch, navigate]);
+  }, [isSignedIn, clerkUser, isAuth, getToken, dispatch, navigate]);
 
-  // Показываем прогресс пока Clerk обрабатывает коллбэк
-  if (!isSignedIn && !isAuth) {
-    return (
-      <>
-        <AuthenticateWithRedirectCallback />
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100vh"
-        >
-          <CircularProgress size={80} />
-        </Box>
-      </>
-    );
-  }
-
-  return null;
+  // Эта страница всегда должна рендерить компонент коллбэка
+  return <AuthenticateWithRedirectCallback />;
 };
