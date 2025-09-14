@@ -18,7 +18,7 @@ function InnerRoot() {
   const navigate = useNavigate();
 
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} navigate={navigate}>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <App />

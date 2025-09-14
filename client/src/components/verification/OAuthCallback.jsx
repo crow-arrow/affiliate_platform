@@ -3,10 +3,11 @@ import {
   useUser,
   useAuth,
 } from "@clerk/clerk-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { loginWithOAuth } from "../../redux/features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export const OAuthCallback = () => {
   const { isSignedIn } = useUser();
@@ -14,18 +15,29 @@ export const OAuthCallback = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // защита от повторных вызовов
+  const calledRef = useRef(false);
+
   useEffect(() => {
+    if (!isSignedIn || calledRef.current) return;
+
     const run = async () => {
-      if (isSignedIn) {
+      try {
         const token = await getToken();
         if (token) {
+          calledRef.current = true;
           await dispatch(loginWithOAuth({ token }));
+          toast("Login successful!");
           navigate("/my-account");
         }
+      } catch (e) {
+        console.error("OAuth error:", e);
+        toast.error("OAuth login failed. Please try again.");
       }
     };
+
     run();
-  }, [isSignedIn]);
+  }, [isSignedIn, getToken, dispatch, navigate]);
 
   return <AuthenticateWithRedirectCallback />;
 };
