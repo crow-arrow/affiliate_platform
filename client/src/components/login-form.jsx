@@ -67,7 +67,7 @@ export function LoginForm({ className, ...props }) {
       .authenticateWithRedirect({
         strategy,
         redirectUrl: "https://dev.jinn-travel.com/sign-in/sso-callback",
-        redirectUrlComplete: "https://dev.jinn-travel.com/my-account",
+        redirectUrlComplete: "https://dev.jinn-travel.com/sign-in/oauth-done",
       })
       .then((res) => {
         console.log(res);
