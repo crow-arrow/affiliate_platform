@@ -10,9 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export const OAuthCallback = () => {
-  const { isSignedIn } = useUser();
-  const { clerkUser } = useUser();
-  const { getToken } = useAuth();
+  const { isSignedIn, user } = useUser();
+  const { userId, sessionId, getToken, isLoaded } = useAuth();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -21,7 +20,10 @@ export const OAuthCallback = () => {
 
   console.log("=== OAuthCallback effect ===");
   console.log("isSignedIn:", isSignedIn);
-  console.log("clerkUser:", clerkUser);
+  console.log("clerkUser:", user);
+  console.log("clerkUser ID:", userId);
+  console.log("sessionId:", sessionId);
+  console.log("isLoaded?:", isLoaded);
 
   useEffect(() => {
     if (!isSignedIn || calledRef.current) return;
@@ -34,7 +36,7 @@ export const OAuthCallback = () => {
           calledRef.current = true;
           console.log("🔥 Перед диспатчем loginWithOAuth", {
             isSignedIn,
-            clerkUser,
+            user,
           });
           await dispatch(loginWithOAuth({ token }));
           toast("Login successful!");
