@@ -20,16 +20,12 @@ const AppProvider = () => {
   const navigate = useNavigate();
 
   return (
-    <ThemeProvider theme={theme}>
-      <ClerkProvider
-        publishableKey={PUBLISHABLE_KEY}
-        domain="jinn-travel.com"
-        navigate={navigate}
-      >
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} navigate={navigate}>
+      <ThemeProvider theme={theme}>
         <CssBaseline />
         <App />
-      </ClerkProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </ClerkProvider>
   );
 };
 
