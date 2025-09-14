@@ -34,5 +34,5 @@ export const OAuthDone = () => {
     run();
   }, [isLoaded, userId, sessionId, getToken, dispatch, navigate]);
 
-  return <p>Завершаем вход…</p>;
+  return <p>Inicializing sign in …</p>;
 };
