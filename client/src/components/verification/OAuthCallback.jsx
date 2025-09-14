@@ -1,3 +1,17 @@
+import {
+  AuthenticateWithRedirectCallback,
+  useUser,
+  useAuth,
+} from "@clerk/clerk-react";
+import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  loginWithOAuth,
+  checkIsAuth,
+} from "../../redux/features/auth/authSlice.js";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 export const OAuthCallback = () => {
   const { isSignedIn, user: clerkUser } = useUser();
   const { getToken } = useAuth();
