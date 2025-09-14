@@ -18,6 +18,11 @@ export const OAuthCallback = () => {
   // защита от повторных вызовов
   const calledRef = useRef(false);
 
+  console.log("=== OAuthCallback effect ===");
+  console.log("isSignedIn:", isSignedIn);
+  console.log("clerkUser:", clerkUser);
+  console.log("isAuth:", isAuth);
+
   useEffect(() => {
     if (!isSignedIn || calledRef.current) return;
 

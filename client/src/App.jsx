@@ -56,9 +56,13 @@ function App() {
         <Route
           path="/"
           element={
-            <AdminProtectedRoute allowedRoles={["Admin", "Genie"]}>
-              <Layout />
-            </AdminProtectedRoute>
+            showAppLayout ? (
+              <AdminProtectedRoute allowedRoles={["Admin", "Genie"]}>
+                <Layout />
+              </AdminProtectedRoute>
+            ) : (
+              <Navigate to="/sign-in" />
+            )
           }
         >
           <Route index element={<Dashboard />} />
