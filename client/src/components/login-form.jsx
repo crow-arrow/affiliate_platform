@@ -5,7 +5,6 @@ import {
   loginUser,
   checkIsAuth,
   clearErrors,
-  getMe,
 } from "../redux/features/auth/authSlice";
 import { toast } from "react-toastify";
 import PropTypes from "prop-types";
@@ -17,7 +16,6 @@ import { Label } from "@/components/ui/label";
 import { Loader2Icon } from "lucide-react";
 
 import { useSignIn } from "@clerk/clerk-react";
-import { useUser } from "@clerk/clerk-react";
 
 export function LoginForm({ className, ...props }) {
   const [email, setEmail] = useState("");
@@ -29,20 +27,6 @@ export function LoginForm({ className, ...props }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { signIn } = useSignIn();
-
-  const { user: clerkUser, isSignedIn } = useUser();
-  console.log(clerkUser?.primaryEmailAddress?.emailAddress);
-
-  if (!signIn) {
-    return (
-      <div className="flex justify-center items-center min-h-[300px]">
-        <Loader2Icon className="animate-spin mr-2" />
-        Loading sign-in...
-      </div>
-    );
-  }
-
   useEffect(() => {
     if (status === "succeeded" && isAuth && user) {
       toast(message);
@@ -51,7 +35,7 @@ export function LoginForm({ className, ...props }) {
       toast.error(errors[0].message || "Server error");
       dispatch(clearErrors());
     }
-  }, [status, message, errors, isAuth, user, role]);
+  }, [status, message, errors, isAuth, user, role, dispatch, navigate]);
 
   const loading = status === "loading";
 
@@ -72,7 +56,13 @@ export function LoginForm({ className, ...props }) {
     }
   };
 
+  const { signIn } = useSignIn();
+
   const handleOAuth = (strategy) => {
+    if (!signIn) {
+      toast.error("Clerk not initialized yet. Please try again.");
+      return;
+    }
     return signIn
       .authenticateWithRedirect({
         strategy,
