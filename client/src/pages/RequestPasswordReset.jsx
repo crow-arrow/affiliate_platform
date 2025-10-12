@@ -9,8 +9,6 @@ import { toast } from "react-toastify";
 import logo from "../assets/logo.png";
 
 export const RequestPasswordReset = () => {
-  console.log("Request Password rendered");
-
   const { status, message, requestResetError } = useSelector(
     (state) => state.password
   );

@@ -26,14 +26,7 @@ router.post("/sign-in", login);
 
 // OAuth Login with Clerk
 // http://localhost:3002/api/auth/oauth-login
-router.post("/oauth-login", clerkMiddleware(), oauthLogin, (req, res, next) => {
-  console.log("=== HIT OAUTH-LOGIN ROUTE ===");
-  console.log("Method:", req.method);
-  console.log("URL:", req.url);
-  console.log("Body:", req.body);
-  console.log("Headers:", req.headers);
-  next();
-});
+router.post("/oauth-login", clerkMiddleware(), oauthLogin);
 
 // Get Me
 // http://localhost:3002/api/auth/me

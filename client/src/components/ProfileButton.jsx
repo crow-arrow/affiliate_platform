@@ -51,10 +51,15 @@ export const ProfileButton = ({ isOpen }) => {
   const isAdminPage = location.pathname.startsWith("/admin");
 
   const logoutHandler = async () => {
-    await signOut();
-    dispatch(logout());
-    // toast.info("You are out");
-    navigate("/sign-in");
+    try {
+      await signOut();
+      dispatch(logout());
+      navigate("/sign-in", { replace: true }); // ← ДОБАВЬТЕ replace: true
+    } catch (error) {
+      console.error("Logout error:", error);
+      // На всякий случай всё равно редиректим
+      navigate("/sign-in", { replace: true });
+    }
   };
 
   return (

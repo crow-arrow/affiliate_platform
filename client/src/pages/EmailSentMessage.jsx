@@ -86,7 +86,6 @@ export const EmailSentMessage = () => {
   const handleClick = async () => {
     if (!email || loading || countdown > 0) return;
 
-    console.log("Email:", email);
     setLoading(true);
     try {
       const result = await dispatch(resendEmailVerification(email));

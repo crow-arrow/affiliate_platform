@@ -17,7 +17,6 @@ export const ProgressBar = () => {
   const offset =
     circumferenceFullCircle -
     (circumferenceFullCircle * numberOfTravellers) / 2 / maxTravellersBronze;
-  console.log(circumference);
 
   const offsetSilver =
     circumferenceFullCircle -

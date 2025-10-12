@@ -20,7 +20,6 @@ export const OAuthDone = () => {
     const run = async () => {
       try {
         const token = await getToken({ template: "backend" });
-        console.log("✅ Полученный токен:", token);
         if (!token) {
           console.warn("⚠️ Clerk вернул null вместо токена");
           return;

@@ -39,11 +39,15 @@ export const loginUser = createAsyncThunk(
 
       const { data } = response;
 
-      console.log("LOGIN RESPONSE DATA:", data);
-
       if (data.token) {
         window.localStorage.setItem("token", data.token);
-        return { user: data.user, token: data.token, message: data.message };
+        window.localStorage.setItem("refreshToken", data.refreshToken);
+        return {
+          user: data.user,
+          token: data.token,
+          refreshToken: data.refreshToken,
+          message: data.message,
+        };
       }
     } catch (error) {
       return rejectWithValue(
@@ -64,11 +68,16 @@ export const loginWithOAuth = createAsyncThunk(
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log("➡️ OAuth token received:", token);
       const { data } = response;
       if (data.token) {
         localStorage.setItem("token", data.token);
-        return { user: data.user, token: data.token, message: data.message };
+        localStorage.setItem("refreshToken", data.refreshToken);
+        return {
+          user: data.user,
+          token: data.token,
+          refreshToken: data.refreshToken,
+          message: data.message,
+        };
       }
     } catch (error) {
       return rejectWithValue(
@@ -83,6 +92,9 @@ export const getMe = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await axios.get("/auth/me");
+      if (data.refreshToken) {
+        localStorage.setItem("refreshToken", data.refreshToken);
+      }
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -94,11 +106,45 @@ export const getMe = createAsyncThunk(
   }
 );
 
+export const refreshAccessToken = createAsyncThunk(
+  "auth/refreshAccessToken",
+  async (_, { rejectWithValue }) => {
+    try {
+      const refreshToken = window.localStorage.getItem("refreshToken");
+
+      if (!refreshToken) {
+        throw new Error("No refresh token available");
+      }
+
+      const { data } = await axios.post("/auth/refresh-token", {
+        refreshToken,
+      });
+
+      window.localStorage.setItem("token", data.token);
+      window.localStorage.setItem("refreshToken", data.refreshToken);
+
+      return {
+        token: data.token,
+        refreshToken: data.refreshToken,
+      };
+    } catch (error) {
+      // Если refresh token невалиден, очищаем все токены
+      window.localStorage.removeItem("token");
+      window.localStorage.removeItem("refreshToken");
+
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to refresh token"
+      );
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
     token: window.localStorage.getItem("token") || null,
+    refreshToken: window.localStorage.getItem("refreshToken") || null,
     isLoading: false,
     status: "idle",
     errors: [],
@@ -107,9 +153,11 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.refreshToken = null;
       state.isLoading = false;
       state.status = null;
       window.localStorage.removeItem("token");
+      window.localStorage.removeItem("refreshToken");
     },
     clearErrors: (state) => {
       state.errors = [];
@@ -135,6 +183,7 @@ const authSlice = createSlice({
         state.message = action.payload.message;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
         state.errors = [];
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -153,6 +202,7 @@ const authSlice = createSlice({
         state.message = action.payload.message;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
         state.errors = [];
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -171,6 +221,7 @@ const authSlice = createSlice({
         state.message = action.payload.message;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
         state.errors = [];
       })
       .addCase(loginWithOAuth.rejected, (state, action) => {
@@ -186,17 +237,29 @@ const authSlice = createSlice({
       .addCase(getMe.fulfilled, (state, action) => {
         state.isLoading = false;
         state.status = "succeeded";
-        state.message = action.payload.message;
         state.user = action.payload?.user;
-        state.token = action.payload?.token;
         state.errors = [];
+        // getMe больше не возвращает токены, используем существующие
       })
       .addCase(getMe.rejected, (state) => {
         state.isLoading = false;
         state.status = "failed";
         state.user = null;
+      })
+      // Refresh Token
+      .addCase(refreshAccessToken.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(refreshAccessToken.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.token = action.payload.token;
+        state.refreshToken = action.payload.refreshToken;
+      })
+      .addCase(refreshAccessToken.rejected, (state) => {
+        state.isLoading = false;
+        state.user = null;
         state.token = null;
-        window.localStorage.removeItem("token");
+        state.refreshToken = null;
       });
   },
 });

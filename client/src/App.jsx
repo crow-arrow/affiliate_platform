@@ -1,6 +1,11 @@
 import { Layout } from "./components/Layout";
 import { AdminLayout } from "./components/AdminLayout";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { checkIsAuth } from "./redux/features/auth/authSlice.js";
+import { getMe } from "./redux/features/auth/authSlice.js";
 
 import { AdminDashboard } from "./admin_pages/AdminDashboard.jsx";
 import { Team } from "./admin_pages/Team.jsx";
@@ -27,15 +32,69 @@ import { OAuthDone } from "./components/verification/OAuthDone.jsx";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useSelector } from "react-redux";
-import { checkIsAuth } from "./redux/features/auth/authSlice.js";
 import { CropAvatar } from "./components/Avatar.jsx";
 
 function App() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const isAuth = useSelector(checkIsAuth);
   const { user } = useSelector((state) => state.auth);
   const emailVerified = user?.emailVerified === true;
   const showAppLayout = isAuth && user && emailVerified;
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Роуты где НЕ нужно проверять авторизацию
+  const publicRoutes = [
+    "/sign-in",
+    "/sign-up",
+    "/verify-email",
+    "/reset-password",
+    "/request-reset",
+    "/email-verification",
+    "/sso-callback",
+    "/oauth-done",
+    "/404-not-found",
+  ];
+
+  const isPublicRoute = publicRoutes.some((route) =>
+    location.pathname.startsWith(route)
+  );
+
+  useEffect(() => {
+    if (!isAuth && !isPublicRoute && isLoaded) {
+      navigate("/sign-in", { replace: true });
+    }
+
+    if (isPublicRoute) {
+      setIsLoaded(true);
+      return;
+    }
+
+    const token = window.localStorage.getItem("token");
+
+    if (token) {
+      dispatch(getMe())
+        .unwrap()
+        .catch((error) => {
+          console.error("Failed to fetch user:", error);
+          // Токен невалиден - очищаем
+          window.localStorage.removeItem("token");
+          window.localStorage.removeItem("refreshToken");
+        })
+        .finally(() => setIsLoaded(true));
+    } else {
+      setIsLoaded(true);
+    }
+  }, [dispatch, isPublicRoute]);
+
+  if (!isLoaded && !isPublicRoute) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <>

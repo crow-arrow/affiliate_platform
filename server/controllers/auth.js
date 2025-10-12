@@ -8,6 +8,23 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 dotenv.config();
 
+// Функция генерации токенов
+const generateTokens = (user) => {
+  const accessToken = jwt.sign(
+    { id: user.id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "15m" } // Короткий access token
+  );
+
+  const refreshToken = jwt.sign(
+    { id: user.id, role: user.role },
+    process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET, // Используйте отдельный секрет!
+    { expiresIn: "7d" } // Долгий refresh token
+  );
+
+  return { accessToken, refreshToken };
+};
+
 // Register User
 export const signUp = async (req, res) => {
   try {
@@ -50,16 +67,14 @@ export const signUp = async (req, res) => {
       emailVerified: false,
     });
 
-    const token = jwt.sign(
-      { id: newUser.id, role: newUser.role, avatarUrl: newUser.avatarUrl },
-      process.env.JWT_SECRET,
-      { expiresIn: "30m" }
-    );
-    sendVerificationEmail(newUser.email, newUser.first_name, token);
+    const { accessToken, refreshToken } = generateTokens(newUser);
+
+    sendVerificationEmail(newUser.email, newUser.first_name, accessToken);
 
     res.status(201).json({
       user: { id: newUser.id, email: newUser.email },
-      token,
+      token: accessToken,
+      refreshToken,
       message:
         "Account created successfully. Please check your email to verify your account.",
     });
@@ -101,16 +116,13 @@ export const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "15m" }
-    );
+    const { accessToken, refreshToken } = generateTokens(user);
 
     const { password: _, ...safeUser } = user.toJSON();
 
     res.status(200).json({
-      token,
+      token: accessToken,
+      refreshToken,
       user: safeUser,
       message: "You are in",
     });
@@ -122,19 +134,13 @@ export const login = async (req, res) => {
 
 // POST /auth/oauth-login
 export const oauthLogin = async (req, res) => {
-  console.log("🎯 INSIDE oauthLogin FUNCTION");
-  console.log("Request method:", req.method);
-  console.log("Request body:", req.body);
-  console.log("AUTH HEADER:", req.headers.authorization);
   try {
     const authData = getAuth(req);
-    console.log("getAuth(req):", authData);
 
     const { userId } = authData;
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    console.log("OAuth login attempt for Clerk userId:", userId);
 
     const clerkUser = await clerkClient.users.getUser(userId);
     if (!clerkUser) {
@@ -149,28 +155,16 @@ export const oauthLogin = async (req, res) => {
     const lastName = clerkUser?.lastName || "NoName";
     const imageUrl = clerkUser?.imageUrl || null;
 
-    console.log("Clerk user data:", { email, firstName, lastName, imageUrl });
-
-    // if (!email) {
-    //   return res
-    //     .status(400)
-    //     .json({ message: "Email is missing from OAuth provider" });
-    // }
-
-    // Try to find by clerkId first
     let user = await User.findOne({ where: { clerkId: userId } });
 
-    // If not found by clerkId, try by email to link existing account
     if (!user && email) {
       user = await User.findOne({ where: { email } });
       if (user) {
         user.clerkId = userId;
         await user.save();
-        console.log("Linked existing user with Clerk ID");
       }
     }
 
-    // If still not found — create a new user
     if (!user) {
       const randomPassword = crypto.randomBytes(32).toString("hex");
       const salt = bcrypt.genSaltSync(10);
@@ -190,16 +184,13 @@ export const oauthLogin = async (req, res) => {
       console.log("Created new user from Clerk data");
     }
 
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "30m" }
-    );
+    const { accessToken, refreshToken } = generateTokens(user);
 
     const { password: _, ...safeUser } = user.toJSON();
 
     res.status(200).json({
-      token,
+      token: accessToken,
+      refreshToken,
       user: safeUser,
       message: "Welcome via SSO",
     });
@@ -220,14 +211,7 @@ export const getMe = async (req, res) => {
       return res.status(404).json({ message: "User does not exist" });
     }
 
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
     res.json({
-      token,
       user: user.get({
         plain: true,
         attributes: { exclude: ["password"] },
@@ -236,5 +220,50 @@ export const getMe = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(403).json({ message: "Access denied" });
+  }
+};
+
+// Refresh Token endpoint
+export const refreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: "Refresh token is required" });
+    }
+
+    // Верифицируем refresh token
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
+    );
+
+    // Находим пользователя
+    const user = await User.findByPk(decoded.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Генерируем новые токены
+    const tokens = generateTokens(user);
+
+    res.status(200).json({
+      token: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      message: "Token refreshed successfully",
+    });
+  } catch (error) {
+    console.error("Refresh token error:", error);
+
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Refresh token expired" });
+    }
+
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
+
+    res.status(500).json({ message: "Failed to refresh token" });
   }
 };
