@@ -161,7 +161,7 @@ export function LoginForm({ className, ...props }) {
             type="button"
             variant="outline"
             className="w-full bg-transparent"
-            onClick={() => handleOAuth("oauth_linkedin")}
+            onClick={() => handleOAuth("oauth_linkedin_oidc")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
