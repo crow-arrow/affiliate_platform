@@ -125,8 +125,12 @@ export const oauthLogin = async (req, res) => {
   console.log("🎯 INSIDE oauthLogin FUNCTION");
   console.log("Request method:", req.method);
   console.log("Request body:", req.body);
+  console.log("AUTH HEADER:", req.headers.authorization);
   try {
-    const { userId } = getAuth(req);
+    const authData = getAuth(req);
+    console.log("getAuth(req):", authData);
+
+    const { userId } = authData;
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -197,7 +201,7 @@ export const oauthLogin = async (req, res) => {
     res.status(200).json({
       token,
       user: safeUser,
-      message: "Welcome via OAuth",
+      message: "Welcome via SSO",
     });
   } catch (error) {
     console.error("OAuth login error:", error);

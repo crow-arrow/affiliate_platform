@@ -29,7 +29,7 @@ export function LoginForm({ className, ...props }) {
 
   useEffect(() => {
     if (status === "succeeded" && isAuth && user) {
-      toast(message);
+      // toast(message);
       navigate("/my-account");
     } else if (status === "failed" && errors.length > 0) {
       toast.error(errors[0].message || "Server error");
@@ -66,8 +66,8 @@ export function LoginForm({ className, ...props }) {
     return signIn
       .authenticateWithRedirect({
         strategy,
-        redirectUrl: "https://dev.jinn-travel.com/sign-in/sso-callback",
-        redirectUrlComplete: "https://dev.jinn-travel.com/sign-in/oauth-done",
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete: "/oauth-done",
       })
       .then((res) => {
         console.log(res);
@@ -163,13 +163,15 @@ export function LoginForm({ className, ...props }) {
             className="w-full bg-transparent"
             onClick={() => handleOAuth("oauth_linkedin")}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path
-                d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
-                fill="currentColor"
-              />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-5 h-5"
+            >
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.048c.476-.9 1.637-1.85 3.372-1.85 3.606 0 4.272 2.373 4.272 5.458v6.283zM5.337 7.433a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zM6.945 20.452H3.73V9h3.215v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.226.792 24 1.771 24h20.451C23.2 24 24 23.226 24 22.271V1.729C24 .774 23.2 0 22.225 0z" />
             </svg>
-            <span className="sr-only">Login with Apple</span>
+            <span className="sr-only">Login with LinkedIn</span>
           </Button>
           <Button
             type="button"

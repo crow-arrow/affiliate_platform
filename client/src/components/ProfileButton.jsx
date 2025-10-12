@@ -6,7 +6,8 @@ import {
   checkRole,
   logout,
 } from "../redux/features/auth/authSlice";
-import { toast } from "react-toastify";
+import { useClerk } from "@clerk/clerk-react";
+// import { toast } from "react-toastify";
 import avatarLogo from "../assets/avatar.webp";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
@@ -38,6 +39,7 @@ export const ProfileButton = ({ isOpen }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { signOut } = useClerk();
 
   const isAuth = useSelector(checkIsAuth);
   const userRole = useSelector(checkRole);
@@ -49,11 +51,9 @@ export const ProfileButton = ({ isOpen }) => {
   const isAdminPage = location.pathname.startsWith("/admin");
 
   const logoutHandler = async () => {
+    await signOut();
     dispatch(logout());
-    window.localStorage.removeItem("token");
-    toast("You are out");
-
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    // toast.info("You are out");
     navigate("/sign-in");
   };
 

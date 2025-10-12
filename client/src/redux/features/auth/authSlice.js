@@ -57,13 +57,14 @@ export const loginUser = createAsyncThunk(
 
 export const loginWithOAuth = createAsyncThunk(
   "auth/loginWithOAuth",
-  async ({ viaOAuth }, { rejectWithValue }) => {
+  async ({ token }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
         "/auth/oauth-login",
         {},
-        { headers: { Authorization: `Bearer ${viaOAuth}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+      console.log("➡️ OAuth token received:", token);
       const { data } = response;
       if (data.token) {
         localStorage.setItem("token", data.token);
@@ -108,6 +109,7 @@ const authSlice = createSlice({
       state.token = null;
       state.isLoading = false;
       state.status = null;
+      window.localStorage.removeItem("token");
     },
     clearErrors: (state) => {
       state.errors = [];

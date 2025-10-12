@@ -52,8 +52,8 @@ function App() {
         <Route path="/reset-password/:token" element={<PasswordRecover />} />
         <Route path="/request-reset" element={<RequestPasswordReset />} />
         <Route path="/email-verification" element={<EmailSentMessage />} />
-        <Route path="/sign-in/sso-callback" element={<SSOCallback />} />
-        <Route path="/sign-in/oauth-done" element={<OAuthDone />} />
+        <Route path="/sso-callback" element={<SSOCallback />} />
+        <Route path="/oauth-done" element={<OAuthDone />} />
 
         <Route
           path="/"
