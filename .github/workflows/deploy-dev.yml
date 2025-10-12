@@ -83,6 +83,7 @@ jobs:
           source: "server"
           target: "/opt/dev.jinn-travel.com"
           strip_components: 1
+          exclude: ".env"
 
       - name: 📦 Install backend dependencies
         uses: appleboy/ssh-action@v0.1.10
@@ -91,7 +92,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd "/opt/dev.jinn-travel.com/server"
+            cd "/opt/dev.jinn-travel.com"
             npm install --production --legacy-peer-deps
 
       - name: 🔁 Restart PM2 backend process
