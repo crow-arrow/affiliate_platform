@@ -27,13 +27,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: 📦 Installing dependencies
+      # ========================
+      # FRONTEND BUILD
+      # ========================
+      - name: 📦 Install frontend dependencies
         working-directory: client
         run: npm install --legacy-peer-deps
-
-      - name: 🧪 Print .env.production
-        working-directory: client
-        run: cat .env.production
 
       - name: 📄 Write .env.production
         working-directory: client
@@ -42,22 +41,16 @@ jobs:
           echo "VITE_API_URL=${{ vars.VITE_API_URL }}" >> .env.production
           echo "VITE_SHOW_DEV_BANNER=${{ vars.VITE_SHOW_DEV_BANNER }}" >> .env.production
 
-      - name: ⚙️ Build project
+      - name: ⚙️ Build frontend
         working-directory: client
         run: npm run build
 
-      - name: 📦 Install backend dependencies (local for tests)
+      # ========================
+      # BACKEND TESTS
+      # ========================
+      - name: 📦 Install backend dependencies
         working-directory: server
         run: npm install --legacy-peer-deps
-
-      - name: 🔍 Debug secrets visibility
-        working-directory: server
-        run: |
-          echo "JWT_SECRET is: ${JWT_SECRET:-undefined}"
-          echo "CLERK_SECRET_KEY is: ${CLERK_SECRET_KEY:-undefined}"
-        env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
 
       - name: 🧪 Run backend tests
         working-directory: server
@@ -69,6 +62,9 @@ jobs:
           CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY }}
         run: npm test
 
+      # ========================
+      # DEPLOY FRONTEND
+      # ========================
       - name: 🧹 Clean target directory on server
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -97,6 +93,9 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: sudo systemctl restart nginx
 
+      # ========================
+      # DEPLOY BACKEND
+      # ========================
       - name: 🚛 Upload backend (server/)
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -108,7 +107,7 @@ jobs:
           strip_components: 1
           exclude: ".env"
 
-      - name: 📦 Install backend dependencies
+      - name: 📦 Install backend dependencies on server
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -124,15 +123,17 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: |
-            sudo pm2 restart affiliate_server_dev
+          script: sudo pm2 restart affiliate_server_dev
 
+      # ========================
+      # NOTIFICATION
+      # ========================
       - name: 📩 Notify in Telegram
         run: |
           curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }} \
             -H "Content-Type: application/json" \
             -d '{
               "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
-              "text": "🚧 *Dev* Frontend deployed successfully!\n👤 Author: ${{ github.actor }}\n💬 Message: ${{ github.event.head_commit.message }}",
+              "text": "🚧 *Dev* build & deploy successful!*\n👤 Author: ${{ github.actor }}\n💬 Commit: ${{ github.event.head_commit.message }}",
               "parse_mode": "Markdown"
             }'
