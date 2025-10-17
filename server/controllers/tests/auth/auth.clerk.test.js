@@ -98,6 +98,12 @@ describe("POST /api/auth/oauth-login", () => {
     vi.clearAllMocks();
   });
 
+  it("should print environment variables (debug)", () => {
+    console.log("JWT_SECRET:", process.env.JWT_SECRET);
+    console.log("CLERK_SECRET_KEY:", process.env.CLERK_SECRET_KEY);
+    expect(process.env.JWT_SECRET).toBeDefined();
+  });
+
   it("returns success response when Clerk middleware passes", async () => {
     const response = await request(app)
       .post("/api/auth/oauth-login")
