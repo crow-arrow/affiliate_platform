@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getUserClicks } from "./getClicks.js";
-import { ClicksData, User } from "../models/models.js";
+import { getUserClicks } from "../getClicks.js";
+import { ClicksData, User } from "../../models/models.js";
 
-vi.mock("../models/models.js", () => ({
+vi.mock("../../models/models.js", () => ({
   User: {
     findByPk: vi.fn(),
   },
@@ -38,6 +38,7 @@ describe("getUserClicks", () => {
       where: { referral_user_id: 1 },
     });
     expect(mockRes.json).toHaveBeenCalledWith({
+      success: true,
       userId: 1,
       clicks: mockClicks,
     });
@@ -53,7 +54,9 @@ describe("getUserClicks", () => {
   });
 
   it("should return 500 on error", async () => {
+    expect.assertions(2);
     const error = new Error("DB error");
+
     User.findByPk.mockRejectedValue(error);
 
     await getUserClicks(mockReq, mockRes);
@@ -61,7 +64,7 @@ describe("getUserClicks", () => {
     expect(mockRes.status).toHaveBeenCalledWith(500);
     expect(mockRes.json).toHaveBeenCalledWith({
       message: "Server error",
-      error: error.message,
+      error: "DB error",
     });
   });
 });

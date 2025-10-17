@@ -2,6 +2,10 @@ import { ClicksData, User } from "../models/models.js";
 
 export const getUserClicks = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(400).json({ message: "Missing user in request" });
+    }
+
     const user = await User.findByPk(req.user.id, {
       include: [
         {
@@ -20,9 +24,11 @@ export const getUserClicks = async (req, res) => {
         referral_user_id: user.id,
       },
     });
-    res.json({ userId: user.id, clicks });
+    res.json({ success: true, userId: user.id, clicks });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    if (process.env.NODE_ENV !== "test") console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
   }
 };

@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { getCommission } from "./commissionCalculate.js";
+import { getCommission } from "../commissionCalculate.js";
 
 describe("getCommission", () => {
   test("should return correct commission for Bronze level", () => {

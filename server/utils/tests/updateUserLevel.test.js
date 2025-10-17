@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { updateUserLevel } from "../utils/updateUserLevel.js";
+import { updateUserLevel } from "../updateUserLevel.js";
 
 // Вспомогательные функции для моков
 const mockUser = (level, levelYear = new Date().getFullYear()) => ({

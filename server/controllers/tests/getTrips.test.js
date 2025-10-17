@@ -1,17 +1,17 @@
+vi.mock("../../models/User.js");
+vi.mock("../../models/LevelHistory.js");
+vi.mock("../../models/Trips.js");
+vi.mock("../../utils/updateUserLevel.js");
+vi.mock("../../utils/commissionCalculate.js");
+
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Op } from "sequelize";
-import { getUserTrips } from "./getUsers";
-import User from "../models/User";
-import LevelHistory from "../models/LevelHistory";
-import Trips from "../models/Trips"; // Использую "Trips", как указано в вашем коде
-import { updateUserLevel } from "../utils/updateUserLevel";
-import { getCommission } from "../utils/commissionCalculate"; // Использую "commissionCalculate", как указано в вашем коде
-
-vi.mock("../models/User");
-vi.mock("../models/LevelHistory");
-vi.mock("../models/Trips");
-vi.mock("../utils/updateUserLevel");
-vi.mock("../utils/commissionCalculate");
+import { getUserTrips } from "../me/getTrips";
+import User from "../../models/User";
+import LevelHistory from "../../models/LevelHistory";
+import Trips from "../../models/Trips";
+import { updateUserLevel } from "../../utils/updateUserLevel";
+import { getCommission } from "../../utils/commissionCalculate";
 
 describe("getUserTrips", () => {
   let mockReq;
@@ -19,6 +19,9 @@ describe("getUserTrips", () => {
   let mockUser;
   let mockTrips;
   let mockLevelHistory;
+
+  console.log("getUserTrips:", getUserTrips);
+  console.log("typeof getUserTrips:", typeof getUserTrips);
 
   beforeEach(() => {
     vi.clearAllMocks();

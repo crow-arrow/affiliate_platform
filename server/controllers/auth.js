@@ -151,6 +151,13 @@ export const oauthLogin = async (req, res) => {
       clerkUser?.emailAddresses?.[0]?.emailAddress ||
       clerkUser?.externalAccounts?.[0]?.emailAddress ||
       null;
+
+    if (!email) {
+      return res
+        .status(400)
+        .json({ message: "Cannot create user without email" });
+    }
+
     const firstName = clerkUser?.firstName || "NoName";
     const lastName = clerkUser?.lastName || "NoName";
     const imageUrl = clerkUser?.imageUrl || null;
@@ -158,10 +165,13 @@ export const oauthLogin = async (req, res) => {
     let user = await User.findOne({ where: { clerkId: userId } });
 
     if (!user && email) {
-      user = await User.findOne({ where: { email } });
-      if (user) {
-        user.clerkId = userId;
-        await user.save();
+      const foundByEmail = await User.findOne({ where: { email } });
+      if (foundByEmail) {
+        foundByEmail.clerkId = userId;
+        if (typeof foundByEmail.save === "function") {
+          await foundByEmail.save();
+        }
+        user = foundByEmail;
       }
     }
 
@@ -179,6 +189,16 @@ export const oauthLogin = async (req, res) => {
         role: "Genie",
         emailVerified: true,
         password: hash,
+      }).catch(async (err) => {
+        if (err.name === "SequelizeUniqueConstraintError") {
+          const existing = await User.findOne({ where: { email } });
+          if (existing && !existing.clerkId) {
+            existing.clerkId = userId;
+            await existing.save();
+          }
+          return existing;
+        }
+        throw err; // пробрасываем неизвестные ошибки дальше
       });
 
       console.log("Created new user from Clerk data");
@@ -196,9 +216,7 @@ export const oauthLogin = async (req, res) => {
     });
   } catch (error) {
     console.error("OAuth login error:", error);
-    res
-      .status(500)
-      .json({ message: "OAuth login failed", error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
