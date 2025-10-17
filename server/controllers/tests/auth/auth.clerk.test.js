@@ -1,10 +1,3 @@
-import request from "supertest";
-import express from "express";
-import { vi, describe, it, expect, beforeEach } from "vitest";
-import { clerkMiddleware, getAuth } from "@clerk/express";
-import authRoutes from "../../../routes/auth.js";
-
-// 🧩 Мокаем модели и Clerk
 vi.mock("../../../models/User.js", () => ({
   default: {
     create: vi.fn(),
@@ -33,7 +26,20 @@ vi.mock("@clerk/express", () => ({
   },
 }));
 
-// ⚙️ Инициализация приложения
+vi.mock("../../../utils/generateTokens.js", () => ({
+  generateTokens: vi.fn(() => ({
+    accessToken: "mocked_access_token",
+    refreshToken: "mocked_refresh_token",
+  })),
+}));
+
+import request from "supertest";
+import express from "express";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import { clerkMiddleware } from "@clerk/express";
+
+const authRoutes = (await import("../../../routes/auth.js")).default;
+
 const app = express();
 app.use(express.json());
 app.use("/api/auth", authRoutes);
@@ -43,28 +49,33 @@ describe("POST /api/auth/oauth-login", () => {
   let clerkClient;
 
   beforeEach(async () => {
-    vi.resetModules();
     vi.clearAllMocks();
+
     User = (await import("../../../models/User.js")).default;
     clerkClient = (await import("@clerk/express")).clerkClient;
 
-    // дефолтные моки
     User.findOne.mockResolvedValue(null);
     User.create.mockResolvedValue({
       id: 999,
       email: "test123@example.com",
       first_name: "Test",
       last_name: "User",
-      toJSON: () => ({
-        id: 999,
-        email: "test123@example.com",
-        first_name: "Test",
-        last_name: "User",
-      }),
+      toJSON() {
+        return {
+          id: this.id,
+          email: this.email,
+          first_name: this.first_name,
+          last_name: this.last_name,
+        };
+      },
     });
   });
 
-  it("should return success response when Clerk middleware passes", async () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns success response when Clerk middleware passes", async () => {
     const response = await request(app)
       .post("/api/auth/oauth-login")
       .send({ provider: "linkedin_oidc" });
@@ -83,7 +94,7 @@ describe("POST /api/auth/oauth-login", () => {
     );
   });
 
-  it("should handle DB errors gracefully", async () => {
+  it("handles DB errors gracefully", async () => {
     User.findOne.mockResolvedValueOnce(null);
     User.findOne.mockResolvedValueOnce(null);
     User.create.mockRejectedValueOnce(new Error("DB connection lost"));
@@ -96,7 +107,7 @@ describe("POST /api/auth/oauth-login", () => {
     expect(response.body.message).toContain("Server error");
   });
 
-  it("should not create a new user if one already exists", async () => {
+  it("does not create a new user if one already exists", async () => {
     const existingUser = {
       id: 55,
       email: "existing@example.com",
@@ -120,7 +131,7 @@ describe("POST /api/auth/oauth-login", () => {
     expect(response.body.user.email).toBe("existing@example.com");
   });
 
-  it("should return 500 if Clerk fails to provide user data", async () => {
+  it("returns 500 if Clerk fails to provide user data", async () => {
     clerkClient.users.getUser.mockRejectedValueOnce(
       new Error("Clerk API down")
     );
@@ -133,7 +144,7 @@ describe("POST /api/auth/oauth-login", () => {
     expect(response.body.message).toContain("Server error");
   });
 
-  it("should return 401 if Clerk middleware does not provide auth", async () => {
+  it("returns 401 if Clerk middleware does not provide auth", async () => {
     const { getAuth } = await import("@clerk/express");
     getAuth.mockReturnValueOnce({}); // simulate no userId
 
@@ -145,7 +156,7 @@ describe("POST /api/auth/oauth-login", () => {
     expect(response.body.message).toContain("Unauthorized");
   });
 
-  it("should create a new user with correct data", async () => {
+  it("creates a new user with correct data", async () => {
     User.findOne.mockResolvedValueOnce(null);
 
     const response = await request(app)
@@ -164,7 +175,7 @@ describe("POST /api/auth/oauth-login", () => {
     expect(response.status).toBe(200);
   });
 
-  it("should return structured error details on DB error", async () => {
+  it("returns structured error details on DB error", async () => {
     User.findOne.mockResolvedValueOnce(null);
     User.findOne.mockResolvedValueOnce(null);
     User.create.mockRejectedValueOnce(new Error("DB write failure"));
@@ -182,7 +193,7 @@ describe("POST /api/auth/oauth-login", () => {
     );
   });
 
-  it("should return 400 if Clerk user has no email", async () => {
+  it("returns 400 if Clerk user has no email", async () => {
     const { clerkClient } = await import("@clerk/express");
 
     // имитируем пользователя без email
