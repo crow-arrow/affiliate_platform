@@ -46,6 +46,10 @@ jobs:
         working-directory: client
         run: npm run build
 
+      - name: 🧪 Run backend tests
+        working-directory: server
+        run: npm test
+
       - name: 🧹 Clean target directory on server
         uses: appleboy/ssh-action@v0.1.10
         with:
