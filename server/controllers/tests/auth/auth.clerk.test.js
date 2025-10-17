@@ -54,7 +54,30 @@ describe("POST /api/auth/oauth-login", () => {
     User = (await import("../../../models/User.js")).default;
     clerkClient = (await import("@clerk/express")).clerkClient;
 
-    User.findOne.mockResolvedValue(null);
+    // Мокаем User.findOne с реалистичной логикой по email
+    User.findOne.mockImplementation(({ where }) => {
+      // эмулируем существующего пользователя
+      if (
+        where &&
+        (where.email === "existing@example.com" ||
+          where.email === "existing@example.com")
+      ) {
+        return Promise.resolve({
+          id: 55,
+          email: "existing@example.com",
+          first_name: "Existing",
+          last_name: "User",
+          toJSON: () => ({
+            id: 55,
+            email: "existing@example.com",
+            first_name: "Existing",
+            last_name: "User",
+          }),
+        });
+      }
+      // эмулируем отсутствие пользователя для всех остальных email
+      return Promise.resolve(null);
+    });
     User.create.mockResolvedValue({
       id: 999,
       email: "test123@example.com",
