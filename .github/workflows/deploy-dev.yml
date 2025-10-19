@@ -34,13 +34,6 @@ jobs:
         working-directory: client
         run: npm install --legacy-peer-deps
 
-      - name: 📄 Write .env.production
-        working-directory: client
-        run: |
-          echo "VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}" > .env.production
-          echo "VITE_API_URL=${{ vars.VITE_API_URL }}" >> .env.production
-          echo "VITE_SHOW_DEV_BANNER=${{ vars.VITE_SHOW_DEV_BANNER }}" >> .env.production
-
       - name: ⚙️ Build frontend
         working-directory: client
         run: npm run build
