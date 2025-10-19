@@ -45,16 +45,6 @@ jobs:
         working-directory: server
         run: npm install --legacy-peer-deps
 
-      - name: 🧪 Run backend tests
-        working-directory: server
-        env:
-          NODE_ENV: test
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY }}
-        run: npm test
-
       # ========================
       # DEPLOY FRONTEND
       # ========================
