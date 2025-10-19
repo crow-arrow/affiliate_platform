@@ -23,7 +23,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json', 'server/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
 
@@ -88,7 +88,6 @@ jobs:
           source: "server"
           target: "/opt/dev.jinn-travel.com"
           strip_components: 1
-          exclude: ".env"
 
       - name: 📦 Install backend dependencies on server
         uses: appleboy/ssh-action@v0.1.10
