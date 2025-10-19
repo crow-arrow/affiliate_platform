@@ -4,8 +4,7 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { checkIsAuth } from "./redux/features/auth/authSlice.js";
-import { getMe } from "./redux/features/auth/authSlice.js";
+import { checkIsAuth, getMe } from "./redux/features/auth/authSlice";
 
 import { AdminDashboard } from "./admin_pages/AdminDashboard.jsx";
 import { Team } from "./admin_pages/Team.jsx";

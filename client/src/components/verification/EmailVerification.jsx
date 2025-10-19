@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { verifyEmail } from "../../redux/features/verification/emailVerificationSlice.js";
+import { verifyEmail } from "../../redux/features/verification/emailVerificationSlice";
 import { toast } from "react-toastify";
 import logo from "../../assets/logo.png";
 import { CircularProgress } from "@mui/material";

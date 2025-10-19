@@ -1,8 +1,8 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { Provider } from "react-redux";
-import { store } from "./redux/store.js";
-import { setupInterceptors } from "./utils/axios.js"; // Импортируем функцию
+import { store } from "./redux/store.ts";
+import { setupInterceptors } from "./utils/axios.ts"; // Импортируем функцию
 import Root from "./Root.jsx";
 
 setupInterceptors(store);
