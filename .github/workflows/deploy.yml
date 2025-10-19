@@ -11,7 +11,10 @@ jobs:
     environment: production
 
     steps:
-      - name: 🔄 Git clone
+      # ========================
+      # GIT + NODE SETUP
+      # ========================
+      - name: 🔄 Checkout repository
         uses: actions/checkout@v3
 
       - name: 🧩 Setup Node.js
@@ -36,6 +39,10 @@ jobs:
 
       - name: ⚙️ Build frontend
         working-directory: client
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_SHOW_DEV_BANNER: ${{ vars.VITE_SHOW_DEV_BANNER }}
         run: npm run build
 
       # ========================
@@ -58,7 +65,7 @@ jobs:
             find /var/www/partner.jinn-travel.com/ -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.map' \) -delete
             rm -rf /var/www/partner.jinn-travel.com/assets
 
-      - name: 🚀 Deploy frontend to partner server
+      - name: 🚀 Deploy builded frontend
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -68,18 +75,19 @@ jobs:
           target: "/var/www/partner.jinn-travel.com"
           strip_components: 2
 
-      - name: 🔄 Restart nginx
+      - name: 🔄 Reload Nginx
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: sudo systemctl restart nginx
+          script: |
+            sudo nginx -t && sudo systemctl reload nginx
 
       # ========================
       # DEPLOY BACKEND
       # ========================
-      - name: 🚛 Upload backend (server/)
+      - name: 🚛 Upload backend code
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -105,17 +113,17 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: sudo pm2 restart affiliate_server
+          script: sudo pm2 restart affiliate_server --update-env
 
       # ========================
-      # NOTIFICATION
+      # TELEGRAM NOTIFICATION
       # ========================
       - name: 📩 Notify in Telegram
         run: |
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }} \
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
             -H "Content-Type: application/json" \
             -d '{
               "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
-              "text": "✅ Main deployed successfully!\n👤 Author: ${{ github.actor }}\n💬 Message: ${{ github.event.head_commit.message }}",
+              "text": "✅ *Main* deploy successful!\n🌍 [Production](https://partner.jinn-travel.com)\n👤 Author: ${{ github.actor }}\n💬 Commit: ${{ github.event.head_commit.message }}",
               "parse_mode": "Markdown"
             }'

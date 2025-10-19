@@ -11,7 +11,10 @@ jobs:
     environment: development
 
     steps:
-      - name: 🔄 Git clone
+      # ========================
+      # GIT + NODE SETUP
+      # ========================
+      - name: 🔄 Checkout repository
         uses: actions/checkout@v3
 
       - name: 🧩 Setup Node.js
@@ -36,6 +39,10 @@ jobs:
 
       - name: ⚙️ Build frontend
         working-directory: client
+        env:
+          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_SHOW_DEV_BANNER: ${{ vars.VITE_SHOW_DEV_BANNER }}
         run: npm run build
 
       # ========================
@@ -48,7 +55,7 @@ jobs:
       # ========================
       # DEPLOY FRONTEND
       # ========================
-      - name: 🧹 Clean target directory on server
+      - name: 🧹 Clean target directory on dev server
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -58,7 +65,7 @@ jobs:
             find /var/www/dev.jinn-travel.com/ -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.map' \) -delete
             rm -rf /var/www/dev.jinn-travel.com/assets
 
-      - name: 🚀 Deploy frontend to dev server
+      - name: 🚀 Deploy builded frontend to dev server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -68,13 +75,14 @@ jobs:
           target: "/var/www/dev.jinn-travel.com"
           strip_components: 2
 
-      - name: 🔄 Restart nginx
+      - name: 🔄 Reload nginx
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: sudo systemctl restart nginx
+          script: |
+            sudo nginx -t && sudo systemctl reload nginx
 
       # ========================
       # DEPLOY BACKEND
@@ -99,23 +107,23 @@ jobs:
             cd "/opt/dev.jinn-travel.com"
             npm install --production --legacy-peer-deps
 
-      - name: 🔁 Restart PM2 backend process
+      - name: 🔁 Restart PM2 backend process (dev)
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: sudo pm2 restart affiliate_server_dev
+          script: sudo pm2 restart affiliate_server_dev --update-env
 
       # ========================
-      # NOTIFICATION
+      # TELEGRAM NOTIFICATION
       # ========================
       - name: 📩 Notify in Telegram
         run: |
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }} \
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
             -H "Content-Type: application/json" \
             -d '{
               "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
-              "text": "🚧 *Dev* build & deploy successful!*\n👤 Author: ${{ github.actor }}\n💬 Commit: ${{ github.event.head_commit.message }}",
+              "text": "🚧 *Dev* deploy successful!*\n🌍 [Development](https://dev.jinn-travel.com)\n👤 Author: ${{ github.actor }}\n💬 Commit: ${{ github.event.head_commit.message }}",
               "parse_mode": "Markdown"
             }'
