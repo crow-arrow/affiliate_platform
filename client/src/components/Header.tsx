@@ -1,15 +1,16 @@
 import { useSelector } from "react-redux";
-import { checkIsAuth } from "../redux/features/auth/authSlice";
+import { checkIsAuth } from "@/redux/features/auth/authSlice";
 // import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined'
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
 import InsertLinkRoundedIcon from "@mui/icons-material/InsertLinkRounded";
-import { ThemeSwitcher } from "./ThemeSwitcher";
-import { toast } from "react-toastify";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import { toast } from "sonner";
+import { useAppSelector } from "@/redux/hooks";
 
 export const Header = () => {
   const isAuth = useSelector(checkIsAuth);
 
-  const handleCopy = (id) => {
+  const handleCopy = (id: string) => {
     navigator.clipboard
       .writeText(id)
       .then(() => {
@@ -20,8 +21,9 @@ export const Header = () => {
       });
   };
 
-  const currentUser = useSelector((state) => state.auth.user);
-  const userAffiliateId = currentUser.affiliate_id;
+  const { user } = useAppSelector((state) => state.auth);
+  if (!user) return null;
+  const userAffiliateId = user.affiliate_id;
   const refLink = `https://jinn-travel.com/?affiliateId=${userAffiliateId}`;
 
   return (

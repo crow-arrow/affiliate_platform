@@ -139,8 +139,6 @@
   transform-origin: center;
 }
 
-
-
 @layer base {
   * {
     @apply border-border;

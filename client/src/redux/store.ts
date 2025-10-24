@@ -18,3 +18,7 @@ export const store = configureStore({
     verification: emailVerificationSlice,
   },
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+export type StoreType = typeof store;

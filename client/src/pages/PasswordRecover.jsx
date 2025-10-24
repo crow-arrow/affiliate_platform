@@ -7,7 +7,7 @@ import {
   checkResetLink,
   clearErrors,
 } from "../redux/features/password/resetPasswordSlice";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import logo from "../assets/logo.png";
 import ErrorIcon from "@mui/icons-material/Error";
 
@@ -23,14 +23,14 @@ export const PasswordRecover = () => {
 
   useEffect(() => {
     dispatch(checkResetLink(token));
-  }, [token]);
+  }, [token, dispatch]);
 
   useEffect(() => {
     if (status === "succeeded" && message) {
       toast.success(message);
       navigate("/sign-in");
     }
-  }, [status, errors, message]);
+  }, [status, errors, message, navigate]);
 
   const loading = status === "loading";
 

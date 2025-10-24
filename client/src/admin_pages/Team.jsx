@@ -3,7 +3,7 @@ import { Box, Typography, Avatar, CircularProgress } from "@mui/material";
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../redux/features/users/userSlice";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import avatarLogo from "../assets/avatar.webp";
 import { ThemedDataGrid } from "../data_grid_theme/ThemedDataGrid";
 

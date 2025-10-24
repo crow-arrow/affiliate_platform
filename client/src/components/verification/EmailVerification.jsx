@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { verifyEmail } from "../../redux/features/verification/emailVerificationSlice";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import logo from "../../assets/logo.png";
 import { CircularProgress } from "@mui/material";
 import ErrorIcon from "@mui/icons-material/Error";
@@ -18,7 +18,7 @@ export const EmailVerification = () => {
     if (token) {
       dispatch(verifyEmail(token));
     }
-  }, [token]);
+  }, [token, dispatch]);
 
   useEffect(() => {
     if (status === "succeeded") {
@@ -27,7 +27,7 @@ export const EmailVerification = () => {
     } else if (status === "failed") {
       toast.error(error || "An error occurred");
     }
-  }, [status, message, error]);
+  }, [status, message, error, navigate]);
 
   return (
     <div className="flex flex-col w-full h-screen bg-gradient-primary justify-center items-center">

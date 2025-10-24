@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^5.46.1",
+    "@clerk/clerk-react": "^5.53.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fullcalendar/core": "^6.1.15",
@@ -20,6 +20,7 @@
     "@fullcalendar/react": "^6.1.15",
     "@fullcalendar/timegrid": "^6.1.15",
     "@fullcalendar/timeline": "^6.1.15",
+    "@hookform/resolvers": "^5.2.2",
     "@mui/icons-material": "^6.4.5",
     "@mui/material": "^6.4.5",
     "@mui/x-data-grid": "^7.27.0",
@@ -35,17 +36,20 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.525.0",
+    "next-themes": "^0.4.6",
     "postcss": "^8.5.1",
     "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-advanced-cropper": "^0.20.1",
     "react-apexcharts": "^1.7.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.65.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.0",
-    "react-toastify": "^11.0.3",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

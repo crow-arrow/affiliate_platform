@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { AnimatedCountdown } from "../components/utils/AnimatedCountdown";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 const TIMER_DURATION_SECONDS = 120;
 const LOCAL_STORAGE_KEY = "resendEmailTimerEndTime";
@@ -22,7 +22,7 @@ export const EmailSentMessage = () => {
     if (status === "failed") {
       setTimeout(() => navigate("/sign-in"), 2000);
     }
-  }, [status]);
+  }, [status, navigate]);
 
   useEffect(() => {
     if (location.state?.email) {

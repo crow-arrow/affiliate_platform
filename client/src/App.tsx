@@ -24,13 +24,13 @@ import { RequestPasswordReset } from "./pages/RequestPasswordReset.jsx";
 import { EmailSentMessage } from "./pages/EmailSentMessage.jsx";
 import { LoginPage } from "./pages/LoginPage";
 import { SignUpPage } from "./pages/SignUpPage";
-import { NotFound } from "./pages/NotFound.jsx";
+import { NotFound } from "./pages/NotFound";
 import AdminProtectedRoute from "./components/protected-routes/AdminProtectedRoute";
-import { SSOCallback } from "./components/verification/SSOCallback.jsx";
-import { OAuthDone } from "./components/verification/OAuthDone.jsx";
+import { SSOCallback } from "./components/verification/SSOCallback";
+import { OAuthDone } from "./components/verification/OAuthDone";
+import { SignIn } from "@clerk/clerk-react";
 
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "@/components/ui/sonner";
 import { CropAvatar } from "./components/Avatar.jsx";
 
 function App() {
@@ -112,6 +112,10 @@ function App() {
         <Route path="/email-verification" element={<EmailSentMessage />} />
         <Route path="/sso-callback" element={<SSOCallback />} />
         <Route path="/oauth-done" element={<OAuthDone />} />
+        <Route
+          path="/sign-in"
+          element={<SignIn routing="path" path="/sign-in" />}
+        />
 
         <Route
           path="/"
@@ -159,7 +163,8 @@ function App() {
         <Route path="*" element={<Navigate to="/404-not-found" />} />
       </Routes>
 
-      <ToastContainer position="bottom-right" />
+      <Toaster position="top-center" />
+      {/* <ToastContainer position="bottom-right" /> */}
     </>
   );
 }

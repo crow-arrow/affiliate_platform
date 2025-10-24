@@ -5,7 +5,7 @@ import {
 } from "../redux/features/password/resetPasswordSlice";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import logo from "../assets/logo.png";
 
 export const RequestPasswordReset = () => {
@@ -25,7 +25,7 @@ export const RequestPasswordReset = () => {
       toast.error(requestResetError);
       dispatch(clearErrors());
     }
-  }, [status, message, requestResetError]);
+  }, [status, message, requestResetError, dispatch, navigate]);
 
   const loading = status === "loading";
 

@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import "react-advanced-cropper/dist/style.css";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import PropTypes from "prop-types";

@@ -7,7 +7,6 @@ import {
   logout,
 } from "../redux/features/auth/authSlice";
 import { useClerk } from "@clerk/clerk-react";
-// import { toast } from "react-toastify";
 import avatarLogo from "../assets/avatar.webp";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";

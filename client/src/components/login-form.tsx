@@ -1,66 +1,102 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
+import { FieldErrors } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   loginUser,
   checkIsAuth,
   clearErrors,
-} from "../redux/features/auth/authSlice";
-import { toast } from "react-toastify";
-import PropTypes from "prop-types";
+} from "@/redux/features/auth/authSlice";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  loginSchema,
+  LoginFormData,
+  getInputErrorClass,
+  showErrorsInOrder,
+} from "@/components/validation/formSchema";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Loader2Icon } from "lucide-react";
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+  FieldDescription,
+  FieldSeparator,
+} from "@/components/ui/field";
+import { toast } from "sonner";
 
 import { useSignIn } from "@clerk/clerk-react";
 
-export function LoginForm({ className, ...props }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+export function LoginForm({
+  className,
+  ...props
+}: React.ComponentProps<"form">) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const { status, user, message, errors } = useSelector((state) => state.auth);
-  const isAuth = useSelector(checkIsAuth);
-  const role = user?.role;
-  const dispatch = useDispatch();
+  const { status, message, user } = useAppSelector((state) => state.auth);
+  const isAuth = useAppSelector(checkIsAuth);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { signIn } = useSignIn();
+
+  const orderedFields: (keyof LoginFormData)[] = ["password", "email"];
+
+  useEffect(() => {
+    const error = signIn?.firstFactorVerification?.error;
+
+    if (error && error.code === "oauth_access_denied") {
+      toast.error(error.longMessage || error.message);
+
+      signIn?.create({});
+    }
+  }, [signIn?.firstFactorVerification?.error]);
 
   useEffect(() => {
     if (status === "succeeded" && isAuth && user) {
-      // toast(message);
+      toast.success(message || "You are signed in!");
       navigate("/my-account");
-    } else if (status === "failed" && errors.length > 0) {
-      toast.error(errors[0].message || "Server error");
-      dispatch(clearErrors());
     }
-  }, [status, message, errors, isAuth, user, role, dispatch, navigate]);
+  }, [status, isAuth, user, navigate]);
 
   const loading = status === "loading";
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      await dispatch(loginUser({ email, password })).unwrap();
-      setEmail("");
-      setPassword("");
+      await dispatch(loginUser(data)).unwrap();
     } catch (errors) {
-      if (errors && Array.isArray(errors) && errors.length > 0) {
-        toast.error(errors[0].message || "Server error");
-        dispatch(clearErrors());
+      if (Array.isArray(errors)) {
+        toast.error(errors[0]?.message || "Signin failed. Please try again.");
+      } else {
+        toast.error("Something went wrong. Please try again.");
       }
-      setEmail("");
-      setPassword("");
+      dispatch(clearErrors());
     }
   };
 
-  const { signIn } = useSignIn();
+  const onError = (errors: FieldErrors<LoginFormData>) => {
+    showErrorsInOrder(errors, orderedFields);
+  };
 
-  const handleOAuth = (strategy) => {
+  enum OAuthStrategy {
+    Google = "oauth_google",
+    LinkedIn = "oauth_linkedin_oidc",
+    Facebook = "oauth_facebook",
+  }
+
+  const handleOAuth = (strategy: OAuthStrategy) => {
     if (!signIn) {
-      toast.error("Clerk not initialized yet. Please try again.");
+      toast.error("Not loaded yet, please try again.");
       return;
     }
     return signIn
@@ -73,9 +109,8 @@ export function LoginForm({ className, ...props }) {
         console.log(res);
       })
       .catch((err) => {
-        console.log(err.errors);
         console.error(err, null, 2);
-        toast.error("OAuth sign-in failed. Please try again.");
+        toast.error("OAuth signin failed. Please try again.");
       });
   };
 
@@ -91,31 +126,31 @@ export function LoginForm({ className, ...props }) {
   return (
     <form
       className={cn("flex flex-col gap-6", className)}
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit, onError)}
+      noValidate
       {...props}
     >
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Welcome back</h1>
         <p className="text-balance text-sm text-muted-foreground">
-          Login to your Acme Inc account
+          Login to your Jinn affiliate program
         </p>
       </div>
-      <div className="grid gap-6">
-        <div className="grid gap-2">
-          <Label htmlFor="email">Email</Label>
+      <FieldGroup className="grid gap-6">
+        <Field className="grid gap-2">
+          <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
             id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+            type="text"
             autoComplete="email"
             placeholder="exemple@jinn-travel.com"
+            {...register("email")}
+            className={cn(getInputErrorClass("email", errors))}
           />
-        </div>
-        <div className="grid gap-2">
+        </Field>
+        <Field className="grid gap-2">
           <div className="flex items-center">
-            <Label htmlFor="password">Password</Label>
+            <FieldLabel htmlFor="password">Password</FieldLabel>
             <Link
               to={"/request-reset"}
               className="ml-auto text-sm underline-offset-4 hover:underline"
@@ -126,14 +161,12 @@ export function LoginForm({ className, ...props }) {
           <Input
             id="password"
             type="password"
-            required
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
             placeholder="*********"
             autoComplete="current-password"
+            {...register("password")}
+            className={cn(getInputErrorClass("password", errors))}
           />
-        </div>
+        </Field>
         <Button
           type="submit"
           disabled={loading}
@@ -151,17 +184,15 @@ export function LoginForm({ className, ...props }) {
             "Log in"
           )}
         </Button>
-        <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-          <span className="relative z-10 bg-background px-2 text-muted-foreground">
-            Or continue with
-          </span>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
+        <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
+          Or continue with
+        </FieldSeparator>
+        <Field className="grid grid-cols-3 gap-4">
           <Button
             type="button"
             variant="outline"
             className="w-full bg-transparent"
-            onClick={() => handleOAuth("oauth_linkedin_oidc")}
+            onClick={() => handleOAuth(OAuthStrategy.LinkedIn)}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -177,7 +208,7 @@ export function LoginForm({ className, ...props }) {
             type="button"
             variant="outline"
             className="w-full bg-transparent"
-            onClick={() => handleOAuth("oauth_google")}
+            onClick={() => handleOAuth(OAuthStrategy.Google)}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
@@ -191,7 +222,7 @@ export function LoginForm({ className, ...props }) {
             type="button"
             variant="outline"
             className="w-full bg-transparent"
-            onClick={() => handleOAuth("oauth_facebook")}
+            onClick={() => handleOAuth(OAuthStrategy.Facebook)}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path
@@ -201,18 +232,11 @@ export function LoginForm({ className, ...props }) {
             </svg>
             <span className="sr-only">Login with Meta</span>
           </Button>
-        </div>
-      </div>
-      <div className="text-center text-sm">
-        {"Don't have an account? "}
-        <Link to="/sign-up" className="underline underline-offset-4">
-          Sign up
-        </Link>
-      </div>
+        </Field>
+        <FieldDescription className="text-center">
+          Don&apos;t have an account? <Link to="/sign-up">Sign up</Link>
+        </FieldDescription>
+      </FieldGroup>
     </form>
   );
 }
-
-LoginForm.propTypes = {
-  className: PropTypes.string,
-};

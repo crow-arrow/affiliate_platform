@@ -1,28 +1,33 @@
 import { useEffect } from "react";
 import { useClerk } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 import { Loader2Icon } from "lucide-react";
+import { toast } from "sonner";
 
 export const SSOCallback = () => {
-  const { handleRedirectCallback } = useClerk();
+  const { handleRedirectCallback, client } = useClerk();
   const navigate = useNavigate();
 
   useEffect(() => {
     const run = async () => {
       try {
-        await handleRedirectCallback();
-        toast.success("SSO login successful!");
+        await handleRedirectCallback({});
+
+        const signIn = client?.signIn;
+
+        if (!signIn || signIn.status !== "complete") {
+          return;
+        }
+
         navigate("/oauth-done");
       } catch (err) {
-        console.error("SSO login failed. Please try again:", err);
-        // toast.error("SSO login failed. Please try again.");
-        navigate("/sign-in");
+        console.error("SSO login failed:", err);
+        toast.error("SSO sign in failed. Please try again");
       }
     };
 
     run();
-  }, [handleRedirectCallback, navigate]);
+  }, [handleRedirectCallback, navigate, client]);
 
   return (
     <div className="flex h-screen w-screen justify-center items-center">

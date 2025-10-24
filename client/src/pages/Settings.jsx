@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { getMe, registerUser } from "../redux/features/auth/authSlice";
 import { CropAvatar } from "../components/Avatar";
 import avatarLogo from "../assets/avatar.webp";
@@ -10,8 +10,6 @@ import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
 import InsertLinkRoundedIcon from "@mui/icons-material/InsertLinkRounded";
 
 export const Settings = () => {
-  console.log("Settings rendered");
-
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.user);
   const avatar = currentUser.avatarUrl

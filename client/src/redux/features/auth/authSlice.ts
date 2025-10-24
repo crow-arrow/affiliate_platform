@@ -1,5 +1,12 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "../../../utils/axios";
+import {
+  createAsyncThunk,
+  createSlice,
+  PayloadAction,
+  isPending,
+  isFulfilled,
+  isRejected,
+} from "@reduxjs/toolkit";
+import axios, { cancelFailedQueue } from "../../../utils/axios";
 
 export interface User {
   id: string;
@@ -7,6 +14,7 @@ export interface User {
   phone: string;
   first_name: string;
   last_name: string;
+  affiliate_id: string;
   avatarUrl?: string;
   role: "user" | "admin";
 }
@@ -213,6 +221,8 @@ const authSlice = createSlice({
       state.status = "idle";
       window.localStorage.removeItem("token");
       window.localStorage.removeItem("refreshToken");
+
+      cancelFailedQueue();
     },
     clearErrors: (state) => {
       state.errors = [];
@@ -226,92 +236,55 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Register
-      .addCase(registerUser.pending, (state) => {
-        state.isLoading = true;
-        state.status = "loading";
-      })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.status = "succeeded";
-        state.message = action.payload.message ?? null;
         state.user = action.payload.user ?? null;
         state.token = action.payload.token ?? null;
         state.refreshToken = action.payload.refreshToken ?? null;
+        state.message = action.payload.message ?? null;
         state.errors = [];
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.status = "failed";
-        state.errors = (action.payload as any) || [];
       })
       // Login
-      .addCase(loginUser.pending, (state) => {
-        state.isLoading = true;
-        state.status = "loading";
-      })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.status = "succeeded";
-        state.message = action.payload.message ?? null;
         state.user = action.payload.user ?? null;
         state.token = action.payload.token ?? null;
         state.refreshToken = action.payload.refreshToken ?? null;
+        state.message = action.payload.message ?? null;
         state.errors = [];
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.status = "failed";
-        state.errors = (action.payload as any) || [];
       })
       // Login with OAuth
-      .addCase(loginWithOAuth.pending, (state) => {
-        state.isLoading = true;
-        state.status = "loading";
-      })
       .addCase(loginWithOAuth.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.status = "succeeded";
         state.message = action.payload.message ?? null;
         state.user = action.payload.user ?? null;
         state.token = action.payload.token ?? null;
         state.refreshToken = action.payload.refreshToken ?? null;
         state.errors = [];
       })
-      .addCase(loginWithOAuth.rejected, (state, action) => {
-        state.isLoading = false;
-        state.status = "failed";
-        state.errors = (action.payload as { message: string }[]) ?? [];
-      })
       // Check authorization
-      .addCase(getMe.pending, (state) => {
-        state.isLoading = true;
-        state.status = "loading";
-      })
       .addCase(getMe.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.status = "succeeded";
         state.user = action.payload?.user ?? null;
         state.errors = [];
       })
-      .addCase(getMe.rejected, (state) => {
-        state.isLoading = false;
-        state.status = "failed";
-        state.user = null;
-      })
       // Refresh Token
-      .addCase(refreshAccessToken.pending, (state) => {
-        state.isLoading = true;
-      })
       .addCase(refreshAccessToken.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.token = action.payload.token;
         state.refreshToken = action.payload.refreshToken;
       })
-      .addCase(refreshAccessToken.rejected, (state) => {
+      // All pending actions matchers
+      .addMatcher(isPending, (state) => {
+        state.isLoading = true;
+        state.status = "loading";
+        state.errors = [];
+      })
+      // All fulfilled actions matchers
+      .addMatcher(isFulfilled, (state) => {
         state.isLoading = false;
-        state.user = null;
-        state.token = null;
-        state.refreshToken = null;
+        state.status = "succeeded";
+      })
+      // All rejected actions matchers
+      .addMatcher(isRejected, (state, action) => {
+        state.isLoading = false;
+        state.status = "failed";
+        state.errors = (action.payload as Array<{ message: string }>) ?? [];
       });
   },
 });

@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { Navbar } from "./Navbar.jsx";
-import { Header } from "./Header.jsx";
+import { Header } from "./Header";
 import { useState, useEffect } from "react";
 
 export const Layout = () => {

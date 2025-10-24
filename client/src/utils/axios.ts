@@ -1,31 +1,45 @@
 import axios from "axios";
-import {
-  refreshAccessToken,
-  logout,
-} from "../redux/features/auth/authSlice.js";
+import { refreshAccessToken, logout } from "../redux/features/auth/authSlice";
+import type { StoreType } from "@/redux/store";
 
 const instance = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL}api`,
   withCredentials: true,
 });
 
-// Флаг для предотвращения множественных refresh запросов
-let isRefreshing = false;
-let failedQueue = [];
+type FailedRequest = {
+  resolve: (token: string) => void;
+  reject: (err: any) => void;
+};
 
-const processQueue = (error, token = null) => {
+let isRefreshing = false;
+let failedQueue: FailedRequest[] = [];
+let interceptorsSet = false;
+
+const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
     } else {
-      prom.resolve(token);
+      prom.resolve(token!);
     }
   });
 
   failedQueue = [];
 };
 
-// Request interceptor - добавляем токен к каждому запросу
+export const cancelFailedQueue = () => {
+  failedQueue.forEach(({ reject }) => reject(new Error("Request cancelled")));
+  failedQueue = [];
+  isRefreshing = false;
+};
+
+const isAuthRoute = (url?: string): boolean => {
+  return ["/auth/sign-in", "/auth/sign-up", "/auth/refresh-token"].some(
+    (path) => url?.includes(path)
+  );
+};
+
 instance.interceptors.request.use(
   (config) => {
     const token = window.localStorage.getItem("token");
@@ -39,28 +53,22 @@ instance.interceptors.request.use(
   }
 );
 
-// Функция для настройки interceptors с доступом к store
-export const setupInterceptors = (store) => {
+export const setupInterceptors = (store: StoreType) => {
+  if (interceptorsSet) return;
+  interceptorsSet = true;
+
   instance.interceptors.response.use(
-    (response) => {
-      return response;
-    },
+    (response) => response,
     async (error) => {
       const originalRequest = error.config;
 
-      // Если получили 401 и это не повторный запрос
-      if (error.response?.status === 401 && !originalRequest._retry) {
-        // Не пытаемся обновить токен для этих эндпоинтов
-        if (
-          originalRequest.url.includes("/auth/sign-in") ||
-          originalRequest.url.includes("/auth/sign-up") ||
-          originalRequest.url.includes("/auth/refresh-token")
-        ) {
-          return Promise.reject(error);
-        }
-
+      if (
+        error.response?.status === 401 &&
+        !originalRequest._retry &&
+        !isAuthRoute(originalRequest.url)
+      ) {
+        originalRequest._retry = true;
         if (isRefreshing) {
-          // Если уже идет обновление токена, добавляем запрос в очередь
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject });
           })
@@ -68,56 +76,41 @@ export const setupInterceptors = (store) => {
               originalRequest.headers.Authorization = `Bearer ${token}`;
               return instance(originalRequest);
             })
-            .catch((err) => {
-              return Promise.reject(err);
-            });
+            .catch((err) => Promise.reject(err));
         }
 
-        originalRequest._retry = true;
         isRefreshing = true;
 
         try {
-          // Пытаемся обновить токен
           const resultAction = await store.dispatch(refreshAccessToken());
 
           if (refreshAccessToken.fulfilled.match(resultAction)) {
             const newToken = resultAction.payload.token;
 
-            // Обновляем токен в оригинальном запросе
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
 
-            // Обрабатываем очередь запросов
             processQueue(null, newToken);
 
-            isRefreshing = false;
-
-            // Повторяем оригинальный запрос с новым токеном
             return instance(originalRequest);
           } else {
-            // Если refresh не удался, разлогиниваем пользователя
             processQueue(new Error("Token refresh failed"), null);
+            cancelFailedQueue();
             store.dispatch(logout());
-            isRefreshing = false;
-
-            // Редирект на страницу логина (если нужно)
             if (window.location.pathname !== "/sign-in") {
               window.location.href = "/sign-in";
             }
-
             return Promise.reject(error);
           }
         } catch (refreshError) {
           processQueue(refreshError, null);
-
+          cancelFailedQueue();
           store.dispatch(logout());
-
-          isRefreshing = false;
-
           if (window.location.pathname !== "/sign-in") {
             window.location.href = "/sign-in";
           }
-
           return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
         }
       }
 
