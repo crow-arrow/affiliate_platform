@@ -1,27 +1,29 @@
 import { Layout } from "./components/Layout";
+import { TestLayout } from "./components/layout-test";
 import { AdminLayout } from "./components/AdminLayout";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useAppSelector, useAppDispatch } from "./redux/hooks";
 import { useLocation } from "react-router-dom";
 import { checkIsAuth, getMe } from "./redux/features/auth/authSlice";
 
-import { AdminDashboard } from "./admin_pages/AdminDashboard.jsx";
-import { Team } from "./admin_pages/Team.jsx";
-import { Calendar } from "./pages/Calendar.jsx";
-import { Invoices } from "./admin_pages/Invoices.jsx";
-import { AllOrders } from "./admin_pages/AllOrders.jsx";
+import { AdminDashboard } from "./admin_pages/AdminDashboard";
+import { Team } from "./admin_pages/Team";
+import { Calendar } from "./pages/Calendar";
+import { Invoices } from "./admin_pages/Invoices";
+import { AllOrders } from "./admin_pages/AllOrders";
 
 import { Dashboard } from "./pages/Dashboard";
-import { Trips } from "./pages/Trips.jsx";
-import { CklicksList } from "./pages/CklicksList.jsx";
-import { Documents } from "./pages/Documents.jsx";
-import { Settings } from "./pages/Settings.jsx";
+import { DashboardCopy } from "./pages/DashboardCopy";
+import { Trips } from "./pages/Trips";
+import { CklicksList } from "./pages/CklicksList";
+import { Documents } from "./pages/Documents";
+import { Settings } from "./pages/Settings";
 
-import { EmailVerification } from "./components/verification/EmailVerification.jsx";
-import { PasswordRecover } from "./pages/PasswordRecover.jsx";
-import { RequestPasswordReset } from "./pages/RequestPasswordReset.jsx";
-import { EmailSentMessage } from "./pages/EmailSentMessage.jsx";
+import { EmailVerification } from "./components/verification/EmailVerification";
+import { PasswordRecover } from "./pages/PasswordRecover";
+import { RequestPasswordReset } from "./pages/RequestPasswordReset";
+import { EmailSentMessage } from "./pages/EmailSentMessage";
 import { LoginPage } from "./pages/LoginPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { NotFound } from "./pages/NotFound";
@@ -31,14 +33,14 @@ import { OAuthDone } from "./components/verification/OAuthDone";
 import { SignIn } from "@clerk/clerk-react";
 
 import { Toaster } from "@/components/ui/sonner";
-import { CropAvatar } from "./components/Avatar.jsx";
+import { CropAvatar } from "./components/Avatar";
 
 function App() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const isAuth = useSelector(checkIsAuth);
-  const { user } = useSelector((state) => state.auth);
+  const isAuth = useAppSelector(checkIsAuth);
+  const { user } = useAppSelector((state) => state.auth);
   const emailVerified = user?.emailVerified === true;
   const showAppLayout = isAuth && user && emailVerified;
   const [isLoaded, setIsLoaded] = useState(false);
@@ -75,7 +77,7 @@ function App() {
     if (token) {
       dispatch(getMe())
         .unwrap()
-        .catch((error) => {
+        .catch((error: any) => {
           console.error("Failed to fetch user:", error);
           // Токен невалиден - очищаем
           window.localStorage.removeItem("token");
@@ -117,12 +119,18 @@ function App() {
           element={<SignIn routing="path" path="/sign-in" />}
         />
 
+        {/*Test pages*/}
+        <Route path="/test/*">
+          <Route index element={<Dashboard />} />
+          <Route path="my-account" element={<DashboardCopy />} />
+        </Route>
+
         <Route
           path="/"
           element={
             showAppLayout ? (
               <AdminProtectedRoute allowedRoles={["Admin", "Genie"]}>
-                <Layout />
+                <TestLayout />
               </AdminProtectedRoute>
             ) : (
               <Navigate to="/sign-in" />

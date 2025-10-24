@@ -3,7 +3,7 @@ import { createTheme } from "@mui/material/styles";
 import { useMemo } from "react";
 import { Box } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { themeSettings } from "../data_grid_theme/theme";
+import { themeSettings } from "./theme";
 import { useMuiMode } from "./useMuiMode";
 import PropTypes from "prop-types";
 import GlobalStyles from "@mui/material/GlobalStyles";

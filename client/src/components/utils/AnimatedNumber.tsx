@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
-import PropTypes from "prop-types";
 
-export const AnimatedNumber = ({
+interface AnimatedNumberProps {
+  value: number;
+  duration?: number;
+  suffix?: string;
+  decimals?: number;
+  formatValue?: (value: number) => string;
+}
+
+export const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   value,
   duration = 1000,
   suffix = "",
@@ -11,10 +18,10 @@ export const AnimatedNumber = ({
   const [displayedValue, setDisplayedValue] = useState(0);
 
   useEffect(() => {
-    let animationFrameId;
+    let animationFrameId: number;
     const startTime = performance.now();
 
-    const animate = (currentTime) => {
+    const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const current = progress * value;
@@ -30,20 +37,14 @@ export const AnimatedNumber = ({
     return () => cancelAnimationFrame(animationFrameId);
   }, [value, duration]);
 
+  const formatted = formatValue
+    ? formatValue(Number(displayedValue.toFixed(decimals)))
+    : displayedValue.toFixed(decimals);
+
   return (
     <span>
-      {formatValue
-        ? formatValue(Number(displayedValue.toFixed(decimals)))
-        : displayedValue.toFixed(decimals)}
+      {formatted}
       {suffix}
     </span>
   );
-};
-
-AnimatedNumber.propTypes = {
-  value: PropTypes.number.isRequired,
-  duration: PropTypes.number,
-  suffix: PropTypes.string,
-  decimals: PropTypes.number,
-  formatValue: PropTypes.func,
 };

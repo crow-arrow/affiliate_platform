@@ -17,6 +17,10 @@ export interface User {
   affiliate_id: string;
   avatarUrl?: string;
   role: "user" | "admin";
+  emailVerified: boolean;
+  booked_trips_count?: number;
+  total_commission?: number;
+  level?: number;
 }
 
 export interface AuthResponse {

@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { AdminNavbar } from "./AdminNavbar.jsx";
+import { AdminNavbar } from "./AdminNavbar";
 import { Header } from "./Header";
 import { useState, useEffect } from "react";
 

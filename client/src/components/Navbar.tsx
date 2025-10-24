@@ -27,6 +27,16 @@ export const Navbar = ({ isOpen, setIsOpen }) => {
       icon: <RoofingRoundedIcon className="m-1" />,
     },
     {
+      to: "../test/my-account",
+      label: "Dashboard Copy",
+      tooltip: (
+        <div className="sidebar-tooltip group-hover:scale-100">
+          Dashboard Copy
+        </div>
+      ),
+      icon: <RoofingRoundedIcon className="m-1" />,
+    },
+    {
       to: "../trips",
       label: "Trips",
       tooltip: (

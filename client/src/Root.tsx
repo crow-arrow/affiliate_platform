@@ -3,7 +3,7 @@ import App from "./App.js";
 import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "./components/theme-provider.js";
 import CssBaseline from "@mui/material/CssBaseline";
-// import { useMuiMode } from "./data_grid_theme/useMuiMode.jsx";
+// import { useMuiMode } from "./data_grid_theme/useMuiMode.tsx";
 // import { themeSettings } from "./data_grid_theme/theme.js";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { BrowserRouter } from "react-router-dom";

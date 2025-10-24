@@ -1,7 +1,28 @@
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchTrips, fetchUsers } from "../redux/features/users/userSlice";
 import { fetchClicks } from "../redux/features/clicks/clicksSlice";
+import {
+  selectUserTrips,
+  selectUserLastThreeTrips,
+  selectUserTotalRevenue,
+  selectUserTripsCount,
+  selectTripsStatus,
+  selectTripsError,
+  selectUserById,
+} from "@/redux/features/users/userSelectors";
+import {
+  selectAllClicks,
+  selectClicksStatus,
+  selectClicksError,
+  selectClicksCount,
+  selectClicksByType,
+  selectClicksByDevice,
+  selectClicksAfterDate,
+  selectUniqueIpCount,
+} from "@/redux/features/clicks/clicksSelectors";
+import { formatCurrency, formatDate } from "@/components/utils/formatters";
+import { getOrderStatusClasses } from "@/components/utils/tripStatus";
 import { ProgressBar } from "../components/levelProgressBar";
 import { CommissionChart } from "../components/commissionChart";
 import { AnimatedNumber } from "../components/utils/AnimatedNumber";
@@ -12,57 +33,76 @@ import StackedBarChartRoundedIcon from "@mui/icons-material/StackedBarChartRound
 import AccountTreeRoundedIcon from "@mui/icons-material/AccountTreeRounded";
 import { CircularProgress } from "@mui/material";
 
-export const Dashboard = () => {
-  const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
+export const Dashboard: React.FC = () => {
+  const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    Promise.all([
-      dispatch(fetchTrips()),
-      dispatch(fetchClicks(currentUser.id)),
-      dispatch(fetchUsers()),
-    ]).then(() => {
-      setLoading(false);
-    });
-  }, []);
-
-  const currentUser = useSelector((state) => state.auth.user);
-  const tripsCount = currentUser?.booked_trips_count;
+  const authUser = useAppSelector((state) => state.auth.user);
+  const currentUserSelector = selectUserById(String(authUser?.id));
+  const currentUser = useAppSelector(currentUserSelector);
+  const userTrips = useAppSelector(selectUserTrips);
+  const lastThreeTrips = useAppSelector(selectUserLastThreeTrips);
+  const totalRevenue = useAppSelector(selectUserTotalRevenue);
+  const tripsCount = useAppSelector(selectUserTripsCount);
+  const tripsStatus = useAppSelector(selectTripsStatus);
+  const tripsError = useAppSelector(selectTripsError);
   const commission = currentUser?.total_commission;
-  const userName = currentUser.first_name;
-  const userLevel = currentUser.level;
+  const userName = currentUser?.first_name;
+  const userLevel = currentUser?.level;
 
-  const { trips } = useSelector((state) => state.user);
+  const clicks = useAppSelector(selectAllClicks);
+  const status = useAppSelector(selectClicksStatus);
+  const error = useAppSelector(selectClicksError);
+  const totalClicks = useAppSelector(selectClicksCount);
+  const uniqueIps = useAppSelector(selectUniqueIpCount);
 
-  const { clicks } = useSelector((state) => state.clicks);
-  const clicksNumber = clicks.length;
-
-  const lastThreeTrips = trips
-    ?.slice()
-    .sort((a, b) => new Date(b.booking_date) - new Date(a.booking_date))
-    .slice(0, 3)
-    .reverse();
-
-  const formatNumberWithCommas = (number) => {
+  const formatNumberWithCommas = (number: number) => {
     return new Intl.NumberFormat("en-US").format(number);
   };
 
-  const totalRevenue = Array.isArray(trips)
-    ? trips.reduce((sum, order) => {
-        const price = parseFloat(order?.total_price);
-        return sum + (isNaN(price) ? 0 : price);
-      }, 0)
-    : 0;
+  const isLoading = tripsStatus === "loading" || status === "loading";
+  const isFailed = tripsStatus === "failed" || status === "failed";
 
-  // const formatedTotalRevenue = formatNumberWithK(totalRevenue)
-  // const formatedTotalCommission = formatNumberWithK(commission)
+  useEffect(() => {
+    if (!currentUser?.id) return;
 
-  if (loading) {
+    dispatch(fetchTrips());
+    dispatch(fetchClicks(authUser?.id));
+  }, [currentUser?.id]);
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
+
+  const getNextLevel = (level?: string): string => {
+    switch (level) {
+      case "Bronze":
+        return "Silver";
+      case "Silver":
+      case "Gold":
+        return "Gold";
+      default:
+        return "-";
+    }
+  };
+
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <CircularProgress />
       </div>
     );
+  }
+
+  if (isFailed) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>Error: {tripsError || error}</p>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return <p className="text-center mt-4">User not authenticated.</p>;
   }
 
   return (
@@ -74,7 +114,7 @@ export const Dashboard = () => {
               <div className="flex flex-col w-full bg-primaryLite dark:bg-primary p-2 xl:p-4 rounded-xl text-gray-800 dark:text-gray-100">
                 <StackedBarChartRoundedIcon className="text-accentBlue" />
                 <b className="lg:text-xl xl:text-2xl">
-                  <AnimatedNumber value={tripsCount || 0} />
+                  <AnimatedNumber key={tripsCount} value={tripsCount || 0} />
                 </b>
                 <span className="text-sm">Total Order</span>
               </div>
@@ -82,6 +122,7 @@ export const Dashboard = () => {
                 <CurrencyExchangeRoundedIcon className="text-accentPink" />
                 <b className="lg:text-xl xl:text-2xl">
                   <AnimatedNumber
+                    key={totalRevenue}
                     value={totalRevenue || 0}
                     formatValue={(n) => formatNumberWithCommas(n)}
                     suffix=" €"
@@ -94,6 +135,7 @@ export const Dashboard = () => {
                 <ShoppingCartOutlinedIcon className="text-accentAqua" />
                 <b className="lg:text-xl xl:text-2xl">
                   <AnimatedNumber
+                    key={commission}
                     value={commission || 0}
                     formatValue={(n) => formatNumberWithCommas(n)}
                     suffix=" €"
@@ -106,7 +148,8 @@ export const Dashboard = () => {
                 <AccountTreeRoundedIcon className="text-accentOrange" />
                 <b className="lg:text-xl xl:text-2xl">
                   <AnimatedNumber
-                    value={clicksNumber}
+                    key={totalClicks}
+                    value={totalClicks}
                     formatValue={(n) => formatNumberWithCommas(n)}
                   />
                 </b>
@@ -132,47 +175,40 @@ export const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {lastThreeTrips?.map((trip) => (
-                    <tr
-                      key={trip.id}
-                      className="border-b border-gray-200 dark:border-gray-700"
-                    >
-                      <td className="px-4 py-2">{trip.id}</td>
-                      <td className="px-4 py-2">
-                        {new Date(trip.booking_date).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          }
-                        )}
-                      </td>
-                      <td className="px-4 py-2">
-                        {parseFloat(trip.total_price).toFixed(2)}€
-                      </td>
-                      <td className="px-4 py-2">
-                        <span
-                          className={`
-                            rounded-lg px-4 py-0.5 capitalize text-center justify-start
-                            ${
-                              trip.order_status === "cancel"
-                                ? "bg-accentPink/30 text-accentPink"
-                                : trip.order_status === "rejected"
-                                ? "bg-gray-300/30 text-gray-300"
-                                : trip.order_status === "pending"
-                                ? "bg-accentOrange/30 text-accentOrange"
-                                : trip.order_status === "wait-for-approval"
-                                ? "bg-accentBlue/30 text-accentBlue"
-                                : "bg-accentAqua text-accentGreen"
-                            }
-                          `}
-                        >
-                          {trip.order_status}
-                        </span>
+                  {lastThreeTrips?.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="text-center py-4 text-gray-500"
+                      >
+                        No recent trips found.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    lastThreeTrips?.map((trip) => (
+                      <tr
+                        key={trip.id}
+                        className="border-b border-gray-200 dark:border-gray-700"
+                      >
+                        <td className="px-4 py-2">{trip.id}</td>
+                        <td className="px-4 py-2">
+                          {formatDate(trip.booking_date)}
+                        </td>
+                        <td className="px-4 py-2">
+                          {formatCurrency(trip.total_price)}
+                        </td>
+                        <td className="px-4 py-2">
+                          <span
+                            className={`rounded-lg px-4 py-0.5 capitalize ${getOrderStatusClasses(
+                              trip.order_status
+                            )}`}
+                          >
+                            {trip.order_status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -213,10 +249,7 @@ export const Dashboard = () => {
           </dl>
           <ProgressBar />
           <span className="text-sm px-4 py-2 my-2 rounded-xl border border-gray-400">
-            Next level:{" "}
-            {userLevel === "Gold" || userLevel === "Silver"
-              ? "Gold"
-              : userLevel === "Bronze" && "Silver"}
+            Next level: {getNextLevel(userLevel)}
           </span>
         </div>
         <div className="flex flex-col max-md:row-start-3 col-span-4 lg:col-span-2 gap-6 w-full  rounded-2xl bg-white dark:bg-secondary">
