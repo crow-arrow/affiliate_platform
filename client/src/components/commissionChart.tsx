@@ -91,7 +91,7 @@ export const CommissionChart = () => {
           horizontal: false,
           columnWidth: "50%",
           borderRadiusApplication: "end",
-          borderRadius: 12,
+          borderRadius: 5,
           borderRadiusWhenStacked: "last",
           distributed: false,
           rangeBarGroupRows: false,

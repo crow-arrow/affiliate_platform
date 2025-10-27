@@ -1,4 +1,4 @@
-import User from "../../models/User.js";
+import prisma from "../../prisma/client.js";
 
 export const getUserById = async (req, res) => {
   try {
@@ -8,13 +8,36 @@ export const getUserById = async (req, res) => {
       return res.status(400).json({ message: "Invalid ID format" });
     }
 
-    const user = await User.findByPk(userId, {
-      attributes: { exclude: ["password"] },
-      include: [
-        { association: "levelHistory", as: "levelHistory" },
-        { association: "clicksData", as: "clicksData" },
-        { association: "affiliateTrips", as: "affiliateTrips" },
-      ],
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        clerkId: true,
+        email: true,
+        phone: true,
+        first_name: true,
+        last_name: true,
+        emailVerified: true,
+        coupon_code: true,
+        affiliate_id: true,
+        role: true,
+        level: true,
+        levelChangedAt: true,
+        booked_trips_count: true,
+        current_year_travellers: true,
+        number_of_travellers: true,
+        earnings: true,
+        canceled_earnings: true,
+        total_commission: true,
+        avatarUrl: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      include: {
+        levelHistory: true,
+        clicksData: true,
+        affiliateTrips: true,
+      },
     });
 
     if (!user) {

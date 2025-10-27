@@ -3,31 +3,21 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    @apply transition-colors duration-500;
-  }
-  body {
-    font-family: "Lexend Giga", serif;
-    min-height: 100vh;
-  }
-  /* svg,
-  path {
-    @apply transition-all duration-300 ease-in-out;
-  } */
-  .hover\:bg-gradient-blurLite:hover {
-    @apply transition-all duration-300 ease-in-out;
-  }
-  .link {
-    text-decoration: underline;
-    color: inherit; /* Наследует цвет родительского элемента */
+  * {
+    box-sizing: border-box;
   }
 
-  .link:hover {
-    color: #d8b21d; /* Замените на ваш цвет акцента */
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
   }
-  .material-symbols-outlined {
-    font-variation-settings: "FILL" 0, "wght" 100, "GRAD" 0, "opsz" 24;
+
+  #root {
+    height: 100%;
   }
+
   /* .fc-license-message {
     display: none;
   } */
@@ -153,13 +143,4 @@
 .my-svg-icon {
   transform: rotate(180deg);
   transform-origin: center;
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
 }

@@ -1,10 +1,21 @@
 /** @type {import('tailwindcss').Config} */
+import tailwindcssAnimate from "tailwindcss-animate";
 export default {
   darkMode: "class",
-  content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: {
+        sidebar: {
+          DEFAULT: "var(--sidebar)",
+          foreground: "var(--sidebar-foreground)",
+          primary: "var(--sidebar-primary)",
+          "primary-foreground": "var(--sidebar-primary-foreground)",
+          accent: "var(--sidebar-accent)",
+          "accent-foreground": "var(--sidebar-accent-foreground)",
+          border: "var(--sidebar-border)",
+          ring: "var(--sidebar-ring)",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -19,7 +30,7 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
-        accentGreen: "rgba(79,124,130,1)",
+        accentGreen: "#4f7c82",
         accentAqua: "#A9DFD8",
         accentBlue: "#20AEF3",
         accentPink: "#F2C8ED",
@@ -125,6 +136,6 @@ export default {
         },
       });
     },
-    require("tailwindcss-animate"),
+    tailwindcssAnimate,
   ],
 };

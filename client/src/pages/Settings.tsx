@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import { getMe, registerUser } from "../redux/features/auth/authSlice";
 import { CropAvatar } from "../components/Avatar";
 import avatarLogo from "../assets/avatar.webp";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 import PartyModeOutlinedIcon from "@mui/icons-material/PartyModeOutlined";
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
@@ -95,7 +97,14 @@ export const Settings = () => {
       <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 border-box">
         <div className="flex flex-col max-md:order-1 justify-between rounded-2xl px-4 py-6 bg-white dark:bg-secondary backdrop-blur-sm">
           <div className="col-span-full mb-6">
-            <h1 className="text-2xl w-content">Profile</h1>
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl w-content">Profile</h1>
+              <Link to="/settings/account">
+                <Button variant="outline" size="sm">
+                  Account Settings
+                </Button>
+              </Link>
+            </div>
           </div>
           <span className="text-accentBlue">Your referral link:</span>
           <div className="flex flex-col items-start justify-between rounded-xl">

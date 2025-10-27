@@ -19,6 +19,7 @@ import { Trips } from "./pages/Trips";
 import { CklicksList } from "./pages/CklicksList";
 import { Documents } from "./pages/Documents";
 import { Settings } from "./pages/Settings";
+import { Account } from "./pages/Account";
 
 import { EmailVerification } from "./components/verification/EmailVerification";
 import { PasswordRecover } from "./pages/PasswordRecover";
@@ -30,10 +31,15 @@ import { NotFound } from "./pages/NotFound";
 import AdminProtectedRoute from "./components/protected-routes/AdminProtectedRoute";
 import { SSOCallback } from "./components/verification/SSOCallback";
 import { OAuthDone } from "./components/verification/OAuthDone";
-import { SignIn } from "@clerk/clerk-react";
 
 import { Toaster } from "@/components/ui/sonner";
 import { CropAvatar } from "./components/Avatar";
+
+// Обертка для CropAvatar с дефолтными пропсами
+const CropAvatarWrapper = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  return <CropAvatar isOpen={isOpen} onClose={() => setIsOpen(false)} />;
+};
 
 function App() {
   const dispatch = useAppDispatch();
@@ -63,6 +69,12 @@ function App() {
   );
 
   useEffect(() => {
+    // Если пользователь уже авторизован и заходит на публичные страницы, редиректим на главную
+    if (isAuth && user && isPublicRoute && isLoaded) {
+      navigate("/", { replace: true });
+      return;
+    }
+
     if (!isAuth && !isPublicRoute && isLoaded) {
       navigate("/sign-in", { replace: true });
     }
@@ -87,7 +99,7 @@ function App() {
     } else {
       setIsLoaded(true);
     }
-  }, [dispatch, isPublicRoute]);
+  }, [dispatch, isPublicRoute, isAuth, user, isLoaded]);
 
   if (!isLoaded && !isPublicRoute) {
     return (
@@ -114,10 +126,6 @@ function App() {
         <Route path="/email-verification" element={<EmailSentMessage />} />
         <Route path="/sso-callback" element={<SSOCallback />} />
         <Route path="/oauth-done" element={<OAuthDone />} />
-        <Route
-          path="/sign-in"
-          element={<SignIn routing="path" path="/sign-in" />}
-        />
 
         {/*Test pages*/}
         <Route path="/test/*">
@@ -129,9 +137,13 @@ function App() {
           path="/"
           element={
             showAppLayout ? (
-              <AdminProtectedRoute allowedRoles={["Admin", "Genie"]}>
-                <TestLayout />
-              </AdminProtectedRoute>
+              emailVerified ? (
+                <AdminProtectedRoute allowedRoles={["ADMIN", "GENIE"]}>
+                  <TestLayout />
+                </AdminProtectedRoute>
+              ) : (
+                <Navigate to="/email-verification" />
+              )
             ) : (
               <Navigate to="/sign-in" />
             )
@@ -143,7 +155,8 @@ function App() {
           <Route path="clicks-list" element={<CklicksList />} />
           <Route path="documents" element={<Documents />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="crop-avatar" element={<CropAvatar />} />
+          <Route path="settings/account" element={<Account />} />
+          <Route path="crop-avatar" element={<CropAvatarWrapper />} />
         </Route>
 
         {/* Используем защищенные маршруты для админов */}

@@ -1,11 +1,10 @@
-import Trips from "../../models/Trips.js";
-import User from "../../models/User.js";
+import prisma from "../../prisma/client.js";
 
 // Get All Trips
 export const getAllTrips = async (req, res) => {
   try {
-    const trips = await Trips.findAll({
-      order: [["id", "ASC"]],
+    const trips = await prisma.trips.findMany({
+      orderBy: { id: "asc" },
     });
 
     if (trips.length === 0) {
@@ -21,19 +20,27 @@ export const getAllTrips = async (req, res) => {
 
 export const getTripsByUserId = async (req, res) => {
   try {
-    const userId = req.params.id;
+    const userId = parseInt(req.params.id, 10);
 
-    const user = await User.findByPk(userId, {
-      include: [{ model: Trips, as: "affiliateTrips" }],
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        affiliateTrips: true,
+      },
     });
+
     if (!user) {
-      return res.status(404).json({ massege: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     const trips = user.affiliateTrips;
     res.json({ trips });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ massege: "Server error", error: error.massege });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };

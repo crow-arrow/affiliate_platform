@@ -16,7 +16,7 @@ export interface User {
   last_name: string;
   affiliate_id: string;
   avatarUrl?: string;
-  role: "user" | "admin";
+  role: "GENIE" | "ADMIN";
   emailVerified: boolean;
   booked_trips_count?: number;
   total_commission?: number;

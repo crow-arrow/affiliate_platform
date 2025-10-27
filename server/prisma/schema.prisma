@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  domain    String?  // кастомный домен (white-label)
+  branding  Json?    // логотипы, цвета и т.п.
+  users     User[]  @relation("TenantUsers") 
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id                      Int             @id @default(autoincrement())
+  clerkId                 String?         @unique
+  email                   String          @unique
+  phone                   String?         @db.VarChar(20)
+  first_name              String
+  last_name               String
+  password                String
+  emailVerified           Boolean         @default(false)
+  coupon_code             String?         @db.VarChar(50)
+  affiliate_id            String?         @unique @db.VarChar(50)
+  role                    UserRole        @default(GENIE)
+  level                   Level           @default(BRONZE)
+  levelChangedAt          DateTime?
+  booked_trips_count      Int             @default(0)
+  current_year_travellers Int?            @default(0)
+  number_of_travellers    Int?            @default(0)
+  earnings                Float           @default(0)
+  canceled_earnings       Float           @default(0)
+  total_commission        Float           @default(0)
+  avatarUrl               String?
+
+  // relations
+  affiliateTrips          Trips[]         @relation("AffiliateTrips")
+  clicksData              ClicksData[]    @relation("ReferralClicks")
+  referralLinks ReferralLink[] @relation("UserReferralLinks")
+  levelHistory            LevelHistory[]
+  tenantId String? 
+  tenant     Tenant?  @relation("TenantUsers", fields: [tenantId], references: [id])
+
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+
+  @@map("referral_users")
+}
+
+model Trips {
+  id               BigInt     @id @default(autoincrement())
+  traveller_amount Int
+  booking_date     DateTime
+  travel_date      DateTime
+  order_status     OrderStatus? @default(PENDING)
+  total_price      Decimal    @db.Decimal(19, 2)
+  currency         String?    @db.VarChar(10)
+  coupon_code      String?    @db.VarChar(50)
+  affiliate_id     String?
+
+  // relation
+  affiliate        User?      @relation("AffiliateTrips", fields: [affiliate_id], references: [affiliate_id])
+
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@map("wp_tourmaster_order")
+}
+
+model ClicksData {
+  id               BigInt     @id @default(autoincrement())
+  affiliate_id     String     @db.VarChar(50)
+  referer          String?
+  ip_address       String?    @db.VarChar(45)
+  user_agent       String?
+  timestamp        DateTime   @default(now())
+  referral_user_id Int
+
+  // relation
+  user             User       @relation("ReferralClicks", fields: [referral_user_id], references: [id])
+
+  type             ClickType? @default(CLICK)
+  device_type      DeviceType?
+
+  @@map("wp_affiliate_analytics")
+  @@index([affiliate_id])
+  @@index([ip_address])
+  @@index([referral_user_id], name: "fk_referral_user_id")
+}
+
+model LevelHistory {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  level      Level
+  changed_at DateTime  @default(now())
+
+  // relation
+  user       User      @relation(fields: [user_id], references: [id])
+
+  @@map("level_history")
+}
+
+model ConversionEvent {
+  id           Int       @id @default(autoincrement())
+  referralId   String
+  event        String
+  amount       Float?
+  currency     String?
+  orderId      String?
+  email        String?
+  createdAt    DateTime  @default(now())
+
+  referralLink ReferralLink? @relation(fields: [referralId], references: [slug])
+
+  @@index([referralId])
+}
+
+model ReferralLink {
+  id            String            @id @default(cuid())         // внутренний ID
+  slug          String            @unique                      // то, что вставляется в ссылку (например, amal_666)
+  userId        Int                                             
+  user          User @relation("UserReferralLinks", fields: [userId], references: [id])
+
+  createdAt     DateTime          @default(now())
+
+  status ConversionStatus @default(PENDING)
+
+  destinationUrl String?          // если нужно редиректить на кастомную ссылку
+  utmSource     String?           // например: "telegram"
+  utmCampaign   String?           // например: "summer_launch"
+  utmMedium     String?           // "email", "social", "cpc"
+  expiresAt     DateTime?         // чтобы можно было задать срок действия
+
+  conversions   ConversionEvent[] // связь с ConversionEvent
+
+  @@index([userId])
+}
+
+enum UserRole {
+  ADMIN
+  GENIE
+}
+
+enum OrderStatus {
+  APPROVED
+  PENDING
+  CONFIRMED
+  CANCEL
+  COMPLETED
+  WAIT_FOR_APPROVAL
+  REJECTED
+  DEPOSIT_PAID
+}
+
+enum ClickType {
+  CLICK
+  BOOKING
+  BOUNCE
+}
+
+enum DeviceType {
+  MOBILE
+  DESKTOP
+  TABLET
+  UNKNOWN
+}
+
+enum Level {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum ConversionStatus {
+  PENDING
+  APPROVED
+  DECLINED
+}

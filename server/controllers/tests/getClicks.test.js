@@ -1,14 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getUserClicks } from "../getClicks.js";
-import { ClicksData, User } from "../../models/models.js";
 
-vi.mock("../../models/models.js", () => ({
-  User: {
-    findByPk: vi.fn(),
+// Mock Prisma client
+const mockPrisma = {
+  clicksData: {
+    findMany: vi.fn(),
   },
-  ClicksData: {
-    findAll: vi.fn(),
-  },
+};
+
+vi.mock("../../prisma/client.js", () => ({
+  default: mockPrisma,
 }));
 
 describe("getUserClicks", () => {
@@ -23,41 +24,33 @@ describe("getUserClicks", () => {
   });
 
   it("should return clicks for a valid user", async () => {
-    const mockUser = { id: 1 };
     const mockClicks = [{ id: 101 }, { id: 102 }];
 
-    User.findByPk.mockResolvedValue(mockUser);
-    ClicksData.findAll.mockResolvedValue(mockClicks);
+    mockPrisma.clicksData.findMany.mockResolvedValue(mockClicks);
 
     await getUserClicks(mockReq, mockRes);
 
-    expect(User.findByPk).toHaveBeenCalledWith(1, {
-      include: [{ model: ClicksData, as: "clicksData" }],
-    });
-    expect(ClicksData.findAll).toHaveBeenCalledWith({
+    expect(mockPrisma.clicksData.findMany).toHaveBeenCalledWith({
       where: { referral_user_id: 1 },
     });
     expect(mockRes.json).toHaveBeenCalledWith({
-      success: true,
-      userId: 1,
       clicks: mockClicks,
     });
   });
 
-  it("should return 404 if user not found", async () => {
-    User.findByPk.mockResolvedValue(null);
+  it("should return 400 if user ID is missing", async () => {
+    const mockReqNoUser = {};
 
-    await getUserClicks(mockReq, mockRes);
+    await getUserClicks(mockReqNoUser, mockRes);
 
-    expect(mockRes.status).toHaveBeenCalledWith(404);
-    expect(mockRes.json).toHaveBeenCalledWith({ message: "User not found" });
+    expect(mockRes.status).toHaveBeenCalledWith(400);
+    expect(mockRes.json).toHaveBeenCalledWith({ message: "Missing user in request" });
   });
 
   it("should return 500 on error", async () => {
-    expect.assertions(2);
     const error = new Error("DB error");
 
-    User.findByPk.mockRejectedValue(error);
+    mockPrisma.clicksData.findMany.mockRejectedValue(error);
 
     await getUserClicks(mockReq, mockRes);
 

@@ -1,6 +1,6 @@
 import { sendVerificationEmail } from "../utils/mailer.js";
 import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import prisma from "../prisma/client.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -9,7 +9,7 @@ export const resendEmailController = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const user = await User.findOne({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -44,7 +44,7 @@ export const verifyEmail = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findByPk(decoded.id);
+    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
 
     if (!user) return res.status(404).json({ message: "User not found." });
 
@@ -54,8 +54,10 @@ export const verifyEmail = async (req, res) => {
       });
     }
 
-    user.emailVerified = true;
-    await user.save();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { emailVerified: true },
+    });
 
     const authToken = jwt.sign(
       { id: user.id, role: user.role, avatarUrl: user.avatarUrl },

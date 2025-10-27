@@ -31,7 +31,7 @@ export const OAuthDone = () => {
         const result = await dispatch(loginWithOAuth({ token })).unwrap();
 
         toast.success(result.message || "You are signed in!");
-        navigate("/my-account");
+        navigate("/");
       } catch (err: any) {
         const msg =
           err?.message ||

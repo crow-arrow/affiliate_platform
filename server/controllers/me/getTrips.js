@@ -1,20 +1,17 @@
 // Get User Trips
-import { User, LevelHistory, Trips } from "../../models/models.js";
-import { Op } from "sequelize";
+import prisma from "../../prisma/client.js";
 import { getCommission } from "../../utils/commissionCalculate.js";
 import { updateUserLevel } from "../../utils/updateUserLevel.js";
 
 export const getUserTrips = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.id, {
-      include: [
-        {
-          model: LevelHistory,
-          as: "levelHistory",
-          separate: true,
-          order: [["changed_at", "ASC"]],
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      include: {
+        levelHistory: {
+          orderBy: { changed_at: "asc" },
         },
-      ],
+      },
     });
 
     if (!user) {
@@ -23,27 +20,27 @@ export const getUserTrips = async (req, res) => {
 
     const { affiliate_id, coupon_code, level } = user;
 
-    const filterCriteria = {
-      where: {
-        [Op.or]: [],
-      },
-    };
+    const whereConditions = [];
 
     if (affiliate_id !== null) {
-      filterCriteria.where[Op.or].push({ affiliate_id: affiliate_id });
+      whereConditions.push({ affiliate_id: affiliate_id });
     }
 
     if (coupon_code !== null) {
-      filterCriteria.where[Op.or].push({ coupon_code: coupon_code });
+      whereConditions.push({ coupon_code: coupon_code });
     }
 
-    if (filterCriteria.where[Op.or].length === 0) {
+    if (whereConditions.length === 0) {
       return res
         .status(400)
         .json({ message: "User has no valid affiliate_id or coupon_code" });
     }
 
-    const trips = await Trips.findAll(filterCriteria);
+    const trips = await prisma.trips.findMany({
+      where: {
+        OR: whereConditions,
+      },
+    });
 
     const {
       newLevel,
@@ -54,14 +51,20 @@ export const getUserTrips = async (req, res) => {
     } = updateUserLevel(user, trips);
 
     if (newLevel !== user.level) {
-      user.level = newLevel;
-      user.levelChangedAt = new Date();
-      await user.save();
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          level: newLevel,
+          levelChangedAt: new Date(),
+        },
+      });
 
-      await LevelHistory.create({
-        user_id: user.id,
-        level: newLevel,
-        changed_at: user.levelChangedAt,
+      await prisma.levelHistory.create({
+        data: {
+          user_id: user.id,
+          level: newLevel,
+          changed_at: new Date(),
+        },
       });
     }
 
@@ -77,10 +80,10 @@ export const getUserTrips = async (req, res) => {
       const travelDate = new Date(trip.travel_date);
       const isPast = travelDate <= now;
       const isCancelled =
-        trip.order_status === "rejected" || trip.order_status === "cancel";
+        trip.order_status === "REJECTED" || trip.order_status === "CANCEL";
 
       // Найти уровень, который действовал на момент travelDate
-      let applicableLevel = "Bronze";
+      let applicableLevel = "BRONZE";
 
       for (const history of levelHistorySorted) {
         if (new Date(history.changed_at) <= travelDate) {
@@ -91,12 +94,12 @@ export const getUserTrips = async (req, res) => {
       }
 
       const commission = getCommission(applicableLevel, trip.total_price);
-      if (trip.order_status !== "rejected" && trip.order_status !== "cancel") {
+      if (trip.order_status !== "REJECTED" && trip.order_status !== "CANCEL") {
         totalEarnedCommission += commission;
       }
 
       return {
-        ...(typeof trip.toJSON === "function" ? trip.toJSON() : trip),
+        ...trip,
         commission: commission,
         level_used: applicableLevel,
         isCompleted: isPast && !isCancelled,
@@ -120,12 +123,17 @@ export const getUserTrips = async (req, res) => {
       return sum + Number(trip.traveller_amount || 0);
     }, 0);
 
-    user.number_of_travellers = travellerAmount;
-    user.current_year_travellers = currentYearTravellers;
-    user.earnings = earnedFromDeparted;
-    user.canceled_earnings = canceledEarnings;
-    user.total_commission = totalEarnedCommission;
-    await user.save();
+    // Обновляем пользователя в базе данных
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        number_of_travellers: travellerAmount,
+        current_year_travellers: currentYearTravellers,
+        earnings: earnedFromDeparted,
+        canceled_earnings: canceledEarnings,
+        total_commission: totalEarnedCommission,
+      },
+    });
 
     res.json({
       trips: tripsWithCommission,

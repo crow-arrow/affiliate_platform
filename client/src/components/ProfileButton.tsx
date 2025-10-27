@@ -114,7 +114,7 @@ export const ProfileButton = ({ isOpen }) => {
                     Settings
                   </Link>
                 </li>
-                {!isAdminPage && userRole === "Admin" && (
+                {!isAdminPage && userRole === "ADMIN" && (
                   <li
                     className="w-full bg-opacity-0 bg-white dark:bg-secondary/0 text-gray-500 dark:text-gray-400
                                 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary transition-all duration-300"
@@ -129,7 +129,7 @@ export const ProfileButton = ({ isOpen }) => {
                     </Link>
                   </li>
                 )}
-                {isAdminPage && userRole === "Admin" && (
+                {isAdminPage && userRole === "ADMIN" && (
                   <li
                     className="w-full bg-opacity-0 bg-white dark:bg-secondary/0 text-gray-500 dark:text-gray-400
                                 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary transition-all duration-300"

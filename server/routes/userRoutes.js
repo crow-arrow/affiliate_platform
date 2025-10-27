@@ -9,8 +9,8 @@ import { getTripsByUserId } from "../controllers/admin/getTrips.js";
 const router = new Router();
 
 // http://localhost:3002/api/users
-router.get("/get-users", checkAuth, checkRole(["Admin"]), getAllUsers); // Все пользователи
-router.get("/get-user/:id", checkAuth, checkRole(["Admin"]), getUserById); // Один пользователь
-router.get("/:id/trips", checkAuth, checkRole(["Admin"]), getTripsByUserId);
+router.get("/get-users", checkAuth, checkRole(["ADMIN"]), getAllUsers); // Все пользователи
+router.get("/get-user/:id", checkAuth, checkRole(["ADMIN"]), getUserById); // Один пользователь
+router.get("/:id/trips", checkAuth, checkRole(["ADMIN"]), getTripsByUserId);
 
 export default router;

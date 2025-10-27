@@ -20,7 +20,7 @@ export interface User {
   emailVerified: boolean;
   coupon_code?: string | null;
   affiliate_id?: string | null;
-  role: "Genie" | "admin" | string;
+  role: "GENIE" | "ADMIN" | string;
   level: "Bronze" | "Silver" | "Gold";
   levelChangedAt?: string | null;
   booked_trips_count: number;

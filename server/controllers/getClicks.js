@@ -1,4 +1,4 @@
-import { ClicksData } from "../models/models.js";
+import prisma from "../prisma/client.js";
 
 export const getUserClicks = async (req, res) => {
   try {
@@ -8,7 +8,7 @@ export const getUserClicks = async (req, res) => {
       return res.status(400).json({ message: "Missing user in request" });
     }
 
-    const clicks = await ClicksData.findAll({
+    const clicks = await prisma.clicksData.findMany({
       where: { referral_user_id: userId },
     });
 

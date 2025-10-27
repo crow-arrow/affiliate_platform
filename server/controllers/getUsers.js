@@ -1,10 +1,31 @@
-import { User, Trips } from "../models/models.js";
-import { Op } from "sequelize";
+import prisma from "../prisma/client.js";
 
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll({
-      attributes: { exclude: ["password"] },
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        clerkId: true,
+        email: true,
+        phone: true,
+        first_name: true,
+        last_name: true,
+        emailVerified: true,
+        coupon_code: true,
+        affiliate_id: true,
+        role: true,
+        level: true,
+        levelChangedAt: true,
+        booked_trips_count: true,
+        current_year_travellers: true,
+        number_of_travellers: true,
+        earnings: true,
+        canceled_earnings: true,
+        total_commission: true,
+        avatarUrl: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     if (!users || users.length === 0) {
@@ -15,48 +36,54 @@ export const getAllUsers = async (req, res) => {
       users.map(async (user) => {
         if (user.affiliate_id === null && user.coupon_code === null) {
           return {
-            ...user.toJSON(),
+            ...user,
             booked_trips_count: 0,
           };
         }
 
-        const filterCriteria = {
-          where: {
-            [Op.or]: [],
-          },
-        };
+        const whereConditions = [];
 
         if (user.affiliate_id !== null) {
-          filterCriteria.where[Op.or].push({ affiliate_id: user.affiliate_id });
+          whereConditions.push({ affiliate_id: user.affiliate_id });
         }
 
         if (user.coupon_code !== null) {
-          filterCriteria.where[Op.or].push({ coupon_code: user.coupon_code });
+          whereConditions.push({ coupon_code: user.coupon_code });
         }
 
-        if (filterCriteria.where[Op.or].length === 0) {
+        if (whereConditions.length === 0) {
           return {
-            ...user.toJSON(),
+            ...user,
             booked_trips_count: 0,
           };
         }
 
-        const trips = await Trips.findAll(filterCriteria);
+        const trips = await prisma.trips.findMany({
+          where: {
+            OR: whereConditions,
+          },
+        });
+
         const bookedTripsCount = trips.length;
-        user.booked_trips_count = bookedTripsCount;
 
         const departedTrips = trips.filter(
-          (trip) => trip.order_status === "departed"
+          (trip) => trip.order_status === "COMPLETED"
         );
 
         const travellerAmount = departedTrips.reduce((sum, trip) => {
           return sum + Number(trip.traveller_amount || 0);
         }, 0);
-        user.number_of_travellers = travellerAmount;
-        await user.save();
+
+        // Обновляем пользователя в базе данных
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            number_of_travellers: travellerAmount,
+          },
+        });
 
         return {
-          ...user.toJSON(),
+          ...user,
           booked_trips_count: bookedTripsCount,
           number_of_travellers: travellerAmount,
         };

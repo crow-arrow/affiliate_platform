@@ -65,17 +65,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         title: "Trips",
-        url: "/tests/trips",
+        url: "/trips",
         icon: BookOpen,
       },
       {
         title: "Clicks list",
-        url: "/tests/clicks-list",
+        url: "/clicks-list",
         icon: Settings2,
       },
       {
         title: "Documents",
-        url: "/tests/documents",
+        url: "/documents",
         icon: BookOpen,
       },
     ],

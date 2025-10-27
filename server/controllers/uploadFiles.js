@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import User from "../models/User.js";
+import prisma from "../prisma/client.js";
 
 export const uploadAvatar = async (req, res) => {
   try {
@@ -10,7 +10,10 @@ export const uploadAvatar = async (req, res) => {
       });
     }
 
-    const user = await User.findByPk(req.user.id);
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+    });
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -19,19 +22,28 @@ export const uploadAvatar = async (req, res) => {
       ? path.join("/var/www/uploads", path.basename(user.avatarUrl))
       : null;
 
-    user.avatarUrl = `uploads/${req.file.filename}`;
+    const newAvatarUrl = `uploads/${req.file.filename}`;
+    
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { avatarUrl: newAvatarUrl },
+    });
+
     console.log("🧾 req.file:", req.file);
-    await user.save();
 
     if (
       oldAvatar &&
-      user.avatarUrl.startsWith("uploads/") &&
+      newAvatarUrl.startsWith("uploads/") &&
       fs.existsSync(oldAvatar)
     ) {
       fs.unlinkSync(oldAvatar);
     }
 
-    res.status(200).json({ message: "Avatar uploaded successfully!", user });
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: user.id },
+    });
+
+    res.status(200).json({ message: "Avatar uploaded successfully!", user: updatedUser });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

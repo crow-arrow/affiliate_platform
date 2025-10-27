@@ -26,5 +26,9 @@ export default defineConfig(({ mode }) => {
         env.VITE_SHOW_DEV_BANNER
       ),
     },
+    server: {
+      port: 5173,
+      historyApiFallback: true, // 🔥 Добавь это!
+    },
   };
 });

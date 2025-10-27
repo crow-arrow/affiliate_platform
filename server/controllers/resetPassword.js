@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { resetPasswordValidation } from "../middleware/validationSchemas.js";
 import { sendPasswordResetEmail } from "../utils/mailer.js";
-import User from "../models/User.js";
+import prisma from "../prisma/client.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -14,7 +14,7 @@ export const requestPasswordReset = async (req, res) => {
       return res.status(400).json({ message: "Email is required" });
     }
 
-    const user = await User.findOne({ where: { email } });
+    const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -37,7 +37,7 @@ export const checkResetLink = async (req, res) => {
     const { token } = req.body;
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findByPk(decoded.id);
+    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     return res.json({ valid: true });
@@ -73,12 +73,15 @@ export const resetPassword = async (req, res) => {
     const { token, newPassword } = req.body;
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findByPk(decoded.id);
+    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-    await user.save();
+    
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword },
+    });
 
     return res.json({ message: "Password reset successfully" });
   } catch (error) {

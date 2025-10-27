@@ -16,7 +16,7 @@ export const AdminNavbar = ({ isOpen, setIsOpen }) => {
   const isAuth = useSelector(checkIsAuth);
   const userRole = useSelector(checkRole);
 
-  if (!isAuth || userRole !== "Admin") {
+  if (!isAuth || userRole !== "ADMIN") {
     return null;
   }
 

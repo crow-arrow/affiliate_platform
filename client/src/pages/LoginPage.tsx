@@ -6,6 +6,7 @@ import uzbekistan from "@/assets/uzbekistan-2.jpg";
 import logo from "@/assets/jinn.svg";
 
 export function LoginPage() {
+  console.log("API URL:", import.meta.env.VITE_API_URL);
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">

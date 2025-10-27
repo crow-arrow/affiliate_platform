@@ -65,7 +65,8 @@ export function LoginForm({
   useEffect(() => {
     if (status === "succeeded" && isAuth && user) {
       toast.success(message || "You are signed in!");
-      navigate("/my-account");
+      // Редиректим на главную страницу, которая сама определит куда направить пользователя
+      navigate("/");
     }
   }, [status, isAuth, user, navigate]);
 
