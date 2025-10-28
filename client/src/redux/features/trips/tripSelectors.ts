@@ -24,13 +24,13 @@ export const selectTripError = createSelector(
 );
 
 // 📌 Получить только предстоящие поездки
-export const selectUpcomingTrips = createSelector([selectAllTrips], (trips) =>
-  trips.filter((trip) => {
+export const selectUpcomingTrips = createSelector([selectAllTrips], (trips) => {
+  const now = new Date();
+  return trips.filter((trip) => {
     const tripDate = new Date(trip.date);
-    const now = new Date();
     return tripDate > now;
-  })
-);
+  });
+});
 
 // 📌 Получить количество поездок
 export const selectTripsCount = createSelector(

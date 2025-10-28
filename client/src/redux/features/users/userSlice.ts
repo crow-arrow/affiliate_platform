@@ -23,12 +23,12 @@ export interface User {
   role: "GENIE" | "ADMIN" | string;
   level: "Bronze" | "Silver" | "Gold";
   levelChangedAt?: string | null;
-  booked_trips_count: number;
+  booked_trips_count?: number;
   current_year_travellers?: number | null;
   number_of_travellers?: number | null;
-  earnings: number;
-  canceled_earnings: number;
-  total_commission: number;
+  earnings?: number;
+  canceled_earnings?: number;
+  total_commission?: number;
   avatarUrl?: string | null;
   createdAt?: string;
   updatedAt?: string;

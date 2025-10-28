@@ -76,6 +76,24 @@ export default {
           4: "hsl(var(--chart-4))",
           5: "hsl(var(--chart-5))",
         },
+        level: {
+          bronze: {
+            DEFAULT: "hsl(var(--bronze))",
+            foreground: "hsl(var(--bronze-foreground))",
+          },
+          silver: {
+            DEFAULT: "hsl(var(--silver))",
+            foreground: "hsl(var(--silver-foreground))",
+          },
+          gold: {
+            DEFAULT: "hsl(var(--gold))",
+            foreground: "hsl(var(--gold-foreground))",
+          },
+          platinum: {
+            DEFAULT: "hsl(var(--platinum))",
+            foreground: "hsl(var(--platinum-foreground))",
+          },
+        },
       },
       textUnderlineOffset: {
         4: "4px",

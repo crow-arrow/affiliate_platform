@@ -99,7 +99,7 @@ function App() {
     } else {
       setIsLoaded(true);
     }
-  }, [dispatch, isPublicRoute, isAuth, user, isLoaded]);
+  }, [dispatch, isPublicRoute, isAuth, user?.id]);
 
   if (!isLoaded && !isPublicRoute) {
     return (
@@ -163,7 +163,7 @@ function App() {
         <Route
           path="/admin/*"
           element={
-            <AdminProtectedRoute allowedRoles={["Admin"]}>
+            <AdminProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminLayout />
             </AdminProtectedRoute>
           }

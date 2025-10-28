@@ -19,8 +19,9 @@ export interface User {
   role: "GENIE" | "ADMIN";
   emailVerified: boolean;
   booked_trips_count?: number;
+  current_year_travellers?: number;
   total_commission?: number;
-  level?: number;
+  level?: "BRONZE" | "SILVER" | "GOLD" | "PLATINUM";
 }
 
 export interface AuthResponse {

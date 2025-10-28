@@ -1,39 +1,58 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { getMe } from "@/redux/features/auth/authSlice";
-import { fetchTrips, fetchUsers } from "../redux/features/users/userSlice";
+import { fetchTrips } from "../redux/features/users/userSlice";
 import { fetchClicks } from "../redux/features/clicks/clicksSlice";
 import {
-  selectUserTrips,
   selectUserLastThreeTrips,
   selectUserTotalRevenue,
   selectUserTripsCount,
   selectTripsStatus,
   selectTripsError,
-  selectUserById,
 } from "@/redux/features/users/userSelectors";
 import {
-  selectAllClicks,
   selectClicksStatus,
   selectClicksError,
   selectClicksCount,
-  selectClicksByType,
-  selectClicksByDevice,
-  selectClicksAfterDate,
-  selectUniqueIpCount,
 } from "@/redux/features/clicks/clicksSelectors";
 import { formatCurrency, formatDate } from "@/components/utils/formatters";
-import { getOrderStatusClasses } from "@/components/utils/tripStatus";
 import { ProgressBar } from "../components/levelProgressBar";
-import { CommissionChart } from "../components/commissionChart";
-import { CommissionChartCopy } from "../components/commissionChart-copy";
+import { CommissionChartCopy } from "../components/charts/commissionChart-copy";
 import { AnimatedNumber } from "../components/utils/AnimatedNumber";
+import { TripsDataTable } from "../components/trips-data-table";
 
-import CurrencyExchangeRoundedIcon from "@mui/icons-material/CurrencyExchangeRounded";
-import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
-import StackedBarChartRoundedIcon from "@mui/icons-material/StackedBarChartRounded";
-import AccountTreeRoundedIcon from "@mui/icons-material/AccountTreeRounded";
-import { CircularProgress } from "@mui/material";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
+
+import { 
+  TrendingUp, 
+  DollarSign, 
+  ShoppingCart, 
+  BarChart3, 
+  Mail,
+  User,
+  Calendar,
+  Euro
+} from "lucide-react";
+
+// Function to get status badge styling
+function getStatusBadge(status: string) {
+  const statusMap: Record<string, { variant: "default" | "secondary" | "destructive" | "outline", className: string }> = {
+    "COMPLETED": { variant: "default", className: "bg-green-100 text-green-800" },
+    "APPROVED": { variant: "default", className: "bg-green-100 text-green-800" },
+    "CONFIRMED": { variant: "default", className: "bg-green-100 text-green-800" },
+    "CANCEL": { variant: "destructive", className: "bg-red-100 text-red-800" },
+    "REJECTED": { variant: "destructive", className: "bg-red-100 text-red-800" },
+    "PENDING": { variant: "secondary", className: "bg-orange-100 text-orange-800" },
+    "WAIT_FOR_APPROVAL": { variant: "secondary", className: "bg-blue-100 text-blue-800" },
+    "DEPOSIT_PAID": { variant: "secondary", className: "bg-blue-100 text-blue-800" },
+  };
+
+  return statusMap[status] || { variant: "outline", className: "bg-gray-100 text-gray-800" };
+}
 
 export const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -65,24 +84,93 @@ export const Dashboard: React.FC = () => {
     dispatch(getMe());
     dispatch(fetchTrips());
     // dispatch(fetchClicks(currentUser?.id));
-  }, [currentUser?.id]);
+  }, [currentUser?.id, dispatch]);
 
   const getNextLevel = (level?: string): string => {
     switch (level) {
-      case "Bronze":
-        return "Silver";
-      case "Silver":
-      case "Gold":
-        return "Gold";
+      case "BRONZE":
+        return "SILVER";
+      case "SILVER":
+        return "GOLD";
+      case "GOLD":
+        return "PLATINUM";
       default:
         return "-";
+    }
+  };
+
+  const getLevelName = (level?: string): string => {
+    // Если это строка в верхнем регистре (из базы данных)
+    if (typeof level === 'string') {
+      switch (level.toUpperCase()) {
+        case "BRONZE":
+          return "BRONZE";
+        case "SILVER":
+          return "SILVER";
+        case "GOLD":
+          return "GOLD";
+        case "PLATINUM":
+          return "PLATINUM";
+        default:
+          return "BRONZE";
+      }
+    }
+    
+    return "BRONZE";
+  };
+
+  const getLevelCardStyle = (level?: string) => {
+    switch (level) {
+      case "BRONZE":
+        return {
+          className: "relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-950 dark:to-amber-900 border-orange-200 dark:border-orange-800",
+          iconColor: "text-orange-600 dark:text-orange-400",
+          titleColor: "text-orange-700 dark:text-orange-300",
+          descriptionColor: "text-orange-700 dark:text-orange-300",
+          accentColor: "bg-orange-200 dark:bg-orange-800"
+        };
+      case "SILVER":
+        return {
+          className: "relative overflow-hidden bg-gradient-to-br from-gray-50 to-slate-100 dark:from-gray-900 dark:to-slate-500 border-gray-200 dark:border-slate-700",
+          iconColor: "text-gray-600 dark:text-gray-400",
+          titleColor: "text-gray-700 dark:text-gray-300",
+          descriptionColor: "text-gray-600 dark:text-gray-400",
+          accentColor: "bg-gray-200 dark:bg-gray-800"
+        };
+      case "GOLD":
+        return {
+          className: "relative overflow-hidden bg-gradient-to-br from-[#f4e6d7] to-[#cbaf87] dark:from-[#8b6f47] dark:to-[#6b5b3a] border-[#cbaf87] dark:border-[#8b6f47]",
+          iconColor: "text-[#8b6f47] dark:text-[#f4e6d7]",
+          titleColor: "text-[#6b5b3a] dark:text-[#f4e6d7]",
+          descriptionColor: "text-[#8b6f47] dark:text-[#f4e6d7]",
+          accentColor: "bg-[#cbaf87] dark:bg-[#8b6f47]"
+        };
+      case "PLATINUM":
+        return {
+          className: "relative overflow-hidden bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-700 dark:to-gray-600 border-slate-200 dark:border-slate-400",
+          iconColor: "text-slate-600 dark:text-slate-400",
+          titleColor: "text-slate-700 dark:text-slate-300",
+          descriptionColor: "text-slate-600 dark:text-slate-400",
+          accentColor: "bg-slate-200 dark:bg-slate-800"
+        };
+      default:
+        return {
+          className: "relative overflow-hidden bg-gradient-to-br from-gray-50 to-slate-100 dark:from-gray-950 dark:to-slate-900 border-gray-200 dark:border-gray-800",
+          iconColor: "text-gray-600 dark:text-gray-400",
+          titleColor: "text-gray-700 dark:text-gray-300",
+          descriptionColor: "text-gray-600 dark:text-gray-400",
+          accentColor: "bg-gray-200 dark:bg-gray-800"
+        };
     }
   };
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <CircularProgress />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-6 w-6 rounded-full" />
+          <span className="text-lg">Loading dashboard...</span>
+        </div>
       </div>
     );
   }
@@ -90,166 +178,236 @@ export const Dashboard: React.FC = () => {
   if (isFailed) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p>Error: {tripsError || error}</p>
+        <Card className="w-96">
+          <CardHeader>
+            <CardTitle className="text-destructive">Error</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">{tripsError || error}</p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (!currentUser && !isLoading) {
-    return <p className="text-center mt-4">User not authenticated.</p>;
+    return (
+      <Card className="w-96 mx-auto mt-8">
+        <CardContent className="pt-6">
+          <p className="text-center text-muted-foreground">User not authenticated.</p>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
-    <div className="w-full space-y-6">
-      <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-3 flex-wrap gap-4 2xl:w-[1140px]">
-        <div className="flex flex-col col-span-4 lg:col-span-2 flex-1 flex-grow gap-6 p-4 rounded-2xl ">
-          <div className="flex flex-col gap-4">
-            <div className="grid grid-cols-4 max-[600px]:grid-cols-2 gap-3 xl:gap-6 w-full flex-grow">
-              <div className="flex flex-col w-full p-2 xl:p-4 rounded-xl text-gray-800 dark:text-gray-100 bg-zinc-200 dark:bg-zinc-900">
-                <StackedBarChartRoundedIcon className="text-accentBlue" />
-                <b className="lg:text-xl xl:text-2xl">
-                  <AnimatedNumber key={tripsCount} value={tripsCount || 0} />
-                </b>
-                <span className="text-sm">Total Order</span>
-              </div>
-              <div className="flex flex-col w-full  p-2 xl:p-4 rounded-xl text-gray-800 dark:text-gray-100 bg-zinc-200 dark:bg-zinc-900">
-                <CurrencyExchangeRoundedIcon className="text-accentPink" />
-                <b className="lg:text-xl xl:text-2xl">
-                  <AnimatedNumber
-                    key={totalRevenue}
-                    value={totalRevenue || 0}
-                    formatValue={(n) => formatNumberWithCommas(n)}
-                    suffix=" €"
-                    decimals={0}
-                  />
-                </b>
-                <span className="text-sm">Total Sales</span>
-              </div>
-              <div className="flex flex-col w-full  p-2 xl:p-4 rounded-xl text-gray-800 dark:text-gray-100 bg-zinc-200 dark:bg-zinc-900">
-                <ShoppingCartOutlinedIcon className="text-accentAqua" />
-                <b className="lg:text-xl xl:text-2xl">
-                  <AnimatedNumber
-                    key={commission}
-                    value={commission || 0}
-                    formatValue={(n) => formatNumberWithCommas(n)}
-                    suffix=" €"
-                    decimals={0}
-                  />
-                </b>
-                <span className="text-sm">Total commission</span>
-              </div>
-              <div className="flex flex-col w-full  p-2 xl:p-4 rounded-xl text-gray-800 dark:text-gray-100 bg-zinc-200 dark:bg-zinc-900">
-                <AccountTreeRoundedIcon className="text-accentOrange" />
-                <b className="lg:text-xl xl:text-2xl">
-                  <AnimatedNumber
-                    key={totalClicks}
-                    value={totalClicks}
-                    formatValue={(n) => formatNumberWithCommas(n)}
-                  />
-                </b>
-                <span className="text-sm">Total Clicks</span>
-              </div>
+    <div className="w-full space-y-6 p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stats Cards */}
+        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-950 dark:to-indigo-900 border-blue-200 dark:border-blue-800">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-blue-700 dark:text-blue-300">Total Orders</CardTitle>
+            <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
+              <AnimatedNumber key={tripsCount} value={tripsCount || 0} />
             </div>
-            <div className="overflow-scroll text-nowrap">
-              <table className="w-full text-xs text-left text-gray-700 dark:text-gray-200 mt-2">
-                <thead className="text-xs text-gray-600 dark:text-gray-300">
-                  <tr>
-                    <th scope="col" className="px-4 py-2">
-                      ID
-                    </th>
-                    <th scope="col" className="px-4 py-2">
-                      Booking Date
-                    </th>
-                    <th scope="col" className="px-4 py-2">
-                      Amount
-                    </th>
-                    <th scope="col" className="px-4 py-2">
-                      Status
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {lastThreeTrips?.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={4}
-                        className="text-center py-4 text-gray-500"
-                      >
-                        No recent trips found.
-                      </td>
-                    </tr>
-                  ) : (
-                    lastThreeTrips?.map((trip) => (
-                      <tr
-                        key={trip.id}
-                        className="border-b border-gray-200 dark:border-gray-700"
-                      >
-                        <td className="px-4 py-2">{trip.id}</td>
-                        <td className="px-4 py-2">
-                          {formatDate(trip.booking_date)}
-                        </td>
-                        <td className="px-4 py-2">
-                          {formatCurrency(trip.total_price)}
-                        </td>
-                        <td className="px-4 py-2">
-                          <span
-                            className={`rounded-lg px-4 py-0.5 capitalize ${getOrderStatusClasses(
-                              trip.order_status
-                            )}`}
+            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">Orders processed</p>
+          </CardContent>
+          <div className="absolute -top-4 -right-4 w-20 h-20 bg-blue-200 dark:bg-blue-800 rounded-full opacity-20"></div>
+        </Card>
+
+        <Card className="relative overflow-hidden bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900 border-green-200 dark:border-green-800">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Total Sales</CardTitle>
+            <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-900 dark:text-green-100">
+              <AnimatedNumber
+                key={totalRevenue}
+                value={totalRevenue || 0}
+                formatValue={(n) => formatNumberWithCommas(n)}
+                suffix=" €"
+                decimals={0}
+              />
+            </div>
+            <p className="text-xs text-green-600 dark:text-green-400 mt-1">Revenue generated</p>
+          </CardContent>
+          <div className="absolute -top-4 -right-4 w-20 h-20 bg-green-200 dark:bg-green-800 rounded-full opacity-20"></div>
+        </Card>
+
+        <Card className="relative overflow-hidden bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-950 dark:to-violet-900 border-purple-200 dark:border-purple-800">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-purple-700 dark:text-purple-300">Total Commission</CardTitle>
+            <ShoppingCart className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+              <AnimatedNumber
+                key={commission}
+                value={commission || 0}
+                formatValue={(n) => formatNumberWithCommas(n)}
+                suffix=" €"
+                decimals={0}
+              />
+            </div>
+            <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">Commission earned</p>
+          </CardContent>
+          <div className="absolute -top-4 -right-4 w-20 h-20 bg-purple-200 dark:bg-purple-800 rounded-full opacity-20"></div>
+        </Card>
+
+        <Card className="relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-950 dark:to-amber-900 border-orange-200 dark:border-orange-800">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-orange-700 dark:text-orange-300">Total Clicks</CardTitle>
+            <TrendingUp className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-900 dark:text-orange-100">
+              <AnimatedNumber
+                key={totalClicks}
+                value={totalClicks}
+                formatValue={(n) => formatNumberWithCommas(n)}
+              />
+            </div>
+            <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">Clicks tracked</p>
+          </CardContent>
+          <div className="absolute -top-4 -right-4 w-20 h-20 bg-orange-200 dark:bg-orange-800 rounded-full opacity-20"></div>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Recent Trips Table */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Recent Trips</CardTitle>
+            <CardDescription>Your latest trip bookings</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {lastThreeTrips?.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No recent trips found.
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Booking Date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {lastThreeTrips?.map((trip) => {
+                    const statusStyle = getStatusBadge(trip.order_status);
+                    return (
+                      <TableRow key={trip.id}>
+                        <TableCell className="font-medium">#{trip.id}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            {formatDate(trip.booking_date)}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Euro className="h-4 w-4 text-muted-foreground" />
+                            {formatCurrency(trip.total_price)}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge 
+                            variant={statusStyle.variant} 
+                            className={statusStyle.className}
                           >
-                            {trip.order_status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                            {trip.order_status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* User Level Card */}
+        <Card className={getLevelCardStyle(getLevelName(userLevel)).className}>
+          <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className={`flex items-center gap-2 ${getLevelCardStyle(getLevelName(userLevel)).titleColor}`}>
+              <Badge 
+                variant="outline"
+                className={`px-3 py-1 gap-2 text-lg font-bold ${getLevelCardStyle(getLevelName(userLevel)).descriptionColor}`}
+              >
+                {getLevelName(userLevel)}
+              </Badge>
+            </CardTitle>
+            <CardDescription className={`p-2 ${getLevelCardStyle(getLevelName(userLevel)).descriptionColor}`}>
+              <User className={`h-5 w-5 ${getLevelCardStyle(getLevelName(userLevel)).iconColor}`} />
+            </CardDescription>
+          </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            
+            <ProgressBar />
+            <div className="text-center">
+              <Badge variant="outline" className="px-3 py-1">
+                Next level: {getNextLevel(getLevelName(userLevel))}
+              </Badge>
             </div>
-          </div>
-        </div>
-        <div className="flex flex-col max-[600px]:col-span-4 max-[600px]:-order-1 max-md:order-2 col-span-2 lg:col-span-1 gap-1 w-full h-full p-4 rounded-2xl dark:text-white bg-zinc-200 dark:bg-zinc-900">
-          <h2 className="text-md text-gray-400">Affiliate Manager</h2>
-          <p className="font-bold text-md">Nadine Wilke</p>
-          <div className="rounded p-4 ">
-            <p className="text-sm">
-              Hello and welcome to our affiliate program.<br></br>
-              I&apos;m your affiliate manager, and I&apos;m here for you if you
-              have any questions or problems related to our affiliate program.
+          </CardContent>
+          <div className={`absolute -top-4 -right-4 w-24 h-24 ${getLevelCardStyle(getLevelName(userLevel)).accentColor} rounded-full opacity-20`}></div>
+        </Card>
+      </div>
+
+      {/* Affiliate Manager Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Mail className="h-5 w-5" />
+            Affiliate Manager
+          </CardTitle>
+          <CardDescription>Nadine Wilke</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Hello and welcome to our affiliate program. I'm your affiliate manager, 
+              and I'm here for you if you have any questions or problems related to our affiliate program.
             </p>
-            <p className="text-sm">
-              I wish you all success in promoting our products, and a profitable
-              partnership for both you and us.
+            <p className="text-sm text-muted-foreground">
+              I wish you all success in promoting our products, and a profitable partnership for both you and us.
             </p>
           </div>
+          <Separator />
           <div>
-            <h3 className="text-md font-semibold text-gray-400">
+            <h3 className="text-sm font-semibold text-muted-foreground mb-2">
               Contact Email:
             </h3>
             <a
               href="mailto:nadine@jinn-travel.com"
-              className="hover:text-accent transition-colors"
+              className="text-primary hover:underline transition-colors"
             >
               nadine@jinn-travel.com
             </a>
           </div>
-        </div>
-        <div className="flex justify-between relative flex-col max-[600px]:col-span-4 max-[600px]:-order-2 col-span-2 lg:col-span-1 w-full h-full p-4 xl:p-8 rounded-2xl bg-zinc-200 dark:bg-zinc-900">
-          <dl className="flex justify-between">
-            <dt className="font-bold text-xl">{userLevel}</dt>
-            <dd className="text-sm">
-              {userName} - ID: {currentUser?.id}
-            </dd>
-          </dl>
-          <ProgressBar />
-          <span className="text-sm px-4 py-2 my-2 rounded-xl border border-gray-400">
-            Next level: {getNextLevel(userLevel?.toString())}
-          </span>
-        </div>
-        <div className="flex flex-col max-md:row-start-3 col-span-4 lg:col-span-2 gap-6 w-full bg-zinc-200 dark:bg-zinc-900 rounded-2xl ">
+        </CardContent>
+      </Card>
+
+      {/* Commission Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Commission Analytics</CardTitle>
+          <CardDescription>Your commission trends over time</CardDescription>
+        </CardHeader>
+        <CardContent>
           <CommissionChartCopy />
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

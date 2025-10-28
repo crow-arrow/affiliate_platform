@@ -46,7 +46,10 @@ export const selectUserLastThreeTrips = createSelector(
 // 🔹 Все поездки в будущем
 export const selectUserUpcomingTrips = createSelector(
   [selectUserTrips],
-  (trips) => trips.filter((trip) => new Date(trip.booking_date) > new Date())
+  (trips) => {
+    const now = new Date();
+    return trips.filter((trip) => new Date(trip.booking_date) > now);
+  }
 );
 
 // 🔹 Общая сумма всех заказов пользователя (€)

@@ -100,6 +100,7 @@ export const getUserTrips = async (req, res) => {
 
       return {
         ...trip,
+        id: trip.id.toString(), // Конвертируем BigInt в строку
         commission: commission,
         level_used: applicableLevel,
         isCompleted: isPast && !isCancelled,

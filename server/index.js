@@ -5,6 +5,11 @@ import path from "path";
 import { fileURLToPath } from "url";
 import prisma from "./prisma/client.js";
 
+// Глобальный обработчик для BigInt сериализации
+BigInt.prototype.toJSON = function() {
+  return this.toString();
+};
+
 import authRoutes from "./routes/auth.js";
 import meRoutes from "./routes/me.js";
 import resetPasswordRoutes from "./routes/reserPassword.js";

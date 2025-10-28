@@ -12,7 +12,13 @@ export const getUserClicks = async (req, res) => {
       where: { referral_user_id: userId },
     });
 
-    return res.json({ clicks });
+    // Конвертируем BigInt в строки для JSON сериализации
+    const serializedClicks = clicks.map(click => ({
+      ...click,
+      id: click.id.toString()
+    }));
+
+    return res.json({ clicks: serializedClicks });
   } catch (error) {
     if (process.env.NODE_ENV !== "test") console.error(error);
     return res.status(500).json({

@@ -18,36 +18,47 @@ export const CommissionChart = () => {
   const monthlyCommission = Array(12).fill(0);
   const monthlyCompletedCommission = Array(12).fill(0);
 
-  const filteredTrips =
-    trips?.filter(
+  const filteredTrips = useMemo(() => {
+    return trips?.filter(
       (trip) => new Date(trip.booking_date).getFullYear() === selectedYear
     ) ?? [];
-  const filteredLastYearTrips =
-    trips?.filter(
+  }, [trips, selectedYear]);
+
+  const filteredLastYearTrips = useMemo(() => {
+    return trips?.filter(
       (trip) => new Date(trip.booking_date).getFullYear() === selectedYear - 1
     ) ?? [];
+  }, [trips, selectedYear]);
 
-  const completedTripsThisYear = filteredTrips?.filter(
-    (trip) => trip.isCompleted
-  ).length;
-  const completedTripsLastYear = filteredLastYearTrips?.filter(
-    (trip) => trip.isCompleted
-  ).length;
-  const differenceCompletedTrips =
-    completedTripsThisYear - completedTripsLastYear;
+  const completedTripsThisYear = useMemo(() => {
+    return filteredTrips?.filter((trip) => trip.isCompleted).length || 0;
+  }, [filteredTrips]);
 
-  const yearlyEarnings = filteredTrips?.reduce((sum, trip) => {
-    if (trip.isCompleted) {
-      return sum + (trip.commission || 0);
-    }
-    return sum;
-  }, 0);
-  const yearlyCommission = filteredTrips?.reduce((sum, trip) => {
-    if (!trip.isCanceled) {
-      return sum + (trip.commission || 0);
-    }
-    return sum;
-  }, 0);
+  const completedTripsLastYear = useMemo(() => {
+    return filteredLastYearTrips?.filter((trip) => trip.isCompleted).length || 0;
+  }, [filteredLastYearTrips]);
+
+  const differenceCompletedTrips = useMemo(() => {
+    return completedTripsThisYear - completedTripsLastYear;
+  }, [completedTripsThisYear, completedTripsLastYear]);
+
+  const yearlyEarnings = useMemo(() => {
+    return filteredTrips?.reduce((sum, trip) => {
+      if (trip.isCompleted) {
+        return sum + (trip.commission || 0);
+      }
+      return sum;
+    }, 0) || 0;
+  }, [filteredTrips]);
+
+  const yearlyCommission = useMemo(() => {
+    return filteredTrips?.reduce((sum, trip) => {
+      if (!trip.isCanceled) {
+        return sum + (trip.commission || 0);
+      }
+      return sum;
+    }, 0) || 0;
+  }, [filteredTrips]);
 
   filteredTrips.forEach((trip) => {
     const monthIndex = new Date(trip.booking_date).getMonth();

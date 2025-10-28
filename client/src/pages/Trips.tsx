@@ -1,184 +1,66 @@
 import { useEffect } from "react";
-import { Box, CircularProgress, Typography } from "@mui/material";
-import { ThemedDataGrid } from "../data_grid_theme/ThemedDataGrid";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchTrips } from "../redux/features/users/userSlice";
+import { TripsDataTable } from "../components/trips-data-table";
+import { Loader2 } from "lucide-react";
 
 export const Trips = () => {
-  const dispatch = useDispatch();
-  const { trips, status, error } = useSelector((state) => state.user);
+  const dispatch = useAppDispatch();
+  const { trips, tripsStatus, tripsError } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(fetchTrips());
-  }, []);
+  }, [dispatch]);
 
-  const columns = [
-    { field: "id", headerName: "Order ID" },
-    { field: "traveller_amount", headerName: "Traveller Amount" },
-    {
-      field: "booking_date",
-      headerName: "Booking Date",
-      flex: 1,
-      renderCell: (params) => {
-        if (params.value) {
-          const date = new Date(params.value);
-          if (!isNaN(date.getTime())) {
-            return date.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            });
-          }
-          return "";
-        }
-      },
-    },
-    {
-      field: "travel_date",
-      headerName: "Travel Date",
-      flex: 1,
-      renderCell: (params) => {
-        if (params.value) {
-          const date = new Date(params.value);
-          if (!isNaN(date.getTime())) {
-            return date.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            });
-          }
-          return "";
-        }
-      },
-    },
-    {
-      field: "order_status",
-      headerName: "Order Status",
-      flex: 1,
-      minWidth: 175,
-      renderCell: (params) => {
-        const orderStatus = params.value;
-        if (!orderStatus) return null;
-
-        // Классы для разных статусов
-        let statusClass = "";
-
-        if (orderStatus === "cancel") {
-          statusClass = "bg-accentPink/30 text-accentPink";
-        } else if (orderStatus === "rejected") {
-          statusClass = "bg-gray-300/30 text-gray-300";
-        } else if (orderStatus === "pending") {
-          statusClass = "bg-accentOrange/30 text-accentOrange";
-        } else if (orderStatus === "wait-for-approval") {
-          statusClass = "bg-accentBlue/30 text-accentBlue";
-        } else {
-          statusClass = "bg-accentAqua text-accentGreen";
-        }
-
-        const displayStatus = orderStatus
-          .replace(/-/g, " ")
-          .replace(/\b\w/g, (c) => c.toUpperCase());
-
-        return (
-          <Box className="flex justify-start items-center">
-            <Box
-              className={`rounded-xl px-4 my-4 capitalize text-center justify-start ${statusClass}`}
-            >
-              <Typography>{displayStatus}</Typography>
-            </Box>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "total_price",
-      headerName: "Total Price in EUR",
-      flex: 1,
-      renderCell: (params) => {
-        if (params.value !== null && params.value !== undefined) {
-          const cleanedValue = params.value.replace(/[^0-9.]/g, "");
-          const parsedValue = parseFloat(cleanedValue);
-          if (!isNaN(parsedValue)) {
-            return parseFloat(parsedValue).toFixed(2);
-          }
-          return "";
-        }
-        return "";
-      },
-    },
-    {
-      field: "commission",
-      headerName: "Commission",
-      cellClassName: "name-column--cell",
-      flex: 1,
-      renderCell: ({ row: { commission, isCompleted, isCanceled } }) => {
-        return (
-          <Box className="w-[100%] h-[100%] flex justify-start items-center">
-            <Box
-              className={`
-                      ${
-                        isCompleted
-                          ? "text-green-400"
-                          : isCanceled
-                          ? "text-red-700 line-through"
-                          : "text-gray-400"
-                      }`}
-            >
-              <Typography>{commission.toFixed(2)}</Typography>
-            </Box>
-          </Box>
-        );
-      },
-    },
-  ];
-
-  if (status === "loading") {
+  if (tripsStatus === "loading") {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <CircularProgress />
-      </Box>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center gap-2">
+          <Loader2 className="size-6 animate-spin" />
+          <span className="text-lg">Loading trips...</span>
+        </div>
+      </div>
     );
   }
 
-  if (error) {
+  if (tripsError) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <Typography variant="h6" color="error">
-          Error: {error}
-        </Typography>
-      </Box>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-destructive mb-2">
+            Error loading trips
+          </h2>
+          <p className="text-muted-foreground">{tripsError}</p>
+        </div>
+      </div>
     );
   }
 
   if (trips.length === 0) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
-        <Typography variant="h6">No trips available</Typography>
-      </Box>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">No trips available</h2>
+          <p className="text-muted-foreground">
+            You don't have any trips yet. Start booking to see them here.
+          </p>
+        </div>
+      </div>
     );
   }
 
-  return (
-    <ThemedDataGrid
-      rows={trips}
-      columns={columns}
-      getRowId={(row) => row.id}
-      disableRowSelectionOnClick
-    />
-  );
+  // Transform data to match the new schema
+  const transformedTrips = trips.map((trip) => ({
+    id: trip.id,
+    traveller_amount: Number(trip.traveller_amount) || 0,
+    booking_date: trip.booking_date || "",
+    travel_date: trip.travel_date || "",
+    order_status: trip.order_status || "pending",
+    total_price: trip.total_price || "0",
+    commission: Number(trip.commission) || 0,
+    isCompleted: Boolean(trip.isCompleted),
+    isCanceled: Boolean(trip.isCanceled),
+  }));
+
+  return <TripsDataTable data={transformedTrips} />;
 };

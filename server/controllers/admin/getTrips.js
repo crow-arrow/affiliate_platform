@@ -11,7 +11,13 @@ export const getAllTrips = async (req, res) => {
       return res.status(404).json({ message: "No trips found" });
     }
 
-    res.json(trips);
+    // Конвертируем BigInt в строки для JSON сериализации
+    const serializedTrips = trips.map(trip => ({
+      ...trip,
+      id: trip.id.toString()
+    }));
+    
+    res.json(serializedTrips);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -38,7 +44,14 @@ export const getTripsByUserId = async (req, res) => {
     }
 
     const trips = user.affiliateTrips;
-    res.json({ trips });
+    
+    // Конвертируем BigInt в строки для JSON сериализации
+    const serializedTrips = trips.map(trip => ({
+      ...trip,
+      id: trip.id.toString()
+    }));
+    
+    res.json({ trips: serializedTrips });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error", error: error.message });

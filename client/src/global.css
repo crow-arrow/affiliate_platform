@@ -75,6 +75,15 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
+    /* Level colors */
+    --bronze: 30 60% 50%;
+    --bronze-foreground: 30 100% 15%;
+    --silver: 0 0% 70%;
+    --silver-foreground: 0 0% 25%;
+    --gold: 40 80% 55%;
+    --gold-foreground: 40 100% 15%;
+    --platinum: 0 0% 75%;
+    --platinum-foreground: 0 0% 25%;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -109,6 +118,15 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.439 0 0);
+    /* Level colors dark mode */
+    --bronze: 30 60% 40%;
+    --bronze-foreground: 15 75% 28%
+    --silver: 0 0% 60%;
+    --silver-foreground: 0 0% 90%;
+    --gold: 40 80% 45%;
+    --gold-foreground: 40 100% 90%;
+    --platinum: 0 0% 65%;
+    --platinum-foreground: 0 0% 90%;
   }
 }
 
@@ -143,4 +161,25 @@
 .my-svg-icon {
   transform: rotate(180deg);
   transform-origin: center;
+}
+
+/* Level badge styles - minimalistic */
+.level-bronze {
+  background-color: hsl(var(--bronze));
+  color: hsl(var(--bronze-foreground));
+}
+
+.level-silver {
+  background-color: hsl(var(--silver));
+  color: hsl(var(--silver-foreground));
+}
+
+.level-gold {
+  background-color: hsl(var(--gold));
+  color: hsl(var(--gold-foreground));
+}
+
+.level-platinum {
+  background-color: hsl(var(--platinum));
+  color: hsl(var(--platinum-foreground));
 }
