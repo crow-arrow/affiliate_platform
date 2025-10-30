@@ -18,6 +18,7 @@ import tripsRoutes from "./routes/tripsRoutes.js";
 import redirectRoutes from "./routes/redirect.js";
 import conversionRoutes from "./routes/conversion.js";
 import levelSettingsRoutes from "./routes/admin/levelSettings.js";
+import tenantRoutes from "./routes/tenant.js";
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ app.use("/api/password", resetPasswordRoutes);
 app.use("/r", redirectRoutes);
 app.use("/api/prisma", conversionRoutes);
 app.use("/api/admin/level-settings", levelSettingsRoutes);
+app.use("/api/tenant", tenantRoutes);
 
 // Static upload folder
 const __filename = fileURLToPath(import.meta.url);

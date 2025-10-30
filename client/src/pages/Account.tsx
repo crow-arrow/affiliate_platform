@@ -33,7 +33,7 @@ export const Account = () => {
     phone: "+1 (555) 123-4567",
     location: "New York, NY",
     joinDate: "January 15, 2024",
-    role: "GENIE",
+    role: "PARTNER",
     status: "Active",
     level: "Gold",
   });

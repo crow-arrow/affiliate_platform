@@ -46,6 +46,26 @@ instance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // DEV helper: automatically pass ?tenant=slug from current URL to API requests
+    try {
+      const host = window.location.host.toLowerCase();
+      const isLocal = host.startsWith("localhost") || host.startsWith("127.0.0.1");
+      if (isLocal) {
+        const search = new URLSearchParams(window.location.search);
+        const qsTenant = search.get("tenant") || search.get("slug");
+        if (qsTenant) {
+          // attach as query param unless already present
+          const urlHasTenant = typeof config.url === "string" && /[?&](tenant|slug)=/i.test(config.url);
+          const paramsHasTenant = config.params && ("tenant" in (config.params as any) || "slug" in (config.params as any));
+          if (!urlHasTenant && !paramsHasTenant) {
+            config.params = { ...(config.params as any), tenant: qsTenant };
+          }
+        }
+      }
+    } catch (_) {
+      // noop
+    }
     return config;
   },
   (error) => {

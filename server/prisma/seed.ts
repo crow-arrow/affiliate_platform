@@ -23,7 +23,7 @@ async function main() {
       last_name: "ULD",
       password: "hashedpassword123",
       affiliate_id: "amal_666",
-      role: "GENIE",
+      role: "PARTNER",
       level: "BRONZE",
       tenantId: tenant.id,
     },

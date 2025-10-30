@@ -16,7 +16,7 @@ export interface User {
   last_name: string;
   affiliate_id: string;
   avatarUrl?: string;
-  role: "GENIE" | "ADMIN";
+  role: "PARTNER" | "ADMIN";
   emailVerified: boolean;
   booked_trips_count?: number;
   current_year_travellers?: number;
@@ -30,6 +30,7 @@ export interface AuthResponse {
   refreshToken?: string;
   message?: string;
   errors?: Array<{ message: string }>;
+  tenant?: { id: string; name: string; slug: string };
 }
 
 interface AuthState {
@@ -59,6 +60,7 @@ interface RegisterParams {
   last_name: string;
   password: string;
 }
+
 
 export const registerUser = createAsyncThunk<
   AuthResponse,

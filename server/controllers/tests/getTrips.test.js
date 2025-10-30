@@ -33,7 +33,7 @@ describe("getUserTrips", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockReq = { user: { id: 1, role: "GENIE" } };
+    mockReq = { user: { id: 1, role: "PARTNER" } };
     mockRes = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn(),

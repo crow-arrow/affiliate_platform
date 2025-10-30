@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'GENIE');
+CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'PARTNER');
 
 -- CreateEnum
 CREATE TYPE "OrderStatus" AS ENUM ('APPROVED', 'PENDING', 'CONFIRMED', 'CANCEL', 'COMPLETED', 'WAIT_FOR_APPROVAL', 'REJECTED', 'DEPOSIT_PAID');
@@ -39,7 +39,7 @@ CREATE TABLE "referral_users" (
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "coupon_code" VARCHAR(50),
     "affiliate_id" VARCHAR(50),
-    "role" "UserRole" NOT NULL DEFAULT 'GENIE',
+    "role" "UserRole" NOT NULL DEFAULT 'PARTNER',
     "level" "Level" NOT NULL DEFAULT 'BRONZE',
     "levelChangedAt" TIMESTAMP(3),
     "booked_trips_count" INTEGER NOT NULL DEFAULT 0,

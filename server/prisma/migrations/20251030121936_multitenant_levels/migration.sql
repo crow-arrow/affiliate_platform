@@ -37,3 +37,23 @@ ALTER TABLE "LevelSetting" ADD CONSTRAINT "LevelSetting_tenantId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "AppSetting" ADD CONSTRAINT "AppSetting_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- Update existing enum values for role if needed
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'UserRole') THEN
+    CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'PARTNER');
+  END IF;
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- Ensure enum has PARTNER
+DO $$ BEGIN
+  ALTER TYPE "UserRole" ADD VALUE IF NOT EXISTS 'PARTNER';
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- Migrate existing rows from GENIE to PARTNER (if GENIE existed previously)
+DO $$ BEGIN
+  UPDATE "referral_users" SET "role"='PARTNER' WHERE "role"::text='GENIE';
+EXCEPTION WHEN undefined_column THEN NULL; END $$;
+
+-- Set default to PARTNER
+ALTER TABLE "referral_users" ALTER COLUMN "role" SET DEFAULT 'PARTNER';

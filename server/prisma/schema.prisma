@@ -16,9 +16,10 @@ datasource db {
 model Tenant {
   id            String         @id @default(cuid())
   name          String
-  domain        String? // кастомный домен (white-label)
+  domain        String?        @unique
   branding      Json? // логотипы, цвета и т.п.
   users         User[]         @relation("TenantUsers")
+  memberships   Membership[]
   levelSettings LevelSetting[]
   appSettings   AppSetting[]
   createdAt     DateTime       @default(now())
@@ -26,8 +27,8 @@ model Tenant {
 
 model User {
   id                      Int       @id @default(autoincrement())
-  clerkId                 String?   @unique
-  email                   String    @unique
+  clerkId                 String?
+  email                   String
   phone                   String?   @db.VarChar(20)
   first_name              String
   last_name               String
@@ -35,7 +36,7 @@ model User {
   emailVerified           Boolean   @default(false)
   coupon_code             String?   @db.VarChar(50)
   affiliate_id            String?   @unique @db.VarChar(50)
-  role                    UserRole  @default(GENIE)
+  role                    UserRole  @default(PARTNER)
   level                   Level     @default(BRONZE)
   levelChangedAt          DateTime?
   booked_trips_count      Int       @default(0)
@@ -57,7 +58,39 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Составной уникальный индекс: email должен быть уникальным только в рамках одного tenant
+  @@unique([email, tenantId])
   @@map("referral_users")
+}
+
+// Глобальная сущность пользователя (единожды на email)
+model Identity {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  clerkId   String?   @unique
+  firstName String?
+  lastName  String?
+  avatarUrl String?
+  passwordHash String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  memberships Membership[]
+}
+
+// Членство глобальной Identity в конкретном Tenant с ролью
+model Membership {
+  id         String   @id @default(cuid())
+  identityId String
+  tenantId   String
+  role       UserRole @default(PARTNER)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  identity Identity @relation(fields: [identityId], references: [id])
+  tenant   Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@unique([identityId, tenantId])
 }
 
 model Trips {
@@ -178,7 +211,7 @@ model AppSetting {
 
 enum UserRole {
   ADMIN
-  GENIE
+  PARTNER
 }
 
 enum OrderStatus {

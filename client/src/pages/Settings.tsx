@@ -104,7 +104,7 @@ export const Settings = () => {
                   Account Settings
                 </Button>
               </Link>
-              <Link to="/admin/settings/level-settings-test">
+              <Link to="/admin/settings/level-settings">
                 <Button variant="outline" size="sm">
                   Level Settings
                 </Button>

@@ -29,6 +29,7 @@ import { RequestPasswordReset } from "./pages/RequestPasswordReset";
 import { EmailSentMessage } from "./pages/EmailSentMessage";
 import { LoginPage } from "./pages/LoginPage";
 import { SignUpPage } from "./pages/SignUpPage";
+import { BusinessSignUpPage } from "./pages/BusinessSignUpPage";
 import { NotFound } from "./pages/NotFound";
 import AdminProtectedRoute from "./components/protected-routes/AdminProtectedRoute";
 import { SSOCallback } from "./components/verification/SSOCallback";
@@ -36,6 +37,7 @@ import { OAuthDone } from "./components/verification/OAuthDone";
 
 import { Toaster } from "@/components/ui/sonner";
 import { CropAvatar } from "./components/Avatar";
+import { resolveTenant } from "@/redux/features/tenant/tenantSlice";
 
 // Обертка для CropAvatar с дефолтными пропсами
 const CropAvatarWrapper = () => {
@@ -52,6 +54,27 @@ function App() {
   const emailVerified = user?.emailVerified === true;
   const showAppLayout = isAuth && user && emailVerified;
   const [isLoaded, setIsLoaded] = useState(false);
+  const { current: currentTenant, status: tenantStatus, resolvedOnce } = useAppSelector((s) => (s as any).tenant || { current: null, status: "idle", resolvedOnce: false });
+  // Resolve tenant from subdomain or query on first load (non-blocking for public routes)
+  useEffect(() => {
+    if (resolvedOnce) return;
+    const host = window.location.host.toLowerCase();
+    const search = new URLSearchParams(window.location.search);
+    const qSlug = search.get("tenant") || search.get("slug") || undefined;
+    let slug: string | undefined = qSlug;
+    if (!slug && host.includes(".")) {
+      const parts = host.split(":")[0].split(".");
+      // assume subdomain.domain.tld → take first
+      if (parts.length >= 3) slug = parts[0];
+    }
+    if (slug) {
+      dispatch(resolveTenant({ slug }));
+    } else {
+      // mark as resolved to avoid re-run
+      // noop: leave as is; backend will fallback as needed
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedOnce, dispatch]);
 
   // Роуты где НЕ нужно проверять авторизацию
   const publicRoutes = [
@@ -122,6 +145,7 @@ function App() {
         {/* Публичные страницы */}
         <Route path="/sign-in" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
+        <Route path="/business-sign-up" element={<BusinessSignUpPage />} />
         <Route path="/verify-email/:token" element={<EmailVerification />} />
         <Route path="/reset-password/:token" element={<PasswordRecover />} />
         <Route path="/request-reset" element={<RequestPasswordReset />} />
@@ -140,7 +164,7 @@ function App() {
           element={
             showAppLayout ? (
               emailVerified ? (
-                <AdminProtectedRoute allowedRoles={["ADMIN", "GENIE"]}>
+                <AdminProtectedRoute allowedRoles={["ADMIN", "PARTNER"]}>
                   <TestLayout />
                 </AdminProtectedRoute>
               ) : (

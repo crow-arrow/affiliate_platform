@@ -4,7 +4,7 @@ The **Affiliate Platform** is designed to empower users to drive sales through u
 
 ## 🚀 Features
 
-- ✅ **User Roles**: ADMIN and Affiliate ("GENIE") with dynamic status levels: Bronze, Silver, Gold
+- ✅ **User Roles**: ADMIN and Affiliate ("PARTNER") with dynamic status levels: Bronze, Silver, Gold
 - 🎯 **Referral Tracking**: Real-time analytics on clicks, bookings, commissions
 - 🛡️ **Secure Registration**: Email verification and data protection
 - 📊 **Advanced Analytics**: Track user performance, bookings, referral traffic
@@ -74,7 +74,7 @@ Detailed view of bookings made through your link:
 
 ## 👥 ADMIN: Team Overview
 
-ADMINs have access to full data insights of all GENIEs:
+ADMINs have access to full data insights of all PARTNERs:
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/3e9ec730-a9b6-4764-9081-9954761d4116" width="800" />

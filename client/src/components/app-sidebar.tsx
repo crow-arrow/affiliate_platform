@@ -13,6 +13,8 @@ import {
   SquareTerminal,
 } from "lucide-react";
 
+import { } from "react";
+
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavSecondary } from "@/components/nav-secondary";
@@ -29,11 +31,14 @@ import {
 
 import { useAppSelector } from "@/redux/hooks";
 import { checkRole } from "@/redux/features/auth/authSlice";
+import { RootState } from "@/redux/store";
 import { Link } from "react-router-dom";
 
 import LogoWhite from "@/assets/jinn.svg";
 import LogoDark from "@/assets/jinn-dark.svg";
-import Logo from "@/assets/logo.png";
+import { } from "@/components/ui/dropdown-menu";
+import { } from "lucide-react";
+import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAppSelector((state) => state.auth);
@@ -43,7 +48,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   console.log("User Avatar URL from Redux:", avatar);
   const userName = user?.first_name ?? "Guest User";
   const userEmail = user?.email ?? "exemple@jinn-travel.com";
-  const userRole = useAppSelector(checkRole);
+  const tenant = useAppSelector((state: RootState) => state.tenant.current);
+
+  // Workspace switching handled inside WorkspaceSwitcher component
 
   const data = {
     user: {
@@ -113,23 +120,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant="inset" {...props}>
       <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link to="/">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  {Logo && (
-                    <img src={Logo} alt="Jinn Logo" className="h-6 w-6" />
-                  )}
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Jinn Community</span>
-                  <span className="truncate text-xs">{userRole}</span>
-                </div>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <SidebarMenuButton size="lg" asChild>
+          <Link to="/">
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <WorkspaceSwitcher
+                currentTenant={tenant ? { id: tenant.id, name: tenant.name, domain: tenant.slug } : null}
+              />
+            </div>
+          </Link>
+        </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
