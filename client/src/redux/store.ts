@@ -6,6 +6,7 @@ import tripSlice from "./features/trips/tripSlice";
 import clicksSlice from "./features/clicks/clicksSlice";
 import resetPasswordSlice from "./features/password/resetPasswordSlice";
 import emailVerificationSlice from "./features/verification/emailVerificationSlice";
+import adminSettingsSlice from "./features/admin/adminSettingsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     clicks: clicksSlice,
     password: resetPasswordSlice,
     verification: emailVerificationSlice,
+    adminSettings: adminSettingsSlice,
   },
 });
 

@@ -1,62 +1,70 @@
 "use client"
 
-import { useAppSelector } from "@/redux/hooks";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { AnimatedNumber } from "./utils/AnimatedNumber";
 import { ArrowRight } from "lucide-react";
+import { fetchLevelSettings } from "@/redux/features/admin/adminSettingsSlice";
 
 export const ProgressBar = () => {
+  const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.auth.user);
   const numberOfTravellers = currentUser?.current_year_travellers || 0;
   const userLevel = currentUser?.level;
 
-  // Определяем максимальные значения для каждого уровня
-  const getLevelData = () => {
-    switch (userLevel) {
-      case "BRONZE":
-        return {
-          max: 10,
-          current: numberOfTravellers,
-          nextLevel: "SILVER",
-          color: "#374151",
-          steps: [0, 10], // Только начало и конец
-        };
-      case "SILVER":
-        return {
-          max: 25,
-          current: 15,
-          nextLevel: "GOLD",
-          color: "#374151",
-          steps: [0, 10, 25], // Начало, середина, конец
-        };
-      case "GOLD":
-        return {
-          max: 50,
-          current: numberOfTravellers,
-          nextLevel: "PLATINUM",
-          color: "#374151",
-          steps: [0, 25, 50], // Начало, середина, конец
-        };
-      case "PLATINUM":
-        return {
-          max: 100,
-          current: numberOfTravellers,
-          nextLevel: "MAX",
-          color: "#374151",
-          steps: [0, 50, 100], // Начало, середина, конец
-        };
-      default:
-        return {
-          max: 10,
-          current: numberOfTravellers,
-          nextLevel: "SILVER",
-          color: "#374151",
-          steps: [0, 10],
-        };
+  const { levelSettings, appSettings } = useAppSelector(
+    (state) => state.adminSettings
+  );
+
+  // Загружаем настройки уровней
+  useEffect(() => {
+    dispatch(fetchLevelSettings());
+  }, [dispatch]);
+
+  // Определяем текущий уровень и данные на основе динамических настроек
+  const getCurrentLevelData = () => {
+    // Fallback данные если настройки не загружены
+    const fallbackLevels = [
+      { id: 1, levelName: "BRONZE", levelOrder: 1, requiredAmount: 0, isActive: true },
+      { id: 2, levelName: "SILVER", levelOrder: 2, requiredAmount: 10, isActive: true },
+      { id: 3, levelName: "GOLD", levelOrder: 3, requiredAmount: 25, isActive: true },
+      { id: 4, levelName: "PLATINUM", levelOrder: 4, requiredAmount: 50, isActive: true }
+    ];
+    
+    const sortedLevels = (levelSettings.length > 0 ? levelSettings : fallbackLevels)
+      .filter(level => level.isActive)
+      .sort((a, b) => a.levelOrder - b.levelOrder);
+
+    // Находим текущий уровень пользователя
+    const currentLevelIndex = sortedLevels.findIndex(level => 
+      level.levelName.toUpperCase() === userLevel?.toUpperCase()
+    );
+
+    if (currentLevelIndex === -1 || currentLevelIndex === sortedLevels.length - 1) {
+      // Если уровень не найден или это последний уровень
+      const lastLevel = sortedLevels[sortedLevels.length - 1];
+      return {
+        current: numberOfTravellers,
+        max: lastLevel?.requiredAmount || 100,
+        nextLevel: "MAX",
+        steps: sortedLevels.map(level => level.requiredAmount),
+        color: "#374151"
+      };
     }
+
+    const currentLevel = sortedLevels[currentLevelIndex];
+    const nextLevel = sortedLevels[currentLevelIndex + 1];
+
+    return {
+      current: numberOfTravellers,
+      max: nextLevel.requiredAmount,
+      nextLevel: nextLevel.levelName,
+      steps: sortedLevels.map(level => level.requiredAmount),
+      color: "#374151"
+    };
   };
 
-  const levelData = getLevelData();
-
+  const levelData = getCurrentLevelData();
   const remainingTravellers = levelData.max - levelData.current;
 
   return (
@@ -67,10 +75,11 @@ export const ProgressBar = () => {
           <AnimatedNumber value={levelData.current || 0} />
         </div>
         <div className="flex items-center justify-center gap-1 text-sm text-gray-600 mt-2">
-          <span>Travellers This Year</span>
+          <span>{appSettings?.levelAmountDescription || "Travellers This Year"}</span>
           <ArrowRight className="w-3 h-3" />
         </div>
       </div>
+
       {/* Горизонтальный прогресс-бар с кружочками */}
       <div className="relative w-full max-w-[400px]">
         {/* Контейнер прогресс-бара */}
@@ -120,7 +129,10 @@ export const ProgressBar = () => {
       {/* Информация о следующем уровне */}
       <div className="text-center space-y-1">
         <div className="text-sm text-gray-500">
-        {Math.max(0, remainingTravellers)} more to the next level: {levelData.nextLevel}
+          Next level: {levelData.nextLevel}
+        </div>
+        <div className="text-xs text-gray-400">
+          {Math.max(0, remainingTravellers)} more to the next level: {levelData.nextLevel}
         </div>
       </div>
     </div>

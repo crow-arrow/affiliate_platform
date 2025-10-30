@@ -104,6 +104,11 @@ export const Settings = () => {
                   Account Settings
                 </Button>
               </Link>
+              <Link to="/admin/settings/level-settings-test">
+                <Button variant="outline" size="sm">
+                  Level Settings
+                </Button>
+              </Link>
             </div>
           </div>
           <span className="text-accentBlue">Your referral link:</span>

@@ -12,6 +12,8 @@ import { Team } from "./admin_pages/Team";
 import { Calendar } from "./pages/Calendar";
 import { Invoices } from "./admin_pages/Invoices";
 import { AllOrders } from "./admin_pages/AllOrders";
+import { LevelSettingsAdmin } from "./admin_pages/LevelSettings";
+import { LevelSettingsTest } from "./admin_pages/LevelSettingsTest";
 
 import { Dashboard } from "./pages/Dashboard";
 import { DashboardCopy } from "./pages/DashboardCopy";
@@ -175,6 +177,8 @@ function App() {
           <Route path="calendar" element={<Calendar />} />
           <Route path="invoices" element={<Invoices />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="settings/level-settings" element={<LevelSettingsAdmin />} />
+          <Route path="settings/level-settings-test" element={<LevelSettingsTest />} />
         </Route>
 
         {/* Это маршрут для страницы 404 */}

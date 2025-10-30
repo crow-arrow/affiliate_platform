@@ -6,6 +6,7 @@ import {
   ChevronsUpDown,
   CreditCard,
   LogOut,
+  Settings,
   Sparkles,
 } from "lucide-react";
 
@@ -125,6 +126,10 @@ export function NavUser({
               <DropdownMenuItem onClick={() => navigate("/settings/account")}>
                 <BadgeCheck />
                 Account
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/settings")}>
+                <Settings />
+                Profile Settings
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />
