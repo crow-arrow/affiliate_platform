@@ -21,8 +21,13 @@ import {
 } from "@/components/ui/select";
 
 import { useAppSelector } from "@/redux/hooks";
+import { cn } from "@/lib/utils";
 
-export function CommissionChartCopy() {
+interface CommissionChartCopyProps {
+  className?: string;
+}
+
+export function CommissionChartCopy({ className }: CommissionChartCopyProps) {
   const { trips } = useAppSelector((state) => state.user);
   const [timeRange, setTimeRange] = React.useState("365d");
 
@@ -35,7 +40,17 @@ export function CommissionChartCopy() {
     }
 
     trips.forEach((trip) => {
-      const date = new Date(trip.booking_date).toISOString().split("T")[0];
+      if (!trip.bookingDate) {
+        return;
+      }
+
+      const bookingDate = new Date(trip.bookingDate);
+
+      if (isNaN(bookingDate.getTime())) {
+        return; // Пропускаем невалидные даты
+      }
+
+      const date = bookingDate.toISOString().split("T")[0];
       const commission = trip.commission || 0;
 
       if (!dataMap.has(date)) {
@@ -55,7 +70,15 @@ export function CommissionChartCopy() {
 
     return Array.from(dataMap.entries())
       .map(([date, values]) => ({ date, ...values }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      .sort((a, b) => {
+        const dateA = new Date(a.date).getTime();
+        const dateB = new Date(b.date).getTime();
+
+        if (isNaN(dateA) || isNaN(dateB)) {
+          return 0;
+        }
+        return dateA - dateB;
+      });
   }, [trips]);
 
   const chartConfig = {
@@ -83,7 +106,7 @@ export function CommissionChartCopy() {
   }, [chartData, timeRange]);
 
   return (
-    <Card className="pt-0">
+    <Card className={cn("pt-0", className)}>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>Commission Over Time</CardTitle>

@@ -38,6 +38,7 @@ async function main() {
       firstName: "Amal",
       lastName: "ULD",
       passwordHash: passwordHash,
+      emailVerified: true, // Для тестового пользователя email уже верифицирован
     },
   });
 

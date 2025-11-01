@@ -44,13 +44,13 @@ export const Layout = () => {
         >
           <Navbar isOpen={isOpen} setIsOpen={setIsOpen} />
         </aside>
-        <div className="flex flex-col transition-[width] duration-300 flex-1">
+        <div className="flex flex-col transition-[width] duration-300 flex-1 min-w-0">
           {/* Sticky Header */}
           <header className="sticky w-full h-20 top-0 z-20">
             <Header />
           </header>
           {/* Scrollable Main Section */}
-          <main className="flex-1 w-full overflow-auto py-4 mb-8">
+          <main className="flex-1 w-full overflow-y-auto overflow-x-hidden py-4 mb-8 min-w-0">
             <Outlet />
           </main>
         </div>

@@ -54,7 +54,12 @@ export const verifyEmail = async (req, res) => {
 
     if (!identity) return res.status(404).json({ message: "User not found." });
 
-    // Identity всегда считается верифицированным
+    // Обновляем emailVerified = true после успешной верификации
+    await prisma.identity.update({
+      where: { id: identity.id },
+      data: { emailVerified: true },
+    });
+
     // Получаем первый доступный membership для генерации токена
     const membership = await prisma.membership.findFirst({
       where: { identityId: identity.id },

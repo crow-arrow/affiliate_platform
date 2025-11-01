@@ -27,15 +27,16 @@ model Tenant {
 
 // Глобальная сущность пользователя (единожды на email)
 model Identity {
-  id           String   @id @default(cuid())
-  email        String   @unique @db.VarChar(255)
-  clerkId      String?  @unique
-  firstName    String?  @db.VarChar(100)
-  lastName     String?  @db.VarChar(100)
-  avatarUrl    String?
-  passwordHash String?
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id            String   @id @default(cuid())
+  email         String   @unique @db.VarChar(255)
+  clerkId       String?  @unique
+  firstName     String?  @db.VarChar(100)
+  lastName      String?  @db.VarChar(100)
+  avatarUrl     String?
+  passwordHash  String?
+  emailVerified Boolean  @default(false) @map("email_verified")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   memberships Membership[]
 }

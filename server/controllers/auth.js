@@ -100,7 +100,7 @@ export const signUp = async (req, res) => {
         firstName: first_name,
         lastName: last_name,
         passwordHash: hash,
-        phone: phone || null,
+        emailVerified: false, // Email требует подтверждения при кастомной регистрации
       },
     });
 
@@ -239,7 +239,7 @@ export const login = async (req, res) => {
       first_name: identity.firstName || "",
       last_name: identity.lastName || "",
       role: membership?.role || "PARTNER",
-      emailVerified: true,
+      emailVerified: identity.emailVerified || false, // Используем реальное значение из базы
       tenantId: tenantId || null,
     };
 
@@ -298,7 +298,13 @@ export const oauthLogin = async (req, res) => {
       if (byEmail) {
         identity = await prisma.identity.update({
           where: { id: byEmail.id },
-          data: { clerkId: userId, firstName, lastName, avatarUrl: imageUrl },
+          data: {
+            clerkId: userId,
+            firstName,
+            lastName,
+            avatarUrl: imageUrl,
+            emailVerified: true, // OAuth email уже верифицирован Clerk
+          },
         });
       } else {
         identity = await prisma.identity.create({
@@ -308,6 +314,7 @@ export const oauthLogin = async (req, res) => {
             firstName,
             lastName,
             avatarUrl: imageUrl,
+            emailVerified: true, // OAuth email уже верифицирован Clerk
           },
         });
       }
@@ -358,7 +365,7 @@ export const oauthLogin = async (req, res) => {
       last_name: lastName,
       avatarUrl: imageUrl,
       role: membership?.role || "PARTNER",
-      emailVerified: true,
+      emailVerified: identity.emailVerified || false, // Используем реальное значение из базы
       tenantId: tenantId || null,
     };
 
@@ -402,7 +409,7 @@ export const getMe = async (req, res) => {
         first_name: identity.firstName || "",
         last_name: identity.lastName || "",
         role: membership?.role || "PARTNER",
-        emailVerified: true,
+        emailVerified: identity.emailVerified || false, // Используем реальное значение из базы
         tenantId,
       };
       return res.status(200).json({ user: safeUser });

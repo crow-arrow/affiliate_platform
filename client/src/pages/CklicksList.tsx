@@ -1,81 +1,117 @@
-import { useEffect } from "react";
-import { Box, CircularProgress, Typography } from "@mui/material";
-import { ThemedDataGrid } from "../data_grid_theme/ThemedDataGrid";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchClicks } from "../redux/features/clicks/clicksSlice";
+import { useEffect, useMemo } from "react";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { fetchClicks, Click } from "../redux/features/clicks/clicksSlice";
+import { DataTable } from "@/components/DataTable";
+import { createDragColumn, createSelectColumn } from "@/components/data-table-columns";
+import { ColumnDef } from "@tanstack/react-table";
+import { Loader2, Calendar, MoreVertical } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export const CklicksList = () => {
-  const dispatch = useDispatch();
-  const { clicks, status, error } = useSelector((state) => state.clicks);
-  const currentUser = useSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
+  const { clicks, status, error } = useAppSelector((state) => state.clicks);
+  const currentUser = useAppSelector((state) => state.auth.user);
 
   useEffect(() => {
-    dispatch(fetchClicks(currentUser.id));
-  }, [dispatch, currentUser.id]);
+    if (currentUser?.id) {
+      dispatch(fetchClicks(currentUser.id));
+    }
+  }, [dispatch, currentUser?.id]);
 
-  const columns = [
-    { field: "id", headerName: "Order ID" },
-    { field: "referer", headerName: "Referer", flex: 1 },
-    { field: "ip_address", headerName: "IP address", flex: 1 },
-    {
-      field: "timestamp",
-      headerName: "Date of click",
-      flex: 1,
-      renderCell: (params) => {
-        if (params.value) {
-          const date = new Date(params.value);
-          if (!isNaN(date.getTime())) {
-            const day = date.toLocaleString("en-US", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-            });
-            const time = date.toLocaleTimeString("ru-RU", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            });
-            return `${day}, ${time}`;
-          }
-        }
+  const columns: ColumnDef<Click>[] = useMemo(
+    () => [
+      createDragColumn<Click>(),
+      createSelectColumn<Click>(),
+      {
+        accessorKey: "id",
+        header: "Click ID",
+        enableHiding: false,
       },
-    },
-    { field: "type", headerName: "type" },
-    { field: "device_type", headerName: "Device" },
-  ];
+      {
+        accessorKey: "referer",
+        header: "Referer",
+      },
+      {
+        accessorKey: "ip_address",
+        header: "IP Address",
+      },
+      {
+        accessorKey: "timestamp",
+        header: "Date of Click",
+        cell: ({ row }) => {
+          const timestamp = row.original.timestamp;
+          if (!timestamp) return "-";
 
-  if (status === "loading") {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <CircularProgress />
-      </Box>
-    );
-  }
+          const date = new Date(timestamp);
+          if (isNaN(date.getTime())) return "-";
 
-  if (error) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <Typography variant="h6" color="error">
-          Error: {error}
-        </Typography>
-      </Box>
-    );
-  }
+          const day = date.toLocaleString("en-US", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          });
+          const time = date.toLocaleTimeString("ru-RU", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
 
-  if (clicks.length === 0) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-        <Typography variant="h6">No clicks available</Typography>
-      </Box>
-    );
-  }
+          return (
+            <div className="flex items-center gap-2">
+              <Calendar className="size-4 text-muted-foreground" />
+              <span>{`${day}, ${time}`}</span>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "type",
+        header: "Type",
+      },
+      {
+        accessorKey: "device_type",
+        header: "Device",
+      },
+      {
+        id: "actions",
+        cell: () => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+                size="icon"
+              >
+                <MoreVertical />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuItem>View Details</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ),
+      },
+    ],
+    []
+  );
 
   return (
-    <ThemedDataGrid
-      rows={clicks}
+    <DataTable
+      data={clicks || []}
       columns={columns}
-      getRowId={(row) => row.id}
-      disableRowSelectionOnClick
+      getRowId={(row) => String(row.id)}
+      emptyMessage="No clicks found."
+      isLoading={status === "loading"}
     />
   );
 };

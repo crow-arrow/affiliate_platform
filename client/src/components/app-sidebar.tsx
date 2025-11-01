@@ -82,11 +82,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         isActive: true,
       },
       {
-        title: "Dashboard Copy",
-        url: getUrl("/test/my-account"),
-        icon: Bot,
-      },
-      {
         title: "Trips",
         url: getUrl("/trips"),
         icon: BookOpen,

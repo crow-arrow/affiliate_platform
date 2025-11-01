@@ -24,7 +24,11 @@ export const selectUserTrips = createSelector([selectUserState], (state) => stat
 export const selectUserLastThreeTrips = createSelector([selectUserTrips], (trips) =>
   trips
     .slice()
-    .sort((a, b) => new Date(b.booking_date).getTime() - new Date(a.booking_date).getTime())
+    .sort((a, b) => {
+      const dateA = a.bookingDate ? new Date(a.bookingDate).getTime() : 0;
+      const dateB = b.bookingDate ? new Date(b.bookingDate).getTime() : 0;
+      return dateB - dateA;
+    })
     .slice(0, 3)
     .reverse()
 );
@@ -32,13 +36,17 @@ export const selectUserLastThreeTrips = createSelector([selectUserTrips], (trips
 // 🔹 Все поездки в будущем
 export const selectUserUpcomingTrips = createSelector([selectUserTrips], (trips) => {
   const now = new Date();
-  return trips.filter((trip) => new Date(trip.booking_date) > now);
+  return trips.filter((trip) => {
+    if (!trip.bookingDate) return false;
+    const bookingDate = new Date(trip.bookingDate);
+    return !isNaN(bookingDate.getTime()) && bookingDate > now;
+  });
 });
 
 // 🔹 Общая сумма всех заказов пользователя (€)
 export const selectUserTotalRevenue = createSelector([selectUserTrips], (trips) =>
   trips.reduce((sum, trip) => {
-    const price = parseFloat(trip.total_price);
+    const price = parseFloat(trip.totalPrice || "0");
     return sum + (isNaN(price) ? 0 : price);
   }, 0)
 );

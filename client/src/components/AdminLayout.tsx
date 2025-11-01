@@ -45,13 +45,13 @@ export const AdminLayout = () => {
         >
           <AdminNavbar isOpen={isOpen} setIsOpen={setIsOpen} />
         </aside>
-        <div className="flex flex-col flex-1 transition-[width] duration-300">
+        <div className="flex flex-col flex-1 transition-[width] duration-300 min-w-0">
           {/* Sticky Header */}
           <header className="sticky h-20 top-0 z-20">
             <Header />
           </header>
           {/* Scrollable Main Section */}
-          <main className="flex-1 w-full overflow-auto my-4">
+          <main className="flex-1 w-full overflow-y-auto overflow-x-hidden my-4 min-w-0">
             <Outlet />
           </main>
         </div>

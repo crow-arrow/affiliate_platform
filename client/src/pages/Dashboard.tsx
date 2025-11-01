@@ -301,59 +301,6 @@ export const Dashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Trips Table */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Recent Trips</CardTitle>
-            <CardDescription>Your latest trip bookings</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {lastThreeTrips?.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">No recent trips found.</div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Booking Date</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {lastThreeTrips?.map((trip) => {
-                    const statusStyle = getStatusBadge(trip.order_status);
-                    return (
-                      <TableRow key={trip.id}>
-                        <TableCell className="font-medium">#{trip.id}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
-                            {formatDate(trip.booking_date)}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Euro className="h-4 w-4 text-muted-foreground" />
-                            {formatCurrency(trip.total_price)}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={statusStyle.variant} className={statusStyle.className}>
-                            {trip.order_status
-                              .replace(/_/g, " ")
-                              .replace(/\b\w/g, (c) => c.toUpperCase())}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-
         {/* User Level Card */}
         <Card className={getLevelCardStyle(getLevelName(userLevel)).className}>
           <CardHeader>
@@ -389,51 +336,99 @@ export const Dashboard: React.FC = () => {
             className={`absolute -top-4 -right-4 w-24 h-24 ${getLevelCardStyle(getLevelName(userLevel)).accentColor} rounded-full opacity-20`}
           ></div>
         </Card>
+
+        {/* Recent Trips Table */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Recent Trips</CardTitle>
+            <CardDescription>Your latest trip bookings</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {lastThreeTrips?.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">No recent trips found.</div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Booking Date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {lastThreeTrips?.map((trip) => {
+                    const statusStyle = getStatusBadge(trip.orderStatus || "PENDING");
+                    return (
+                      <TableRow key={trip.id}>
+                        <TableCell className="font-medium">#{trip.id}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            {trip.bookingDate ? formatDate(trip.bookingDate) : "-"}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Euro className="h-4 w-4 text-muted-foreground" />
+                            {formatCurrency(trip.totalPrice || "0")}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={statusStyle.variant} className={statusStyle.className}>
+                            {trip.orderStatus
+                              ? trip.orderStatus
+                                  .replace(/_/g, " ")
+                                  .replace(/\b\w/g, (c: string) => c.toUpperCase())
+                              : "Unknown"}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
       </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Commission Chart */}
+        <CommissionChartCopy className="lg:col-span-2" />
 
-      {/* Affiliate Manager Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5" />
-            Affiliate Manager
-          </CardTitle>
-          <CardDescription>Nadine Wilke</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Hello and welcome to our affiliate program. I'm your affiliate manager, and I'm here
-              for you if you have any questions or problems related to our affiliate program.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              I wish you all success in promoting our products, and a profitable partnership for
-              both you and us.
-            </p>
-          </div>
-          <Separator />
-          <div>
-            <h3 className="text-sm font-semibold text-muted-foreground mb-2">Contact Email:</h3>
-            <a
-              href="mailto:nadine@jinn-travel.com"
-              className="text-primary hover:underline transition-colors"
-            >
-              nadine@jinn-travel.com
-            </a>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Commission Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Commission Analytics</CardTitle>
-          <CardDescription>Your commission trends over time</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <CommissionChartCopy />
-        </CardContent>
-      </Card>
+        {/* Affiliate Manager Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              Affiliate Manager
+            </CardTitle>
+            <CardDescription>Nadine Wilke</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                Hello and welcome to our affiliate program. I'm your affiliate manager, and I'm here
+                for you if you have any questions or problems related to our affiliate program.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                I wish you all success in promoting our products, and a profitable partnership for
+                both you and us.
+              </p>
+            </div>
+            <Separator />
+            <div>
+              <h3 className="text-sm font-semibold text-muted-foreground mb-2">Contact Email:</h3>
+              <a
+                href="mailto:nadine@jinn-travel.com"
+                className="text-primary hover:underline transition-colors"
+              >
+                nadine@jinn-travel.com
+              </a>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

@@ -3,9 +3,20 @@ import axios from "@/utils/axios";
 
 export interface Trip {
   id: string;
-  total_price: string;
-  booking_date: string;
-  order_status: string;
+  travellerAmount?: number;
+  bookingDate?: string | null;
+  travelDate?: string | null;
+  orderStatus?: string;
+  totalPrice?: string;
+  currency?: string | null;
+  couponCode?: string | null;
+  affiliateId?: string | null;
+  commission?: number;
+  levelUsed?: string;
+  isCompleted?: boolean;
+  isCanceled?: boolean;
+  createdAt?: string | null;
+  updatedAt?: string | null;
   [key: string]: any;
 }
 

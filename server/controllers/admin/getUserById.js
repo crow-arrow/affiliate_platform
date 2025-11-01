@@ -22,6 +22,7 @@ export const getUserById = async (req, res) => {
         firstName: true,
         lastName: true,
         avatarUrl: true,
+        emailVerified: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -75,7 +76,7 @@ export const getUserById = async (req, res) => {
       avatarUrl: identity.avatarUrl,
       role: membership.role,
       phone: profile?.phone || null,
-      emailVerified: true, // Identity всегда верифицирован
+      emailVerified: identity.emailVerified || false, // Используем реальное значение из базы
       couponCode: profile?.couponCode || null,
       affiliateId: profile?.affiliateId || null,
       level: profile?.level || "BRONZE",

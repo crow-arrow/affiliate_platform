@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
 import { useBreadcrumbs, BreadcrumbItem as BreadcrumbItemType } from "@/hooks/use-breadcrumbs";
+import { useAuthTenantResolver } from "@/hooks/useAuthTenantResolver";
 import { ChevronRight, Home } from "lucide-react";
 
 interface DynamicBreadcrumbProps {
@@ -16,6 +17,11 @@ interface DynamicBreadcrumbProps {
   maxItems?: number;
   customBreadcrumbs?: BreadcrumbItemType[];
   hideOnMobile?: boolean;
+  /**
+   * Использовать tenant slug из useAuthTenantResolver для скрытия в breadcrumbs.
+   * По умолчанию true - использует хук для более надежного определения tenant slug
+   */
+  useResolverForTenantSlug?: boolean;
 }
 
 export const DynamicBreadcrumb = ({
@@ -24,8 +30,13 @@ export const DynamicBreadcrumb = ({
   maxItems = 5,
   customBreadcrumbs,
   hideOnMobile = true,
+  useResolverForTenantSlug = true,
 }: DynamicBreadcrumbProps) => {
-  const defaultBreadcrumbs = useBreadcrumbs();
+  // Получаем tenant slug из useAuthTenantResolver для более надежного определения
+  const { tenant } = useAuthTenantResolver();
+  const tenantSlug = useResolverForTenantSlug ? tenant?.slug : null;
+
+  const defaultBreadcrumbs = useBreadcrumbs({ tenantSlug });
   const breadcrumbs = customBreadcrumbs || defaultBreadcrumbs;
 
   // Ограничиваем количество элементов

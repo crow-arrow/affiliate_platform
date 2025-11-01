@@ -184,12 +184,21 @@ export const getUserTrips = async (req, res) => {
       }
 
       return {
-        ...trip,
         id: trip.id.toString(), // Конвертируем BigInt в строку
+        travellerAmount: trip.travellerAmount,
+        bookingDate: trip.bookingDate?.toISOString() || null,
+        travelDate: trip.travelDate?.toISOString() || null,
+        orderStatus: trip.orderStatus,
+        totalPrice: trip.totalPrice?.toString() || "0",
+        currency: trip.currency,
+        couponCode: trip.couponCode,
+        affiliateId: trip.affiliateId,
         commission: commission,
-        level_used: applicableLevel,
+        levelUsed: applicableLevel,
         isCompleted: isPast && !isCancelled,
         isCanceled: isCancelled,
+        createdAt: trip.createdAt?.toISOString() || null,
+        updatedAt: trip.updatedAt?.toISOString() || null,
       };
     });
 

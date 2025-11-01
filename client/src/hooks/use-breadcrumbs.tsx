@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { getBreadcrumbLabel } from "@/config/breadcrumb-config";
+import { extractTenantSlugFromPath } from "@/constants/routes";
 
 export interface BreadcrumbItem {
   label: string;
@@ -8,7 +9,16 @@ export interface BreadcrumbItem {
   icon?: React.ComponentType<{ className?: string }>;
 }
 
-export const useBreadcrumbs = (): BreadcrumbItem[] => {
+interface UseBreadcrumbsOptions {
+  /**
+   * Tenant slug для скрытия из breadcrumbs.
+   * Если не указан, будет извлечен из пути автоматически.
+   * Можно использовать useAuthTenantResolver().tenant?.slug для более надежного получения
+   */
+  tenantSlug?: string | null;
+}
+
+export const useBreadcrumbs = (options?: UseBreadcrumbsOptions): BreadcrumbItem[] => {
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -23,12 +33,21 @@ export const useBreadcrumbs = (): BreadcrumbItem[] => {
       href: "/",
     });
 
+    // Определяем tenant slug: приоритет у переданного параметра, затем из пути
+    const tenantSlug = options?.tenantSlug ?? extractTenantSlugFromPath(pathname);
+
     // Строим путь по сегментам
     let currentPath = "";
 
     segments.forEach((segment, index) => {
+      // Строим полный путь (включая tenant slug) для href
       currentPath += `/${segment}`;
       const isLast = index === segments.length - 1;
+
+      // Пропускаем tenant slug (первый сегмент, если он является tenant slug) только в отображении
+      if (index === 0 && tenantSlug && segment === tenantSlug) {
+        return; // Пропускаем этот сегмент в breadcrumbs, но путь уже построен
+      }
 
       // Определяем название для сегмента
       let label = segment;

@@ -7,9 +7,11 @@ export const TestLayout: React.FC = () => {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
+      <SidebarInset className="flex flex-col">
         <HeaderTest />
-        <Outlet />
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <Outlet />
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );
