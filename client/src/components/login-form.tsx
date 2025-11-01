@@ -1,12 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { FieldErrors } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import {
-  loginUser,
-  checkIsAuth,
-  clearErrors,
-} from "@/redux/features/auth/authSlice";
+import { loginUser, checkIsAuth, clearErrors } from "@/redux/features/auth/authSlice";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,10 +28,7 @@ import { toast } from "sonner";
 
 import { useSignIn } from "@clerk/clerk-react";
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"form">) {
+export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
   const {
     register,
     handleSubmit,
@@ -52,6 +45,9 @@ export function LoginForm({
 
   const orderedFields: (keyof LoginFormData)[] = ["password", "email"];
 
+  // Флаг для отслеживания, был ли уже показан тост успешного входа
+  const hasShownSuccessToast = useRef(false);
+
   useEffect(() => {
     const error = signIn?.firstFactorVerification?.error;
 
@@ -63,12 +59,18 @@ export function LoginForm({
   }, [signIn?.firstFactorVerification?.error]);
 
   useEffect(() => {
-    if (status === "succeeded" && isAuth && user) {
+    // Показываем тост только один раз при успешном логине
+    if (status === "succeeded" && isAuth && user && !hasShownSuccessToast.current) {
+      hasShownSuccessToast.current = true;
       toast.success(message || "You are signed in!");
-      // Редиректим на главную страницу, которая сама определит куда направить пользователя
       navigate("/");
     }
-  }, [status, isAuth, user, navigate]);
+
+    // Сбрасываем флаг, если статус изменился на другой (например, после нового логина)
+    if (status !== "succeeded") {
+      hasShownSuccessToast.current = false;
+    }
+  }, [status, isAuth, user, navigate, message]);
 
   const loading = status === "loading";
 

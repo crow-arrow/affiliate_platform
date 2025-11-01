@@ -9,25 +9,29 @@ export const resendEmailController = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const identity = await prisma.identity.findUnique({ where: { email } });
 
-    if (!user) {
+    if (!identity) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    if (user.emailVerified) {
-      return res.status(400).json({ message: "Email already verified." });
-    }
+    // Identity всегда считается верифицированным (email уникален и проверен при создании)
+    // Если нужна дополнительная верификация, можно добавить поле emailVerified в Identity
+    // Пока оставляем логику без проверки верификации для Identity
 
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: identity.id }, process.env.JWT_SECRET, {
       expiresIn: "15m",
     });
 
-    if (!user.email) {
+    if (!identity.email) {
       throw new Error("User email is undefined");
     }
 
-    await sendVerificationEmail(user.email, user.first_name || "", token);
+    await sendVerificationEmail(
+      identity.email,
+      identity.firstName || "",
+      token
+    );
 
     res.status(200).json({
       message: "Email resent successfully.",
@@ -44,23 +48,29 @@ export const verifyEmail = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
-
-    if (!user) return res.status(404).json({ message: "User not found." });
-
-    if (user.emailVerified) {
-      return res.status(409).json({
-        message: "Email is already verified.",
-      });
-    }
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { emailVerified: true },
+    const identity = await prisma.identity.findUnique({
+      where: { id: decoded.id },
     });
 
+    if (!identity) return res.status(404).json({ message: "User not found." });
+
+    // Identity всегда считается верифицированным
+    // Получаем первый доступный membership для генерации токена
+    const membership = await prisma.membership.findFirst({
+      where: { identityId: identity.id },
+    });
+
+    if (!membership) {
+      return res.status(404).json({ message: "User membership not found." });
+    }
+
     const authToken = jwt.sign(
-      { id: user.id, role: user.role, avatarUrl: user.avatarUrl },
+      {
+        id: identity.id,
+        role: membership.role,
+        tenantId: membership.tenantId,
+        avatarUrl: identity.avatarUrl,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );

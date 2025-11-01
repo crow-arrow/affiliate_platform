@@ -82,13 +82,15 @@ export const Calendar = () => {
         },
         "& .fc-popover": {
           borderRadius: "0.375rem",
-          color: "black"
+          color: "black",
         },
       }}
     >
       {/* Боковая панель с событиями */}
       <Box className="flex-grow flex-shrink basis-[20%] p-4 overflow-y-auto rounded-2xl bg-white dark:bg-secondary">
-        <Typography className="text-center" variant="h4">Events</Typography>
+        <Typography className="text-center" variant="h4">
+          Events
+        </Typography>
         <List>
           {currentEvents.map((event) => (
             <ListItem key={event.id} className="bg-accentGreen my-2 rounded-xl">

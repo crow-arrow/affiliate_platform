@@ -1,17 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import {
-  requestPasswordReset,
-  clearErrors,
-} from "../redux/features/password/resetPasswordSlice";
+import { requestPasswordReset, clearErrors } from "../redux/features/password/resetPasswordSlice";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import logo from "../assets/logo.png";
 
 export const RequestPasswordReset = () => {
-  const { status, message, requestResetError } = useSelector(
-    (state) => state.password
-  );
+  const { status, message, requestResetError } = useSelector((state) => state.password);
   const [email, setEmail] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -42,28 +37,16 @@ export const RequestPasswordReset = () => {
     <div className="flex flex-col flex-1 h-screen bg-gradient-primary justify-center px-6 mx-auto lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <Link to={"/sign-in"} tabIndex={-1}>
-          <img
-            alt="Jinn community"
-            src={logo}
-            className="mx-auto h-20 w-auto"
-          />
+          <img alt="Jinn community" src={logo} className="mx-auto h-20 w-auto" />
         </Link>
         <h2 className="mt-6 text-center text-2xl font-bold text-gray-100">
           Enter your email to reset the password
         </h2>
       </div>
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form
-          noValidate
-          onSubmit={handleSubmit}
-          method="POST"
-          className="space-y-6"
-        >
+        <form noValidate onSubmit={handleSubmit} method="POST" className="space-y-6">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm/6 font-medium text-gray-100"
-            >
+            <label htmlFor="email" className="block text-sm/6 font-medium text-gray-100">
               Email
             </label>
             <div className="mt-2">

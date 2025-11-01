@@ -69,30 +69,20 @@ export const HIDDEN_BREADCRUMB_SEGMENTS = [
 ];
 
 // Функция для получения лейбла с учетом роли пользователя
-export const getBreadcrumbLabel = (
-  segment: string,
-  userRole?: string
-): string => {
+export const getBreadcrumbLabel = (segment: string, userRole?: string): string => {
   // Проверяем, нужно ли скрыть этот сегмент
   if (HIDDEN_BREADCRUMB_SEGMENTS.includes(segment)) {
     return "";
   }
 
   // Если есть роль, проверяем специальную конфигурацию
-  if (
-    userRole &&
-    ROLE_BREADCRUMB_CONFIGS[userRole as keyof typeof ROLE_BREADCRUMB_CONFIGS]
-  ) {
-    const roleConfig =
-      ROLE_BREADCRUMB_CONFIGS[userRole as keyof typeof ROLE_BREADCRUMB_CONFIGS];
+  if (userRole && ROLE_BREADCRUMB_CONFIGS[userRole as keyof typeof ROLE_BREADCRUMB_CONFIGS]) {
+    const roleConfig = ROLE_BREADCRUMB_CONFIGS[userRole as keyof typeof ROLE_BREADCRUMB_CONFIGS];
     if (segment in roleConfig) {
       return roleConfig[segment as keyof typeof roleConfig];
     }
   }
 
   // Возвращаем стандартный лейбл
-  return (
-    BREADCRUMB_LABELS[segment] ||
-    segment.charAt(0).toUpperCase() + segment.slice(1)
-  );
+  return BREADCRUMB_LABELS[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
 };

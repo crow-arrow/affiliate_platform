@@ -37,9 +37,7 @@ export const AssignCoupon = () => {
       >
         {status === "loading" ? "Adding..." : "Add Coupon"}
       </button>
-      {error && (
-        <p className="text-sm text-red-500">{error.message || error}</p>
-      )}
+      {error && <p className="text-sm text-red-500">{error.message || error}</p>}
       {status === "succeeded" && (
         <p className="text-sm text-green-500">Coupon assigned successfully!</p>
       )}

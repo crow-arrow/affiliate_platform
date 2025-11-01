@@ -6,10 +6,7 @@ import { Trip } from "@/redux/features/trips/tripSlice";
 const selectTripsState = (state: RootState) => state.trips;
 
 // 📌 Получить все поездки
-export const selectAllTrips = createSelector(
-  [selectTripsState],
-  (tripsState) => tripsState.trips
-);
+export const selectAllTrips = createSelector([selectTripsState], (tripsState) => tripsState.trips);
 
 // 📌 Получить статус загрузки
 export const selectTripStatus = createSelector(
@@ -18,10 +15,7 @@ export const selectTripStatus = createSelector(
 );
 
 // 📌 Получить ошибку
-export const selectTripError = createSelector(
-  [selectTripsState],
-  (tripsState) => tripsState.error
-);
+export const selectTripError = createSelector([selectTripsState], (tripsState) => tripsState.error);
 
 // 📌 Получить только предстоящие поездки
 export const selectUpcomingTrips = createSelector([selectAllTrips], (trips) => {
@@ -33,7 +27,4 @@ export const selectUpcomingTrips = createSelector([selectAllTrips], (trips) => {
 });
 
 // 📌 Получить количество поездок
-export const selectTripsCount = createSelector(
-  [selectAllTrips],
-  (trips) => trips.length
-);
+export const selectTripsCount = createSelector([selectAllTrips], (trips) => trips.length);

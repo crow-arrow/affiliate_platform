@@ -18,12 +18,12 @@ interface DynamicBreadcrumbProps {
   hideOnMobile?: boolean;
 }
 
-export const DynamicBreadcrumb = ({ 
+export const DynamicBreadcrumb = ({
   className = "",
   showHomeIcon = true,
   maxItems = 5,
   customBreadcrumbs,
-  hideOnMobile = true
+  hideOnMobile = true,
 }: DynamicBreadcrumbProps) => {
   const defaultBreadcrumbs = useBreadcrumbs();
   const breadcrumbs = customBreadcrumbs || defaultBreadcrumbs;
@@ -49,8 +49,8 @@ export const DynamicBreadcrumb = ({
                 </BreadcrumbPage>
               ) : (
                 <BreadcrumbLink asChild>
-                  <Link 
-                    to={breadcrumb.href || "#"} 
+                  <Link
+                    to={breadcrumb.href || "#"}
                     className="flex items-center gap-1 hover:text-primary transition-colors"
                   >
                     {showHomeIcon && index === 0 && <Home className="h-4 w-4" />}
@@ -67,11 +67,7 @@ export const DynamicBreadcrumb = ({
 
   // Скрываем breadcrumbs на мобильных устройствах если hideOnMobile = true
   if (hideOnMobile) {
-    return (
-      <div className="hidden md:block">
-        {breadcrumbContent}
-      </div>
-    );
+    return <div className="hidden md:block">{breadcrumbContent}</div>;
   }
 
   return breadcrumbContent;

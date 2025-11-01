@@ -28,51 +28,37 @@ export const AdminNavbar = ({ isOpen, setIsOpen }) => {
     {
       to: "../admin/dashboard",
       label: "Dashboard",
-      tooltip: (
-        <div className="sidebar-tooltip group-hover:scale-100">Dashboard</div>
-      ),
+      tooltip: <div className="sidebar-tooltip group-hover:scale-100">Dashboard</div>,
       icon: <RoofingRoundedIcon className="m-1" />,
     },
     {
       to: "../admin/team",
       label: "Team",
-      tooltip: (
-        <div className="sidebar-tooltip group-hover:scale-100">Team</div>
-      ),
+      tooltip: <div className="sidebar-tooltip group-hover:scale-100">Team</div>,
       icon: <Groups3OutlinedIcon className="m-1" />,
     },
     {
       to: "../admin/orders",
       label: "Orders",
-      tooltip: (
-        <div className="sidebar-tooltip group-hover:scale-100">Orders</div>
-      ),
+      tooltip: <div className="sidebar-tooltip group-hover:scale-100">Orders</div>,
       icon: <AirplanemodeActiveOutlinedIcon className="m-1" />,
     },
     {
       to: "../admin/calendar",
       label: "Calendar",
-      tooltip: (
-        <div className="sidebar-tooltip group-hover:scale-100">Calendar</div>
-      ),
+      tooltip: <div className="sidebar-tooltip group-hover:scale-100">Calendar</div>,
       icon: <CalendarTodayOutlinedIcon className="m-1 p-0.5" />,
     },
     {
       to: "../admin/assign-coupon",
       label: "Assign Coupon",
-      tooltip: (
-        <div className="sidebar-tooltip group-hover:scale-100">
-          Assign Coupon
-        </div>
-      ),
+      tooltip: <div className="sidebar-tooltip group-hover:scale-100">Assign Coupon</div>,
       icon: <LocalActivityOutlinedIcon className="m-1" />,
     },
     {
       to: "../admin/invoices",
       label: "Invoices",
-      tooltip: (
-        <div className="sidebar-tooltip group-hover:scale-100">Invoices</div>
-      ),
+      tooltip: <div className="sidebar-tooltip group-hover:scale-100">Invoices</div>,
       icon: <ReceiptOutlinedIcon className="m-1" />,
     },
   ];
@@ -89,9 +75,7 @@ export const AdminNavbar = ({ isOpen, setIsOpen }) => {
               onClick={openNav}
             >
               <LastPageIcon
-                className={`transition-all duration-500 ${
-                  isOpen ? "rotate-180" : ""
-                }`}
+                className={`transition-all duration-500 ${isOpen ? "rotate-180" : ""}`}
               />
               <div className="open-button-tooltip pointer-events-none group-hover/button:tooltip-show">
                 {isOpen ? "Shrink sidebar" : "Expand sidebar"}
@@ -110,10 +94,7 @@ export const AdminNavbar = ({ isOpen, setIsOpen }) => {
                           `flex group gap-2 w-full items-center text-lg rounded-lg
                                                 hover:bg-white dark:hover:bg-secondary
                                                 transition-colors duration-300
-                                                ${
-                                                  isActive &&
-                                                  "bg-white dark:bg-secondary"
-                                                }`
+                                                ${isActive && "bg-white dark:bg-secondary"}`
                         }
                       >
                         {({ isActive }) => (

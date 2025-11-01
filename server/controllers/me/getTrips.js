@@ -5,35 +5,100 @@ import { updateUserLevel } from "../../utils/updateUserLevel.js";
 
 export const getUserTrips = async (req, res) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: req.user.id },
+    // req.user.id это Identity.id (строка)
+    const identityId = req.user.id;
+    const tenantId = req.user.tenantId;
+
+    if (!tenantId) {
+      return res.status(400).json({ message: "Tenant ID is required" });
+    }
+
+    // Получаем Identity
+    const identity = await prisma.identity.findUnique({
+      where: { id: identityId },
+      select: { email: true, firstName: true, lastName: true },
+    });
+
+    if (!identity) {
+      return res.status(404).json({ message: "Identity not found" });
+    }
+
+    // Находим или создаем Membership
+    let membership = await prisma.membership.findUnique({
+      where: {
+        identityId_tenantId: {
+          identityId: identityId,
+          tenantId: tenantId,
+        },
+      },
       include: {
-        levelHistory: {
-          orderBy: { changed_at: "asc" },
+        profile: {
+          include: {
+            levelHistory: {
+              orderBy: { changedAt: "asc" },
+            },
+          },
         },
       },
     });
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    // Если Membership не существует - создаем его с ролью PARTNER
+    if (!membership) {
+      membership = await prisma.membership.create({
+        data: {
+          identityId: identityId,
+          tenantId: tenantId,
+          role: "PARTNER",
+        },
+        include: {
+          profile: {
+            include: {
+              levelHistory: {
+                orderBy: { changedAt: "asc" },
+              },
+            },
+          },
+        },
+      });
     }
 
-    const { affiliate_id, coupon_code, level } = user;
+    // Находим или создаем PartnerProfile
+    let profile = membership.profile;
+    if (!profile) {
+      const affiliateId = `${(
+        identity.firstName || "user"
+      ).toLowerCase()}_${Math.floor(Math.random() * 90000 + 10000)}`;
+
+      profile = await prisma.partnerProfile.create({
+        data: {
+          membershipId: membership.id,
+          affiliateId: affiliateId,
+          level: "BRONZE",
+        },
+        include: {
+          levelHistory: {
+            orderBy: { changedAt: "asc" },
+          },
+        },
+      });
+    }
+
+    const { affiliateId, couponCode, level } = profile;
 
     const whereConditions = [];
 
-    if (affiliate_id !== null) {
-      whereConditions.push({ affiliate_id: affiliate_id });
+    if (affiliateId !== null) {
+      whereConditions.push({ affiliateId: affiliateId });
     }
 
-    if (coupon_code !== null) {
-      whereConditions.push({ coupon_code: coupon_code });
+    if (couponCode !== null) {
+      whereConditions.push({ couponCode: couponCode });
     }
 
     if (whereConditions.length === 0) {
       return res
         .status(400)
-        .json({ message: "User has no valid affiliate_id or coupon_code" });
+        .json({ message: "User has no valid affiliateId or couponCode" });
     }
 
     const trips = await prisma.trips.findMany({
@@ -42,59 +107,79 @@ export const getUserTrips = async (req, res) => {
       },
     });
 
+    // Используем PartnerProfile для updateUserLevel
+    const profileForLevelUpdate = {
+      level: profile.level,
+      levelHistory: profile.levelHistory || [],
+    };
+
     const {
       newLevel,
       currentYearTravellers,
       lastYearTravellers,
       currentYearDepartedTrips,
       lastYearDepartedTrips,
-    } = updateUserLevel(user, trips);
+    } = updateUserLevel(profileForLevelUpdate, trips);
 
-    if (newLevel !== user.level) {
-      await prisma.user.update({
-        where: { id: user.id },
+    if (newLevel !== profile.level) {
+      await prisma.partnerProfile.update({
+        where: { id: profile.id },
         data: {
           level: newLevel,
           levelChangedAt: new Date(),
         },
       });
 
-      await prisma.levelHistory.create({
+      const newHistoryEntry = await prisma.levelHistory.create({
         data: {
-          user_id: user.id,
+          profileId: profile.id,
           level: newLevel,
-          changed_at: new Date(),
+          changedAt: new Date(),
         },
       });
+
+      // Обновляем profile для использования в дальнейшем коде
+      profile.level = newLevel;
+      profile.levelHistory = [...(profile.levelHistory || []), newHistoryEntry];
     }
 
-    const levelHistorySorted = [...(user.levelHistory || [])].sort(
-      (a, b) => new Date(a.changed_at) - new Date(b.changed_at)
-    );
+    // Перезагружаем profile с актуальной историей уровней
+    const profileWithHistory = await prisma.partnerProfile.findUnique({
+      where: { id: profile.id },
+      include: {
+        levelHistory: {
+          orderBy: { changedAt: "asc" },
+        },
+      },
+    });
+
+    const levelHistorySorted = [
+      ...(profileWithHistory?.levelHistory || []),
+    ].sort((a, b) => new Date(a.changedAt) - new Date(b.changedAt));
 
     // Добавляем комиссию к каждому туру и обновляем заработанную комиссию пользователя
     let totalEarnedCommission = 0;
     const now = new Date();
 
     const tripsWithCommission = trips.map((trip) => {
-      const travelDate = new Date(trip.travel_date);
+      const travelDate = new Date(trip.travelDate);
       const isPast = travelDate <= now;
       const isCancelled =
-        trip.order_status === "REJECTED" || trip.order_status === "CANCEL";
+        trip.orderStatus === "REJECTED" || trip.orderStatus === "CANCEL";
 
       // Найти уровень, который действовал на момент travelDate
       let applicableLevel = "BRONZE";
 
       for (const history of levelHistorySorted) {
-        if (new Date(history.changed_at) <= travelDate) {
+        if (new Date(history.changedAt) <= travelDate) {
           applicableLevel = history.level;
         } else {
           break;
         }
       }
 
-      const commission = getCommission(applicableLevel, trip.total_price);
-      if (trip.order_status !== "REJECTED" && trip.order_status !== "CANCEL") {
+      const commission = getCommission(applicableLevel, trip.totalPrice);
+      if (trip.orderStatus !== "REJECTED" && trip.orderStatus !== "CANCEL") {
         totalEarnedCommission += commission;
       }
 
@@ -121,18 +206,18 @@ export const getUserTrips = async (req, res) => {
     );
 
     const travellerAmount = departedTrips.reduce((sum, trip) => {
-      return sum + Number(trip.traveller_amount || 0);
+      return sum + Number(trip.travellerAmount || 0);
     }, 0);
 
-    // Обновляем пользователя в базе данных
-    await prisma.user.update({
-      where: { id: user.id },
+    // Обновляем PartnerProfile в базе данных
+    await prisma.partnerProfile.update({
+      where: { id: profile.id },
       data: {
-        number_of_travellers: travellerAmount,
-        current_year_travellers: currentYearTravellers,
+        numberOfTravellers: travellerAmount,
+        currentYearTravellers: currentYearTravellers,
         earnings: earnedFromDeparted,
-        canceled_earnings: canceledEarnings,
-        total_commission: totalEarnedCommission,
+        canceledEarnings: canceledEarnings,
+        totalCommission: totalEarnedCommission,
       },
     });
 

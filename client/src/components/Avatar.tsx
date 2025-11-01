@@ -2,11 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import PropTypes from "prop-types";
-import {
-  fetchUsers,
-  uploadAvatar,
-  resetAvatarStatus,
-} from "../redux/features/users/userSlice";
+import { fetchUsers, uploadAvatar, resetAvatarStatus } from "../redux/features/users/userSlice";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { CustomFileInput } from "./CustomFileInput";
 import "react-advanced-cropper/dist/themes/corners.css";
@@ -75,10 +71,7 @@ export const CropAvatar = ({ isOpen, onClose }) => {
       onClose();
     } catch (error) {
       console.error("Error during avatar upload:", error);
-      toast.error(
-        "Error during uploading avatar:",
-        error.response?.data || error.message
-      );
+      toast.error("Error during uploading avatar:", error.response?.data || error.message);
     } finally {
       dispatch(resetAvatarStatus());
       setLoading(false);
@@ -93,10 +86,7 @@ export const CropAvatar = ({ isOpen, onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="p-6 bg-secondary backdrop-blur-sm rounded-2xl shadow-lg">
-        <button
-          className="absolute top-4 right-4 text-xl"
-          onClick={handleClose}
-        >
+        <button className="absolute top-4 right-4 text-xl" onClick={handleClose}>
           <CloseOutlinedIcon />
         </button>
         {user ? (
@@ -107,12 +97,7 @@ export const CropAvatar = ({ isOpen, onClose }) => {
                 height={290}
                 mimeTypes="image/jpeg, image/png, image/webp, image/avif"
                 onImageSelected={handleImageSelected}
-                allowedFileTypes={[
-                  "image/jpeg",
-                  "image/png",
-                  "image/webp",
-                  "image/avif",
-                ]}
+                allowedFileTypes={["image/jpeg", "image/png", "image/webp", "image/avif"]}
               />
             </div>
             <button

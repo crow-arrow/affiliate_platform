@@ -40,10 +40,7 @@ export const EmailSentMessage = () => {
 
     if (storedEndTime) {
       const endTime = parseInt(storedEndTime, 10);
-      const remainingTimeSeconds = Math.max(
-        0,
-        Math.ceil((endTime - now) / 1000)
-      );
+      const remainingTimeSeconds = Math.max(0, Math.ceil((endTime - now) / 1000));
 
       if (remainingTimeSeconds > 0) {
         setCountdown(remainingTimeSeconds);
@@ -130,16 +127,13 @@ export const EmailSentMessage = () => {
             <CheckCircleIcon sx={{ fontSize: "2rem" }} />
             <span className="ml-2">
               <span className="ml-2">
-                Account created successfully. Please check your email to verify
-                your account.
+                Account created successfully. Please check your email to verify your account.
               </span>
             </span>
           </div>
         )}
         <div className="gap-0">
-          <p className="text-gray-400 text-xs">
-            If you didn&apos;t get any email, please:
-          </p>
+          <p className="text-gray-400 text-xs">If you didn&apos;t get any email, please:</p>
           <button
             className="
             w-full rounded-lg bg-primaryLite text-gray-800

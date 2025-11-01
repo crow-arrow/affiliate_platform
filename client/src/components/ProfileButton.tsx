@@ -1,11 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  checkIsAuth,
-  checkRole,
-  logout,
-} from "../redux/features/auth/authSlice";
+import { checkIsAuth, checkRole, logout } from "../redux/features/auth/authSlice";
 import { useClerk } from "@clerk/clerk-react";
 import avatarLogo from "../assets/avatar.webp";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -85,11 +81,7 @@ export const ProfileButton = ({ isOpen }) => {
                 <span className="text-xm block">Hi, {firstName}</span>
                 <span className="text-xs block text-stone-500">{userRole}</span>
               </div>
-              <div
-                className={`transition-transform ${
-                  dropdownOpen ? "-rotate-180" : ""
-                }`}
-              >
+              <div className={`transition-transform ${dropdownOpen ? "-rotate-180" : ""}`}>
                 <ExpandMoreIcon />
               </div>
             </div>
@@ -148,10 +140,7 @@ export const ProfileButton = ({ isOpen }) => {
                   className="w-full bg-opacity-0 bg-white dark:bg-secondary/0 text-gray-500 dark:text-gray-400
                                 hover:text-gray-800 dark:hover:text-gray-100 hover:bg-opacity-100 dark:hover:bg-secondary transition-all duration-300"
                 >
-                  <button
-                    onClick={logoutHandler}
-                    className="flex w-full py-2 pl-4 gap-2 text-left"
-                  >
+                  <button onClick={logoutHandler} className="flex w-full py-2 pl-4 gap-2 text-left">
                     <PowerSettingsNewOutlinedIcon />
                     Logout
                   </button>

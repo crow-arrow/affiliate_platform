@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -12,9 +12,7 @@ export const ProgressBar = () => {
   const numberOfTravellers = currentUser?.current_year_travellers || 0;
   const userLevel = currentUser?.level;
 
-  const { levelSettings, appSettings } = useAppSelector(
-    (state) => state.adminSettings
-  );
+  const { levelSettings, appSettings } = useAppSelector((state) => state.adminSettings);
 
   // Загружаем настройки уровней
   useEffect(() => {
@@ -28,16 +26,16 @@ export const ProgressBar = () => {
       { id: 1, levelName: "BRONZE", levelOrder: 1, requiredAmount: 0, isActive: true },
       { id: 2, levelName: "SILVER", levelOrder: 2, requiredAmount: 10, isActive: true },
       { id: 3, levelName: "GOLD", levelOrder: 3, requiredAmount: 25, isActive: true },
-      { id: 4, levelName: "PLATINUM", levelOrder: 4, requiredAmount: 50, isActive: true }
+      { id: 4, levelName: "PLATINUM", levelOrder: 4, requiredAmount: 50, isActive: true },
     ];
-    
+
     const sortedLevels = (levelSettings.length > 0 ? levelSettings : fallbackLevels)
-      .filter(level => level.isActive)
+      .filter((level) => level.isActive)
       .sort((a, b) => a.levelOrder - b.levelOrder);
 
     // Находим текущий уровень пользователя
-    const currentLevelIndex = sortedLevels.findIndex(level => 
-      level.levelName.toUpperCase() === userLevel?.toUpperCase()
+    const currentLevelIndex = sortedLevels.findIndex(
+      (level) => level.levelName.toUpperCase() === userLevel?.toUpperCase()
     );
 
     if (currentLevelIndex === -1 || currentLevelIndex === sortedLevels.length - 1) {
@@ -47,8 +45,8 @@ export const ProgressBar = () => {
         current: numberOfTravellers,
         max: lastLevel?.requiredAmount || 100,
         nextLevel: "MAX",
-        steps: sortedLevels.map(level => level.requiredAmount),
-        color: "#374151"
+        steps: sortedLevels.map((level) => level.requiredAmount),
+        color: "#374151",
       };
     }
 
@@ -59,8 +57,8 @@ export const ProgressBar = () => {
       current: numberOfTravellers,
       max: nextLevel.requiredAmount,
       nextLevel: nextLevel.levelName,
-      steps: sortedLevels.map(level => level.requiredAmount),
-      color: "#374151"
+      steps: sortedLevels.map((level) => level.requiredAmount),
+      color: "#374151",
     };
   };
 
@@ -86,51 +84,47 @@ export const ProgressBar = () => {
         <div className="relative flex items-center justify-between w-full">
           {/* Фоновая линия */}
           <div className="absolute top-1/2 left-0 right-0 h-3 bg-gray-200 rounded-full transform -translate-y-1/2"></div>
-          
+
           {/* Прогресс линия */}
-          <div 
+          <div
             className="absolute top-1/2 left-0 h-3 bg-gray-600 rounded-full transform -translate-y-1/2 transition-all duration-1000"
-            style={{ 
-              width: `${Math.min((levelData.current / levelData.max) * 100, 100)}%` 
+            style={{
+              width: `${Math.min((levelData.current / levelData.max) * 100, 100)}%`,
             }}
           ></div>
-          
+
           {/* Кружочки как часть линии */}
           {levelData.steps.map((step, index) => {
             const isCompleted = levelData.current >= step;
             const position = (step / levelData.max) * 100;
-            
+
             return (
               <div key={step} className="relative z-10 flex flex-col items-center">
                 {/* Кружочек с цифрой */}
-                <div 
+                <div
                   className={`w-8 h-8 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
-                    isCompleted 
-                      ? 'bg-gray-600 border-gray-600 text-white' 
-                      : 'bg-white border-gray-300 text-gray-600'
+                    isCompleted
+                      ? "bg-gray-600 border-gray-600 text-white"
+                      : "bg-white border-gray-300 text-gray-600"
                   }`}
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     left: `${position}%`,
-                    transform: 'translateX(-50%) translateY(-50%)',
-                    top: '50%'
+                    transform: "translateX(-50%) translateY(-50%)",
+                    top: "50%",
                   }}
                 >
-                  <span className="text-xs font-bold">
-                    {step}
-                  </span>
+                  <span className="text-xs font-bold">{step}</span>
                 </div>
               </div>
             );
           })}
         </div>
       </div>
-      
+
       {/* Информация о следующем уровне */}
       <div className="text-center space-y-1">
-        <div className="text-sm text-gray-500">
-          Next level: {levelData.nextLevel}
-        </div>
+        <div className="text-sm text-gray-500">Next level: {levelData.nextLevel}</div>
         <div className="text-xs text-gray-400">
           {Math.max(0, remainingTravellers)} more to the next level: {levelData.nextLevel}
         </div>

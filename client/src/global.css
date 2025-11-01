@@ -120,8 +120,7 @@
     --sidebar-ring: oklch(0.439 0 0);
     /* Level colors dark mode */
     --bronze: 30 60% 40%;
-    --bronze-foreground: 15 75% 28%
-    --silver: 0 0% 60%;
+    --bronze-foreground: 15 75% 28% --silver: 0 0% 60%;
     --silver-foreground: 0 0% 90%;
     --gold: 40 80% 45%;
     --gold-foreground: 40 100% 90%;

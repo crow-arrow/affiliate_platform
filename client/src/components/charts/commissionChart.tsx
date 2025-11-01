@@ -19,15 +19,15 @@ export const CommissionChart = () => {
   const monthlyCompletedCommission = Array(12).fill(0);
 
   const filteredTrips = useMemo(() => {
-    return trips?.filter(
-      (trip) => new Date(trip.booking_date).getFullYear() === selectedYear
-    ) ?? [];
+    return (
+      trips?.filter((trip) => new Date(trip.booking_date).getFullYear() === selectedYear) ?? []
+    );
   }, [trips, selectedYear]);
 
   const filteredLastYearTrips = useMemo(() => {
-    return trips?.filter(
-      (trip) => new Date(trip.booking_date).getFullYear() === selectedYear - 1
-    ) ?? [];
+    return (
+      trips?.filter((trip) => new Date(trip.booking_date).getFullYear() === selectedYear - 1) ?? []
+    );
   }, [trips, selectedYear]);
 
   const completedTripsThisYear = useMemo(() => {
@@ -43,21 +43,25 @@ export const CommissionChart = () => {
   }, [completedTripsThisYear, completedTripsLastYear]);
 
   const yearlyEarnings = useMemo(() => {
-    return filteredTrips?.reduce((sum, trip) => {
-      if (trip.isCompleted) {
-        return sum + (trip.commission || 0);
-      }
-      return sum;
-    }, 0) || 0;
+    return (
+      filteredTrips?.reduce((sum, trip) => {
+        if (trip.isCompleted) {
+          return sum + (trip.commission || 0);
+        }
+        return sum;
+      }, 0) || 0
+    );
   }, [filteredTrips]);
 
   const yearlyCommission = useMemo(() => {
-    return filteredTrips?.reduce((sum, trip) => {
-      if (!trip.isCanceled) {
-        return sum + (trip.commission || 0);
-      }
-      return sum;
-    }, 0) || 0;
+    return (
+      filteredTrips?.reduce((sum, trip) => {
+        if (!trip.isCanceled) {
+          return sum + (trip.commission || 0);
+        }
+        return sum;
+      }, 0) || 0
+    );
   }, [filteredTrips]);
 
   filteredTrips.forEach((trip) => {
@@ -271,8 +275,7 @@ export const CommissionChart = () => {
                   </span>
                 )}
                 <div className="open-button-tooltip pointer-events-none group-hover/button:tooltip-show -right-2 top-8 translate-x-0">
-                  Shows the change in completed trips compared to the previous
-                  year
+                  Shows the change in completed trips compared to the previous year
                 </div>
               </div>
             </div>
@@ -288,13 +291,11 @@ export const CommissionChart = () => {
           <div className="relative group cursor-context-menu">
             <InfoOutlinedIcon fontSize="small" className="mr-2" />
             <div className="info-tooltip pointer-events-none group-hover:tooltip-show">
-              This is the commission earned from completed trips. These amounts
-              are confirmed and ready for payout.
+              This is the commission earned from completed trips. These amounts are confirmed and
+              ready for payout.
             </div>
           </div>
-          <dt className="text-gray-500 dark:text-gray-400 text-sm font-normal me-1">
-            Earnings:
-          </dt>
+          <dt className="text-gray-500 dark:text-gray-400 text-sm font-normal me-1">Earnings:</dt>
           <dd className="text-gray-900 text-sm dark:text-white font-semibold">
             {yearlyEarnings?.toFixed(0)} €
           </dd>
@@ -303,9 +304,8 @@ export const CommissionChart = () => {
           <div className="relative group cursor-context-menu">
             <InfoOutlinedIcon fontSize="small" className="mr-2" />
             <div className="info-tooltip pointer-events-none group-hover:tooltip-show">
-              This is the total commission from all trips, including upcoming
-              ones. This amount is not final and may change if any trips are
-              canceled or modified.
+              This is the total commission from all trips, including upcoming ones. This amount is
+              not final and may change if any trips are canceled or modified.
             </div>
           </div>
           <dt className="text-gray-500 dark:text-gray-400 text-sm font-normal me-1">
@@ -326,10 +326,7 @@ export const CommissionChart = () => {
         className="overflow-scroll"
       />
       <div className="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
-        <div
-          ref={dropdownRef}
-          className="relative flex justify-between items-center pt-5"
-        >
+        <div ref={dropdownRef} className="relative flex justify-between items-center pt-5">
           <button
             id="dropdownDefaultButton"
             onClick={toggleDropdown}

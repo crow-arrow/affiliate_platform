@@ -13,7 +13,7 @@ import {
   SquareTerminal,
 } from "lucide-react";
 
-import { } from "react";
+import {} from "react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
@@ -32,23 +32,39 @@ import {
 import { useAppSelector } from "@/redux/hooks";
 import { checkRole } from "@/redux/features/auth/authSlice";
 import { RootState } from "@/redux/store";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import LogoWhite from "@/assets/jinn.svg";
 import LogoDark from "@/assets/jinn-dark.svg";
-import { } from "@/components/ui/dropdown-menu";
-import { } from "lucide-react";
+import {} from "@/components/ui/dropdown-menu";
+import {} from "lucide-react";
 import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
+import { useMemo } from "react";
+import { extractTenantSlugFromPath, addTenantSlugToPath } from "@/constants/routes";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAppSelector((state) => state.auth);
-  const avatar = user?.avatarUrl
-    ? `${import.meta.env.VITE_API_URL}${user.avatarUrl}`
-    : "";
-  console.log("User Avatar URL from Redux:", avatar);
+  const avatar = user?.avatarUrl ? `${import.meta.env.VITE_API_URL}${user.avatarUrl}` : "";
   const userName = user?.first_name ?? "Guest User";
   const userEmail = user?.email ?? "exemple@jinn-travel.com";
   const tenant = useAppSelector((state: RootState) => state.tenant.current);
+  const location = useLocation();
+
+  // Получаем tenant slug из Redux или из URL пути
+  const tenantSlug = useMemo(() => {
+    // Приоритет 1: из Redux state
+    if (tenant?.slug) {
+      return tenant.slug;
+    }
+    // Приоритет 2: из URL пути (для development)
+    return extractTenantSlugFromPath(location.pathname);
+  }, [tenant?.slug, location.pathname]);
+
+  // Функция для добавления tenant slug к относительным путям
+  const getUrl = useMemo(
+    () => (path: string) => addTenantSlugToPath(path, tenantSlug),
+    [tenantSlug]
+  );
 
   // Workspace switching handled inside WorkspaceSwitcher component
 
@@ -61,28 +77,28 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navMain: [
       {
         title: "Dashboard",
-        url: "/my-account",
+        url: getUrl("/my-account"),
         icon: SquareTerminal,
         isActive: true,
       },
       {
         title: "Dashboard Copy",
-        url: "/test/my-account",
+        url: getUrl("/test/my-account"),
         icon: Bot,
       },
       {
         title: "Trips",
-        url: "/trips",
+        url: getUrl("/trips"),
         icon: BookOpen,
       },
       {
         title: "Clicks list",
-        url: "/clicks-list",
+        url: getUrl("/clicks-list"),
         icon: Settings2,
       },
       {
         title: "Documents",
-        url: "/documents",
+        url: getUrl("/documents"),
         icon: BookOpen,
       },
     ],
@@ -124,7 +140,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <Link to="/">
             <div className="grid flex-1 text-left text-sm leading-tight">
               <WorkspaceSwitcher
-                currentTenant={tenant ? { id: tenant.id, name: tenant.name, domain: tenant.slug } : null}
+                currentTenant={
+                  tenant ? { id: tenant.id, name: tenant.name, domain: tenant.slug } : null
+                }
               />
             </div>
           </Link>

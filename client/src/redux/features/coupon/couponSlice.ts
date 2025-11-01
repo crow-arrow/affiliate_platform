@@ -12,9 +12,7 @@ export const assignCoupon = createAsyncThunk(
       if (error.response?.status === 409) {
         return rejectWithValue("User already has a coupon code");
       }
-      return rejectWithValue(
-        error.response?.data || "Error coupon code assignment"
-      );
+      return rejectWithValue(error.response?.data || "Error coupon code assignment");
     }
   }
 );

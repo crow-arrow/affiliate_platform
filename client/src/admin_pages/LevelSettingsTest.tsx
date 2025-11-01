@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,11 +16,11 @@ export const LevelSettingsTest = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('/admin/level-settings/get');
+      const response = await axios.get("/admin/level-settings/get");
       setLevelSettings(response.data.levelSettings || []);
       setAppSettings(response.data.appSettings || {});
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Failed to fetch settings');
+      setError(err.response?.data?.error || err.message || "Failed to fetch settings");
     } finally {
       setLoading(false);
     }
@@ -35,13 +35,11 @@ export const LevelSettingsTest = () => {
       <Card>
         <CardHeader>
           <CardTitle>Level Settings Test</CardTitle>
-          <CardDescription>
-            Testing the level settings API endpoint
-          </CardDescription>
+          <CardDescription>Testing the level settings API endpoint</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Button onClick={fetchSettings} disabled={loading}>
-            {loading ? 'Loading...' : 'Refresh Settings'}
+            {loading ? "Loading..." : "Refresh Settings"}
           </Button>
 
           {error && (

@@ -1,27 +1,11 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  Shield,
-  Edit,
-  Save,
-  X,
-} from "lucide-react";
+import { User, Mail, Phone, MapPin, Calendar, Shield, Edit, Save, X } from "lucide-react";
 import { useState } from "react";
 
 export const Account = () => {
@@ -54,16 +38,11 @@ export const Account = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Account Settings</h1>
-          <p className="text-muted-foreground">
-            Manage your account information and preferences
-          </p>
+          <p className="text-muted-foreground">Manage your account information and preferences</p>
         </div>
         <div className="flex gap-2">
           {!isEditing ? (
-            <Button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2"
-            >
+            <Button onClick={() => setIsEditing(true)} className="flex items-center gap-2">
               <Edit className="h-4 w-4" />
               Edit Profile
             </Button>
@@ -73,11 +52,7 @@ export const Account = () => {
                 <Save className="h-4 w-4" />
                 Save Changes
               </Button>
-              <Button
-                variant="outline"
-                onClick={handleCancel}
-                className="flex items-center gap-2"
-              >
+              <Button variant="outline" onClick={handleCancel} className="flex items-center gap-2">
                 <X className="h-4 w-4" />
                 Cancel
               </Button>
@@ -142,9 +117,7 @@ export const Account = () => {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>Account Information</CardTitle>
-            <CardDescription>
-              Update your personal information and account details
-            </CardDescription>
+            <CardDescription>Update your personal information and account details</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -153,9 +126,7 @@ export const Account = () => {
                 <Input
                   id="firstName"
                   value={userData.firstName}
-                  onChange={(e) =>
-                    setUserData({ ...userData, firstName: e.target.value })
-                  }
+                  onChange={(e) => setUserData({ ...userData, firstName: e.target.value })}
                   disabled={!isEditing}
                 />
               </div>
@@ -164,9 +135,7 @@ export const Account = () => {
                 <Input
                   id="lastName"
                   value={userData.lastName}
-                  onChange={(e) =>
-                    setUserData({ ...userData, lastName: e.target.value })
-                  }
+                  onChange={(e) => setUserData({ ...userData, lastName: e.target.value })}
                   disabled={!isEditing}
                 />
               </div>
@@ -178,9 +147,7 @@ export const Account = () => {
                 id="email"
                 type="email"
                 value={userData.email}
-                onChange={(e) =>
-                  setUserData({ ...userData, email: e.target.value })
-                }
+                onChange={(e) => setUserData({ ...userData, email: e.target.value })}
                 disabled={!isEditing}
               />
             </div>
@@ -190,9 +157,7 @@ export const Account = () => {
               <Input
                 id="phone"
                 value={userData.phone}
-                onChange={(e) =>
-                  setUserData({ ...userData, phone: e.target.value })
-                }
+                onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
                 disabled={!isEditing}
               />
             </div>
@@ -202,9 +167,7 @@ export const Account = () => {
               <Input
                 id="location"
                 value={userData.location}
-                onChange={(e) =>
-                  setUserData({ ...userData, location: e.target.value })
-                }
+                onChange={(e) => setUserData({ ...userData, location: e.target.value })}
                 disabled={!isEditing}
               />
             </div>
@@ -227,9 +190,7 @@ export const Account = () => {
                   <Label>Status</Label>
                   <div className="flex items-center gap-2">
                     <Badge
-                      variant={
-                        userData.status === "Active" ? "default" : "secondary"
-                      }
+                      variant={userData.status === "Active" ? "default" : "secondary"}
                       className="bg-green-500 text-white dark:bg-green-600"
                     >
                       {userData.status}
@@ -246,46 +207,29 @@ export const Account = () => {
       <Card>
         <CardHeader>
           <CardTitle>Additional Settings</CardTitle>
-          <CardDescription>
-            Manage your account preferences and security settings
-          </CardDescription>
+          <CardDescription>Manage your account preferences and security settings</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Button
-              variant="outline"
-              className="h-auto p-4 flex flex-col items-start gap-2"
-            >
+            <Button variant="outline" className="h-auto p-4 flex flex-col items-start gap-2">
               <Shield className="h-5 w-5" />
               <div className="text-left">
                 <div className="font-semibold">Security</div>
-                <div className="text-sm text-muted-foreground">
-                  Password & 2FA
-                </div>
+                <div className="text-sm text-muted-foreground">Password & 2FA</div>
               </div>
             </Button>
-            <Button
-              variant="outline"
-              className="h-auto p-4 flex flex-col items-start gap-2"
-            >
+            <Button variant="outline" className="h-auto p-4 flex flex-col items-start gap-2">
               <Mail className="h-5 w-5" />
               <div className="text-left">
                 <div className="font-semibold">Notifications</div>
-                <div className="text-sm text-muted-foreground">
-                  Email & alerts
-                </div>
+                <div className="text-sm text-muted-foreground">Email & alerts</div>
               </div>
             </Button>
-            <Button
-              variant="outline"
-              className="h-auto p-4 flex flex-col items-start gap-2"
-            >
+            <Button variant="outline" className="h-auto p-4 flex flex-col items-start gap-2">
               <User className="h-5 w-5" />
               <div className="text-left">
                 <div className="font-semibold">Privacy</div>
-                <div className="text-sm text-muted-foreground">
-                  Data & privacy
-                </div>
+                <div className="text-sm text-muted-foreground">Data & privacy</div>
               </div>
             </Button>
           </div>

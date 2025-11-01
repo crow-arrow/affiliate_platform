@@ -27,10 +27,7 @@ import { toast } from "sonner";
 
 import { useSignIn } from "@clerk/clerk-react";
 
-export function SignupForm({
-  className,
-  ...props
-}: React.ComponentProps<"form">) {
+export function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
   const {
     register,
     handleSubmit,
@@ -197,27 +194,19 @@ export function SignupForm({
                     placeholder={field.placeholder}
                     autoComplete={field.autoComplete}
                     {...register(field.id as keyof SignupFormData)}
-                    className={getInputErrorClass(
-                      field.id as keyof SignupFormData,
-                      errors
-                    )}
+                    className={getInputErrorClass(field.id as keyof SignupFormData, errors)}
                     disabled={loading}
                   />
                 </Field>
                 <Field className="grid gap-2">
-                  <FieldLabel htmlFor={lastNameField.id}>
-                    {lastNameField.label}
-                  </FieldLabel>
+                  <FieldLabel htmlFor={lastNameField.id}>{lastNameField.label}</FieldLabel>
                   <Input
                     id={lastNameField.id}
                     type={lastNameField.type}
                     placeholder={lastNameField.placeholder}
                     autoComplete={lastNameField.autoComplete}
                     {...register(lastNameField.id as keyof SignupFormData)}
-                    className={getInputErrorClass(
-                      lastNameField.id as keyof SignupFormData,
-                      errors
-                    )}
+                    className={getInputErrorClass(lastNameField.id as keyof SignupFormData, errors)}
                     disabled={loading}
                   />
                 </Field>
@@ -240,10 +229,7 @@ export function SignupForm({
                 placeholder={field.placeholder}
                 autoComplete={field.autoComplete}
                 {...register(field.id as keyof SignupFormData)}
-                className={getInputErrorClass(
-                  field.id as keyof SignupFormData,
-                  errors
-                )}
+                className={getInputErrorClass(field.id as keyof SignupFormData, errors)}
                 disabled={loading}
               />
             </Field>

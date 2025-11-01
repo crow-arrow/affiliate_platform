@@ -18,6 +18,7 @@ export interface User {
   avatarUrl?: string;
   role: "PARTNER" | "ADMIN";
   emailVerified: boolean;
+  tenantId?: string | null;
   booked_trips_count?: number;
   current_year_travellers?: number;
   total_commission?: number;
@@ -31,6 +32,10 @@ export interface AuthResponse {
   message?: string;
   errors?: Array<{ message: string }>;
   tenant?: { id: string; name: string; slug: string };
+  currentTenant?: { id: string; name: string; domain: string } | null;
+  tenants?: Array<{ id: string; name: string; domain: string }>;
+  availableTenants?: Array<{ id: string; name: string; domain: string }>;
+  redirectTo?: string;
 }
 
 interface AuthState {
@@ -61,17 +66,13 @@ interface RegisterParams {
   password: string;
 }
 
-
 export const registerUser = createAsyncThunk<
   AuthResponse,
   RegisterParams,
   { rejectValue: Array<{ message: string }> }
 >(
   "auth/registerUser",
-  async (
-    { email, phone, first_name, last_name, password },
-    { rejectWithValue }
-  ) => {
+  async ({ email, phone, first_name, last_name, password }, { rejectWithValue }) => {
     try {
       const { data } = await axios.post<AuthResponse>("/auth/sign-up", {
         email,
@@ -81,9 +82,7 @@ export const registerUser = createAsyncThunk<
         password,
       });
       if (data.message) return data;
-      return rejectWithValue([
-        { message: data.message ?? "Registration failed" },
-      ]);
+      return rejectWithValue([{ message: data.message ?? "Registration failed" }]);
     } catch (error: any) {
       console.log(error);
       return rejectWithValue(
@@ -118,14 +117,10 @@ export const loginUser = createAsyncThunk<
       window.localStorage.setItem("refreshToken", data.refreshToken ?? "");
       return data;
     }
-    return rejectWithValue([
-      { message: data.message || "Missing token in response" },
-    ]);
+    return rejectWithValue([{ message: data.message || "Missing token in response" }]);
   } catch (error: any) {
     return rejectWithValue(
-      error.response?.data?.errors || [
-        { message: error.response?.data?.message || "Login failed" },
-      ]
+      error.response?.data?.errors || [{ message: error.response?.data?.message || "Login failed" }]
     );
   }
 });
@@ -155,33 +150,30 @@ export const loginWithOAuth = createAsyncThunk<
         message: data.message,
       };
     }
-    return rejectWithValue([
-      { message: data.message || "No token in response" },
-    ]);
+    return rejectWithValue([{ message: data.message || "No token in response" }]);
   } catch (error: any) {
     return rejectWithValue(error.response?.data || { message: "OAuth failed" });
   }
 });
 
-export const getMe = createAsyncThunk<
-  AuthResponse,
-  void,
-  { rejectValue: string }
->("auth/getMe", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.get<AuthResponse>("/auth/me");
-    if (data.refreshToken) {
-      localStorage.setItem("refreshToken", data.refreshToken);
+export const getMe = createAsyncThunk<AuthResponse, void, { rejectValue: string }>(
+  "auth/getMe",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get<AuthResponse>("/auth/me");
+      if (data.refreshToken) {
+        localStorage.setItem("refreshToken", data.refreshToken);
+      }
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.response?.data ||
+          "The service is temporarily unavailable. Please try again later"
+      );
     }
-    return data;
-  } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message ||
-        error.response?.data ||
-        "The service is temporarily unavailable. Please try again later"
-    );
   }
-});
+);
 
 export const refreshAccessToken = createAsyncThunk<
   { token: string; refreshToken: string },
@@ -210,9 +202,7 @@ export const refreshAccessToken = createAsyncThunk<
     window.localStorage.removeItem("token");
     window.localStorage.removeItem("refreshToken");
 
-    return rejectWithValue(
-      error.response?.data?.message || "Failed to refresh token"
-    );
+    return rejectWithValue(error.response?.data?.message || "Failed to refresh token");
   }
 });
 
@@ -296,8 +286,7 @@ const authSlice = createSlice({
   },
 });
 
-export const checkIsAuth = (state: { auth: AuthState }) =>
-  Boolean(state.auth.token);
+export const checkIsAuth = (state: { auth: AuthState }) => Boolean(state.auth.token);
 
 export const checkRole = (state: { auth: AuthState }) => {
   const role = state.auth.user?.role || null;

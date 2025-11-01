@@ -60,46 +60,88 @@ export const signUp = async (req, res) => {
       });
     }
 
-    const { email, phone, first_name, last_name, password, tenantSlug } = req.body;
+    const { email, phone, first_name, last_name, password, tenantSlug } =
+      req.body;
     const normalizedEmail = email.trim().toLowerCase();
 
-    const isUsed = await prisma.user.findUnique({ where: { email: normalizedEmail } });
-    if (isUsed) {
+    // Проверяем, существует ли Identity с таким email
+    const existingIdentity = await prisma.identity.findUnique({
+      where: { email: normalizedEmail },
+    });
+    if (existingIdentity) {
       return res.status(409).json({ message: "Email already exists" });
     }
 
-    const affiliateId = `${first_name.toLowerCase()}_${Math.floor(
-      Math.random() * 90000 + 10000
-    )}`;
     const hash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
     // Определяем tenant: prefer request resolve; fallback к tenantSlug
     let tenantId = await resolveTenantIdFromRequest(req);
     if (!tenantId && tenantSlug) {
-      const tenant = await prisma.tenant.findFirst({ where: { domain: tenantSlug } }).catch(() => null);
-      if (!tenant) return res.status(400).json({ message: "Tenant not found for provided slug" });
+      const tenant = await prisma.tenant
+        .findFirst({ where: { domain: tenantSlug } })
+        .catch(() => null);
+      if (!tenant)
+        return res
+          .status(400)
+          .json({ message: "Tenant not found for provided slug" });
       tenantId = tenant.id;
     }
 
-    const newUser = await prisma.user.create({
+    if (!tenantId) {
+      return res
+        .status(400)
+        .json({ message: "Tenant ID is required for registration" });
+    }
+
+    // Создаем Identity
+    const newIdentity = await prisma.identity.create({
       data: {
         email: normalizedEmail,
-        phone,
-        first_name,
-        last_name,
-        password: hash,
-        affiliate_id: affiliateId,
-        role: "PARTNER",
-        emailVerified: false,
-        tenantId,
+        firstName: first_name,
+        lastName: last_name,
+        passwordHash: hash,
+        phone: phone || null,
       },
     });
 
-    const { accessToken, refreshToken } = generateTokens(newUser);
-    await sendVerificationEmail(newUser.email, newUser.first_name, accessToken);
+    // Создаем Membership
+    const membership = await prisma.membership.create({
+      data: {
+        identityId: newIdentity.id,
+        tenantId: tenantId,
+        role: "PARTNER",
+      },
+    });
+
+    // Создаем PartnerProfile с affiliateId
+    const affiliateId = `${first_name.toLowerCase()}_${Math.floor(
+      Math.random() * 90000 + 10000
+    )}`;
+
+    await prisma.partnerProfile.create({
+      data: {
+        membershipId: membership.id,
+        affiliateId: affiliateId,
+        phone: phone || null,
+        level: "BRONZE",
+      },
+    });
+
+    const tokenPayload = {
+      id: newIdentity.id,
+      role: "PARTNER",
+      tenantId: tenantId,
+    };
+    const { accessToken, refreshToken } = generateTokens(tokenPayload);
+
+    await sendVerificationEmail(
+      newIdentity.email,
+      newIdentity.firstName || first_name,
+      accessToken
+    );
 
     res.status(201).json({
-      user: { id: newUser.id, email: newUser.email },
+      user: { id: newIdentity.id, email: newIdentity.email },
       token: accessToken,
       refreshToken,
       message: "Account created successfully. Please check your email.",
@@ -130,47 +172,89 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Auto-resolve tenantId (required for multi-tenant isolation)
-    const tenantId = await resolveTenantIdFromRequest(req);
-    if (!tenantId) {
-      return res.status(400).json({ message: "Tenant is not resolved. Provide ?tenant=slug (dev) or use workspace subdomain." });
+    // Проверяем identity и пароль СНАЧАЛА (до проверки tenant)
+    const identity = await prisma.identity.findUnique({
+      where: { email: normalizedEmail },
+    });
+    if (!identity)
+      return res.status(404).json({ message: "User does not exist" });
+
+    // Проверяем пароль через Identity.passwordHash
+    if (!identity.passwordHash) {
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    console.log('LOGIN:', { normalizedEmail, tenantId });
-    // Проверяем, что у identity есть членство в данном tenant
-    const identity = await prisma.identity.findUnique({ where: { email: normalizedEmail } });
-    if (!identity) return res.status(404).json({ message: "User does not exist" });
-    const membership = await prisma.membership.findUnique({ where: { identityId_tenantId: { identityId: identity.id, tenantId } } });
-    if (!membership) return res.status(403).json({ message: "No access to this workspace" });
+    const passwordValid = await bcrypt.compare(password, identity.passwordHash);
+    if (!passwordValid) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
 
-    // Проверяем пароль: сперва Identity.passwordHash, затем legacy User (совместимость)
-    if (identity.passwordHash) {
-      const ok = await bcrypt.compare(password, identity.passwordHash);
-      if (!ok) return res.status(401).json({ message: "Invalid email or password" });
-    } else {
-      const legacyUser = await prisma.user.findFirst({ where: { email: normalizedEmail, tenantId } });
-      if (legacyUser?.password) {
-        const isPasswordCorrect = await bcrypt.compare(password, legacyUser.password);
-        if (!isPasswordCorrect) return res.status(401).json({ message: "Invalid email or password" });
+    // Попытка резолвить tenantId (опционально)
+    let tenantId = await resolveTenantIdFromRequest(req);
+    let membership = null;
+    let currentTenant = null;
+
+    if (tenantId) {
+      // Если tenant указан - проверяем membership
+      membership = await prisma.membership.findUnique({
+        where: { identityId_tenantId: { identityId: identity.id, tenantId } },
+        include: { tenant: { select: { id: true, name: true, domain: true } } },
+      });
+      if (membership) {
+        currentTenant = membership.tenant;
+      } else {
+        // Если membership не найден - сбрасываем tenantId
+        tenantId = null;
       }
     }
 
-    const tokenPayload = { id: identity.id, role: membership.role, tenantId };
+    // Получаем все доступные tenants для пользователя
+    const allMemberships = await prisma.membership.findMany({
+      where: { identityId: identity.id },
+      include: { tenant: { select: { id: true, name: true, domain: true } } },
+      orderBy: { createdAt: "asc" },
+    });
+    const availableTenants = allMemberships
+      .map((m) => m.tenant)
+      .filter(Boolean);
+
+    // Если tenantId не указан, но есть доступные tenants - используем первый (для обратной совместимости)
+    if (!tenantId && availableTenants.length > 0) {
+      tenantId = availableTenants[0].id;
+      currentTenant = availableTenants[0];
+      membership = allMemberships.find((m) => m.tenantId === tenantId) || null;
+    }
+
+    // Генерируем токен (tenantId может быть null)
+    const tokenPayload = {
+      id: identity.id,
+      role: membership?.role || "PARTNER",
+      tenantId: tenantId || null,
+    };
     const { accessToken, refreshToken } = generateTokens(tokenPayload);
+
     const safeUser = {
       id: identity.id,
       email: normalizedEmail,
       first_name: identity.firstName || "",
       last_name: identity.lastName || "",
-      role: membership.role,
+      role: membership?.role || "PARTNER",
       emailVerified: true,
-      tenantId,
+      tenantId: tenantId || null,
     };
+
+    console.log("LOGIN:", {
+      normalizedEmail,
+      tenantId,
+      hasTenants: availableTenants.length > 0,
+    });
 
     res.status(200).json({
       token: accessToken,
       refreshToken,
       user: safeUser,
+      currentTenant: currentTenant, // Текущий tenant (если есть)
+      availableTenants: availableTenants, // Все доступные tenants
       message: "You are signed in",
     });
   } catch (error) {
@@ -198,52 +282,98 @@ export const oauthLogin = async (req, res) => {
 
     if (!email) return res.status(400).json({ message: "No email from Clerk" });
 
-    const tenantId = await resolveTenantIdFromRequest(req);
-    if (!tenantId) {
-      return res.status(400).json({ message: "Tenant is not resolved. Provide ?tenant=slug (dev) or use workspace subdomain." });
-    }
-
-    console.log('OAUTH LOGIN:', { email, tenantId });
+    // Попытка резолвить tenantId (опционально)
+    let tenantId = await resolveTenantIdFromRequest(req);
 
     const firstName = clerkUser.firstName || "NoName";
     const lastName = clerkUser.lastName || "NoName";
     const imageUrl = clerkUser.imageUrl || null;
 
     // Upsert Identity по clerkId/email
-    let identity = await prisma.identity.findUnique({ where: { clerkId: userId } });
+    let identity = await prisma.identity.findUnique({
+      where: { clerkId: userId },
+    });
     if (!identity) {
       const byEmail = await prisma.identity.findUnique({ where: { email } });
       if (byEmail) {
-        identity = await prisma.identity.update({ where: { id: byEmail.id }, data: { clerkId: userId, firstName, lastName, avatarUrl: imageUrl } });
+        identity = await prisma.identity.update({
+          where: { id: byEmail.id },
+          data: { clerkId: userId, firstName, lastName, avatarUrl: imageUrl },
+        });
       } else {
-        identity = await prisma.identity.create({ data: { clerkId: userId, email, firstName, lastName, avatarUrl: imageUrl } });
+        identity = await prisma.identity.create({
+          data: {
+            clerkId: userId,
+            email,
+            firstName,
+            lastName,
+            avatarUrl: imageUrl,
+          },
+        });
       }
     }
 
-    // Ensure membership in current tenant
-    const membership = await prisma.membership.upsert({
-      where: { identityId_tenantId: { identityId: identity.id, tenantId } },
-      update: {},
-      create: { identityId: identity.id, tenantId, role: "PARTNER" },
-    });
+    let membership = null;
+    let currentTenant = null;
 
-    const tokenPayload = { id: identity.id, role: membership.role, tenantId };
+    if (tenantId) {
+      // Если tenant указан - проверяем/создаем membership
+      membership = await prisma.membership.upsert({
+        where: { identityId_tenantId: { identityId: identity.id, tenantId } },
+        update: {},
+        create: { identityId: identity.id, tenantId, role: "PARTNER" },
+        include: { tenant: { select: { id: true, name: true, domain: true } } },
+      });
+      currentTenant = membership.tenant;
+    }
+
+    // Получаем все доступные tenants для пользователя
+    const allMemberships = await prisma.membership.findMany({
+      where: { identityId: identity.id },
+      include: { tenant: { select: { id: true, name: true, domain: true } } },
+      orderBy: { createdAt: "asc" },
+    });
+    const availableTenants = allMemberships
+      .map((m) => m.tenant)
+      .filter(Boolean);
+
+    // Если tenantId не указан, но есть доступные tenants - используем первый
+    if (!tenantId && availableTenants.length > 0) {
+      tenantId = availableTenants[0].id;
+      currentTenant = availableTenants[0];
+      membership = allMemberships.find((m) => m.tenantId === tenantId) || null;
+    }
+
+    const tokenPayload = {
+      id: identity.id,
+      role: membership?.role || "PARTNER",
+      tenantId: tenantId || null,
+    };
     const { accessToken, refreshToken } = generateTokens(tokenPayload);
+
     const safeUser = {
       id: identity.id,
       email,
       first_name: firstName,
       last_name: lastName,
       avatarUrl: imageUrl,
-      role: membership.role,
+      role: membership?.role || "PARTNER",
       emailVerified: true,
-      tenantId,
+      tenantId: tenantId || null,
     };
+
+    console.log("OAUTH LOGIN:", {
+      email,
+      tenantId,
+      hasTenants: availableTenants.length > 0,
+    });
 
     res.status(200).json({
       token: accessToken,
       refreshToken,
       user: safeUser,
+      currentTenant: currentTenant,
+      availableTenants: availableTenants,
       message: "Welcome via SSO",
     });
   } catch (error) {
@@ -259,9 +389,13 @@ export const getMe = async (req, res) => {
   try {
     const tenantId = req.user.tenantId;
     // Сначала пробуем как Identity (вариант A токен)
-    const identity = await prisma.identity.findUnique({ where: { id: req.user.id } });
+    const identity = await prisma.identity.findUnique({
+      where: { id: req.user.id },
+    });
     if (identity) {
-      const membership = await prisma.membership.findUnique({ where: { identityId_tenantId: { identityId: identity.id, tenantId } } });
+      const membership = await prisma.membership.findUnique({
+        where: { identityId_tenantId: { identityId: identity.id, tenantId } },
+      });
       const safeUser = {
         id: identity.id,
         email: identity.email,
@@ -274,11 +408,8 @@ export const getMe = async (req, res) => {
       return res.status(200).json({ user: safeUser });
     }
 
-    // Фоллбэк: старые токены по User.id
-    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
-    if (!user) return res.status(404).json({ message: "User does not exist" });
-    const { password: _, ...safeUserLegacy } = user;
-    res.status(200).json({ user: safeUserLegacy });
+    // Identity не найден
+    return res.status(404).json({ message: "User does not exist" });
   } catch (error) {
     console.error("getMe error:", error);
     res.status(403).json({ message: "Access denied" });
@@ -298,10 +429,32 @@ export const refreshToken = async (req, res) => {
       process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
     );
 
-    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    // Используем Identity вместо User
+    const identity = await prisma.identity.findUnique({
+      where: { id: decoded.id },
+    });
+    if (!identity) return res.status(404).json({ message: "User not found" });
 
-    const tokens = generateTokens(user);
+    // Получаем tenantId из decoded или первого доступного membership
+    let tenantId = decoded.tenantId || null;
+    let role = decoded.role || "PARTNER";
+
+    if (!tenantId) {
+      const firstMembership = await prisma.membership.findFirst({
+        where: { identityId: identity.id },
+      });
+      if (firstMembership) {
+        tenantId = firstMembership.tenantId;
+        role = firstMembership.role;
+      }
+    }
+
+    const tokenPayload = {
+      id: identity.id,
+      role: role,
+      tenantId: tenantId,
+    };
+    const tokens = generateTokens(tokenPayload);
 
     res.status(200).json({
       token: tokens.accessToken,
@@ -333,20 +486,20 @@ export const getUserTenants = async (req, res) => {
     const memberships = await prisma.membership.findMany({
       where: { identityId: identity.id },
       include: { tenant: { select: { id: true, name: true, domain: true } } },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { createdAt: "asc" },
     });
 
     const tenants = memberships
-      .map(m => m.tenant)
+      .map((m) => m.tenant)
       .filter(Boolean)
-      .filter((t, i, a) => t && a.findIndex(tt => tt.id === t.id) === i);
+      .filter((t, i, a) => t && a.findIndex((tt) => tt.id === t.id) === i);
 
     res.json(tenants);
   } catch (e) {
-    console.error('getUserTenants:', e);
-    res.status(500).json({ message: 'Failed to get companies' });
+    console.error("getUserTenants:", e);
+    res.status(500).json({ message: "Failed to get companies" });
   }
-}
+};
 
 // Возвращает компании текущего пользователя по JWT (Identity + Membership)
 export const getMyTenants = async (req, res) => {
@@ -357,17 +510,17 @@ export const getMyTenants = async (req, res) => {
     const memberships = await prisma.membership.findMany({
       where: { identityId },
       include: { tenant: { select: { id: true, name: true, domain: true } } },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { createdAt: "asc" },
     });
 
     const tenants = memberships
-      .map(m => m.tenant)
+      .map((m) => m.tenant)
       .filter(Boolean)
-      .filter((t, i, a) => t && a.findIndex(tt => tt.id === t.id) === i);
+      .filter((t, i, a) => t && a.findIndex((tt) => tt.id === t.id) === i);
 
     res.json(tenants);
   } catch (e) {
-    console.error('getMyTenants:', e);
-    res.status(500).json({ message: 'Failed to get companies' });
+    console.error("getMyTenants:", e);
+    res.status(500).json({ message: "Failed to get companies" });
   }
-}
+};

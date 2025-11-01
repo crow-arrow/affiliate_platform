@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -8,14 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Save } from "lucide-react";
 import { toast } from "sonner";
-import { 
-  fetchLevelSettings, 
-  updateLevelSettings, 
-  addLevel, 
-  removeLevel, 
+import {
+  fetchLevelSettings,
+  updateLevelSettings,
+  addLevel,
+  removeLevel,
   updateAppSettings,
   clearError,
-  updateLevel as updateLevelAction
+  updateLevel as updateLevelAction,
 } from "@/redux/features/admin/adminSettingsSlice";
 
 export const LevelSettingsAdmin = () => {
@@ -39,10 +39,10 @@ export const LevelSettingsAdmin = () => {
 
   const addNewLevel = () => {
     const newLevel = {
-      levelName: '',
+      levelName: "",
       levelOrder: levelSettings.length + 1,
       requiredAmount: 0,
-      isActive: true
+      isActive: true,
     };
     dispatch(addLevel(newLevel));
   };
@@ -59,7 +59,7 @@ export const LevelSettingsAdmin = () => {
   const saveSettings = async () => {
     try {
       await dispatch(updateLevelSettings({ levelSettings, appSettings })).unwrap();
-      toast.success('Settings saved successfully!');
+      toast.success("Settings saved successfully!");
     } catch (error) {
       // Ошибка уже обработана в slice
     }
@@ -70,9 +70,7 @@ export const LevelSettingsAdmin = () => {
       <Card>
         <CardHeader>
           <CardTitle>Level Settings</CardTitle>
-          <CardDescription>
-            Manage user levels and their requirements
-          </CardDescription>
+          <CardDescription>Manage user levels and their requirements</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* App Settings */}
@@ -83,9 +81,13 @@ export const LevelSettingsAdmin = () => {
               <Input
                 id="levelAmountDescription"
                 value={appSettings.levelAmountDescription}
-                onChange={(e) => dispatch(updateAppSettings({
-                  levelAmountDescription: e.target.value
-                }))}
+                onChange={(e) =>
+                  dispatch(
+                    updateAppSettings({
+                      levelAmountDescription: e.target.value,
+                    })
+                  )
+                }
                 placeholder="e.g., Travellers This Year, Orders Last Month"
               />
             </div>
@@ -110,33 +112,37 @@ export const LevelSettingsAdmin = () => {
                       <Input
                         id={`levelName-${index}`}
                         value={level.levelName}
-                        onChange={(e) => updateLevel(index, 'levelName', e.target.value)}
+                        onChange={(e) => updateLevel(index, "levelName", e.target.value)}
                         placeholder="e.g., Base, Advance, Premium"
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor={`requiredAmount-${index}`}>Required Amount</Label>
                       <Input
                         id={`requiredAmount-${index}`}
                         type="number"
                         value={level.requiredAmount}
-                        onChange={(e) => updateLevel(index, 'requiredAmount', parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                          updateLevel(index, "requiredAmount", parseInt(e.target.value) || 0)
+                        }
                         placeholder="0"
                       />
                     </div>
-                    
+
                     <div className="space-y-2">
                       <Label htmlFor={`levelOrder-${index}`}>Order</Label>
                       <Input
                         id={`levelOrder-${index}`}
                         type="number"
                         value={level.levelOrder}
-                        onChange={(e) => updateLevel(index, 'levelOrder', parseInt(e.target.value) || 1)}
+                        onChange={(e) =>
+                          updateLevel(index, "levelOrder", parseInt(e.target.value) || 1)
+                        }
                         placeholder="1"
                       />
                     </div>
-                    
+
                     <div className="flex items-center space-x-2">
                       <Button
                         variant="destructive"
@@ -156,7 +162,7 @@ export const LevelSettingsAdmin = () => {
           <div className="flex justify-end">
             <Button onClick={saveSettings} disabled={loading}>
               <Save className="w-4 h-4 mr-2" />
-              {loading ? 'Saving...' : 'Save Settings'}
+              {loading ? "Saving..." : "Save Settings"}
             </Button>
           </div>
         </CardContent>

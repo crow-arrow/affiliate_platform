@@ -57,10 +57,7 @@ export const Settings = () => {
       setPassword("");
       setConfirmPassword("");
     } catch (error) {
-      console.error(
-        "Error during registration:",
-        error.response?.data || error.message
-      );
+      console.error("Error during registration:", error.response?.data || error.message);
       toast.error("Registration failed. Please try again.");
     }
   };
@@ -104,7 +101,7 @@ export const Settings = () => {
                   Account Settings
                 </Button>
               </Link>
-              <Link to="/admin/settings/level-settings">
+              <Link to="../admin/settings/level-settings">
                 <Button variant="outline" size="sm">
                   Level Settings
                 </Button>
@@ -167,10 +164,10 @@ export const Settings = () => {
                           userLevel === "Bronze"
                             ? "bg-gradient-bronze border-[1px] border-solid border-bronze-border text-bronze-text [text-shadow:0_2px_1px_rgba(205,_127,_50,_1)]"
                             : userLevel === "Silver"
-                            ? "bg-gradient-silver border-[1px] border-solid border-silver-border text-gray-700 [text-shadow:0_2px_1px_rgba(187,_187,_187,_1)]"
-                            : userLevel === "Gold"
-                            ? "bg-gradient-gold border-[1px] border-solid border-gold-border text-gold-text [text-shadow:0_2px_1px_rgba(180,_126,_17,_1)]"
-                            : "bg-none"
+                              ? "bg-gradient-silver border-[1px] border-solid border-silver-border text-gray-700 [text-shadow:0_2px_1px_rgba(187,_187,_187,_1)]"
+                              : userLevel === "Gold"
+                                ? "bg-gradient-gold border-[1px] border-solid border-gold-border text-gold-text [text-shadow:0_2px_1px_rgba(180,_126,_17,_1)]"
+                                : "bg-none"
                         }`}
             >
               <b>{userLevel}</b>
@@ -282,10 +279,7 @@ export const Settings = () => {
 
           <div>
             <div className="flex items-center justify-between">
-              <label
-                htmlFor="confirm-password"
-                className="block text-sm/6 font-medium"
-              >
+              <label htmlFor="confirm-password" className="block text-sm/6 font-medium">
                 Confirm Password
               </label>
             </div>
@@ -309,7 +303,7 @@ export const Settings = () => {
               // disabled={loading}
               disabled
               className="
-                  w-full md:w-1/4 rounded-lg bg-primaryLite dark:bg-primary text-gray-800 dark:text-gray-300 
+                  w-full md:w-1/4 rounded-lg bg-primaryLite dark:bg-primary text-gray-800 dark:text-gray-300
                   mt-6 px-4 py-1.5 text-lg font-semibold text-center hover:text-black dark:hover:text-white
                   hover:scale-105 active:scale-100 active:shadow-inset-2 transition-all duration-300
                   disabled:scale-100 disabled:shadow-inset-2 disabled:text-gray-300 disabled:animate-pulse disabled:cursor-progress"
@@ -343,9 +337,7 @@ export const Settings = () => {
           </div>
         </form>
       </div>
-      {isModalOpen && (
-        <CropAvatar isOpen={isModalOpen} onClose={handleCloseModal} />
-      )}
+      {isModalOpen && <CropAvatar isOpen={isModalOpen} onClose={handleCloseModal} />}
     </div>
   );
 };

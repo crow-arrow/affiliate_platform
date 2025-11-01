@@ -12,7 +12,7 @@ router.get("/:slug", async (req, res) => {
 
   const referralLink = await prisma.referralLink.findUnique({
     where: { slug },
-    include: { user: true },
+    include: { profile: true },
   });
 
   console.log(referralLink);
@@ -21,20 +21,20 @@ router.get("/:slug", async (req, res) => {
     return res.status(404).send("Referral link not found");
   }
 
-  if (!referralLink?.user?.affiliate_id) {
+  if (!referralLink?.profile?.affiliateId) {
     return res.status(400).json({ error: "Missing affiliate ID" });
   }
 
   // Сохраняем клик (если надо)
   await prisma.clicksData.create({
     data: {
-      affiliate_id: referralLink.user.affiliate_id,
+      affiliateId: referralLink.profile.affiliateId,
       referer,
-      ip_address: ip,
-      user_agent: userAgent,
-      referral_user_id: referralLink.user.id,
+      ipAddress: ip,
+      userAgent: userAgent,
+      referralProfileId: referralLink.profile.id,
       type: "CLICK",
-      device_type: "UNKNOWN", // или вычисли по user-agent
+      deviceType: "UNKNOWN", // или вычисли по user-agent
     },
   });
 

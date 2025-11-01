@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   closestCenter,
   DndContext,
@@ -11,15 +11,15 @@ import {
   useSensors,
   type DragEndEvent,
   type UniqueIdentifier,
-} from "@dnd-kit/core"
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
+} from "@dnd-kit/core";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   arrayMove,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import {
   ChevronDown,
   ChevronLeft,
@@ -40,7 +40,7 @@ import {
   Clock,
   AlertCircle,
   CreditCard,
-} from "lucide-react"
+} from "lucide-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -55,21 +55,21 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import { toast } from "sonner"
-import { z } from "zod"
+} from "@tanstack/react-table";
+import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { toast } from "sonner";
+import { z } from "zod";
 
-import { useIsMobile } from "@/hooks/use-mobile"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import { Checkbox } from "@/components/ui/checkbox"
+} from "@/components/ui/chart";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Drawer,
   DrawerClose,
@@ -79,7 +79,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
+} from "@/components/ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -87,17 +87,17 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -105,13 +105,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const tripsSchema = z.object({
   id: z.string(),
@@ -123,7 +118,7 @@ export const tripsSchema = z.object({
   commission: z.number(),
   isCompleted: z.boolean(),
   isCanceled: z.boolean(),
-})
+});
 
 // Function to get status icon
 function getStatusIcon(status: string) {
@@ -131,19 +126,19 @@ function getStatusIcon(status: string) {
     case "COMPLETED":
     case "APPROVED":
     case "CONFIRMED":
-      return <CheckCircle2 className="w-3 h-3 mr-1" />
+      return <CheckCircle2 className="w-3 h-3 mr-1" />;
     case "CANCEL":
-      return <XCircle className="w-3 h-3 mr-1" />
+      return <XCircle className="w-3 h-3 mr-1" />;
     case "REJECTED":
-      return <XCircle className="w-3 h-3 mr-1" />
+      return <XCircle className="w-3 h-3 mr-1" />;
     case "PENDING":
-      return <Clock className="w-3 h-3 mr-1" />
+      return <Clock className="w-3 h-3 mr-1" />;
     case "WAIT_FOR_APPROVAL":
-      return <AlertCircle className="w-3 h-3 mr-1" />
+      return <AlertCircle className="w-3 h-3 mr-1" />;
     case "DEPOSIT_PAID":
-      return <CreditCard className="w-3 h-3 mr-1" />
+      return <CreditCard className="w-3 h-3 mr-1" />;
     default:
-      return <Loader2 className="w-3 h-3 mr-1" />
+      return <Loader2 className="w-3 h-3 mr-1" />;
   }
 }
 
@@ -151,7 +146,7 @@ function getStatusIcon(status: string) {
 function DragHandle({ id }: { id: string }) {
   const { attributes, listeners } = useSortable({
     id,
-  })
+  });
 
   return (
     <Button
@@ -164,7 +159,7 @@ function DragHandle({ id }: { id: string }) {
       <GripVertical className="text-muted-foreground size-3" />
       <span className="sr-only">Drag to reorder</span>
     </Button>
-  )
+  );
 }
 
 const columns: ColumnDef<z.infer<typeof tripsSchema>>[] = [
@@ -203,7 +198,7 @@ const columns: ColumnDef<z.infer<typeof tripsSchema>>[] = [
     accessorKey: "id",
     header: "Order ID",
     cell: ({ row }) => {
-      return <TripCellViewer item={row.original} />
+      return <TripCellViewer item={row.original} />;
     },
     enableHiding: false,
   },
@@ -221,116 +216,118 @@ const columns: ColumnDef<z.infer<typeof tripsSchema>>[] = [
     accessorKey: "booking_date",
     header: "Booking Date",
     cell: ({ row }) => {
-      const date = new Date(row.original.booking_date)
+      const date = new Date(row.original.booking_date);
       return (
         <div className="flex items-center gap-2">
           <Calendar className="size-4 text-muted-foreground" />
-          <span>{date.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })}</span>
+          <span>
+            {date.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </span>
         </div>
-      )
+      );
     },
   },
   {
     accessorKey: "travel_date",
     header: "Travel Date",
     cell: ({ row }) => {
-      const date = new Date(row.original.travel_date)
+      const date = new Date(row.original.travel_date);
       return (
         <div className="flex items-center gap-2">
           <Calendar className="size-4 text-muted-foreground" />
-          <span>{date.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          })}</span>
+          <span>
+            {date.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </span>
         </div>
-      )
+      );
     },
   },
   {
     accessorKey: "order_status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.original.order_status
-      let bgColor = "bg-gray-100"
-      let textColor = "text-gray-800"
+      const status = row.original.order_status;
+      let bgColor = "bg-gray-100";
+      let textColor = "text-gray-800";
 
       if (status === "CANCEL") {
-        bgColor = "bg-red-100"
-        textColor = "text-red-800"
+        bgColor = "bg-red-100";
+        textColor = "text-red-800";
       } else if (status === "REJECTED") {
-        bgColor = "bg-gray-100"
-        textColor = "text-gray-800"
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-800";
       } else if (status === "PENDING") {
-        bgColor = "bg-orange-100"
-        textColor = "text-orange-800"
+        bgColor = "bg-orange-100";
+        textColor = "text-orange-800";
       } else if (status === "WAIT_FOR_APPROVAL") {
-        bgColor = "bg-blue-100"
-        textColor = "text-blue-800"
+        bgColor = "bg-blue-100";
+        textColor = "text-blue-800";
       } else if (status === "COMPLETED") {
-        bgColor = "bg-green-100"
-        textColor = "text-green-800"
+        bgColor = "bg-green-100";
+        textColor = "text-green-800";
       } else if (status === "APPROVED") {
-        bgColor = "bg-green-100"
-        textColor = "text-green-800"
+        bgColor = "bg-green-100";
+        textColor = "text-green-800";
       } else if (status === "CONFIRMED") {
-        bgColor = "bg-green-100"
-        textColor = "text-green-800"
+        bgColor = "bg-green-100";
+        textColor = "text-green-800";
       } else if (status === "DEPOSIT_PAID") {
-        bgColor = "bg-blue-100"
-        textColor = "text-blue-800"
+        bgColor = "bg-blue-100";
+        textColor = "text-blue-800";
       }
 
-      const displayStatus = status
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase())
+      const displayStatus = status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
       return (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bgColor} ${textColor}`}>
+        <span
+          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bgColor} ${textColor}`}
+        >
           {getStatusIcon(status)}
           {displayStatus}
         </span>
-      )
+      );
     },
   },
   {
     accessorKey: "total_price",
     header: () => <div className="w-full text-right">Total Price</div>,
     cell: ({ row }) => {
-      const price = parseFloat(row.original.total_price.replace(/[^0-9.]/g, ""))
+      const price = parseFloat(row.original.total_price.replace(/[^0-9.]/g, ""));
       return (
         <div className="flex items-center justify-end gap-2">
           <Euro className="size-4 text-muted-foreground" />
           <span className="text-right">{price.toFixed(2)}</span>
         </div>
-      )
+      );
     },
   },
   {
     accessorKey: "commission",
     header: () => <div className="w-full text-right">Commission</div>,
     cell: ({ row }) => {
-      const { commission, isCompleted, isCanceled } = row.original
-      let textColor = "text-gray-400"
-      
+      const { commission, isCompleted, isCanceled } = row.original;
+      let textColor = "text-gray-400";
+
       if (isCompleted) {
-        textColor = "text-green-400"
+        textColor = "text-green-400";
       } else if (isCanceled) {
-        textColor = "text-red-700 line-through"
+        textColor = "text-red-700 line-through";
       }
 
       return (
         <div className="flex items-center justify-end gap-2">
           <Euro className="size-4 text-muted-foreground" />
-          <span className={`text-right ${textColor}`}>
-            {commission.toFixed(2)}
-          </span>
+          <span className={`text-right ${textColor}`}>{commission.toFixed(2)}</span>
         </div>
-      )
+      );
     },
   },
   {
@@ -357,12 +354,12 @@ const columns: ColumnDef<z.infer<typeof tripsSchema>>[] = [
       </DropdownMenu>
     ),
   },
-]
+];
 
 function DraggableRow({ row }: { row: Row<z.infer<typeof tripsSchema>> }) {
   const { transform, transition, setNodeRef, isDragging } = useSortable({
     id: row.original.id,
-  })
+  });
 
   return (
     <TableRow
@@ -381,37 +378,27 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof tripsSchema>> }) {
         </TableCell>
       ))}
     </TableRow>
-  )
+  );
 }
 
-export function TripsDataTable({
-  data: initialData,
-}: {
-  data: z.infer<typeof tripsSchema>[]
-}) {
-  const [data, setData] = React.useState(() => initialData)
-  const [rowSelection, setRowSelection] = React.useState({})
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [sorting, setSorting] = React.useState<SortingState>([])
+export function TripsDataTable({ data: initialData }: { data: z.infer<typeof tripsSchema>[] }) {
+  const [data, setData] = React.useState(() => initialData);
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
-  })
-  const sortableId = React.useId()
+  });
+  const sortableId = React.useId();
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
     useSensor(TouchSensor, {}),
     useSensor(KeyboardSensor, {})
-  )
+  );
 
-  const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map(({ id }) => id) || [],
-    [data]
-  )
+  const dataIds = React.useMemo<UniqueIdentifier[]>(() => data?.map(({ id }) => id) || [], [data]);
 
   const table = useReactTable({
     data,
@@ -436,33 +423,27 @@ export function TripsDataTable({
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  })
+  });
 
   function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
+    const { active, over } = event;
     if (active && over && active.id !== over.id) {
       setData((data) => {
-        const oldIndex = dataIds.indexOf(active.id)
-        const newIndex = dataIds.indexOf(over.id)
-        return arrayMove(data, oldIndex, newIndex)
-      })
+        const oldIndex = dataIds.indexOf(active.id);
+        const newIndex = dataIds.indexOf(over.id);
+        return arrayMove(data, oldIndex, newIndex);
+      });
     }
   }
 
   return (
-    <Tabs
-      defaultValue="trips"
-      className="w-full flex-col justify-start gap-6"
-    >
+    <Tabs defaultValue="trips" className="w-full flex-col justify-start gap-6">
       <div className="flex items-center justify-between px-4 lg:px-6">
         <Label htmlFor="view-selector" className="sr-only">
           View
         </Label>
         <Select defaultValue="trips">
-          <SelectTrigger
-            className="flex w-fit @4xl/main:hidden"
-            id="view-selector"
-          >
+          <SelectTrigger className="flex w-fit @4xl/main:hidden" id="view-selector">
             <SelectValue placeholder="Select a view" />
           </SelectTrigger>
           <SelectContent>
@@ -495,24 +476,18 @@ export function TripsDataTable({
             <DropdownMenuContent align="end" className="w-56">
               {table
                 .getAllColumns()
-                .filter(
-                  (column) =>
-                    typeof column.accessorFn !== "undefined" &&
-                    column.getCanHide()
-                )
+                .filter((column) => typeof column.accessorFn !== "undefined" && column.getCanHide())
                 .map((column) => {
                   return (
                     <DropdownMenuCheckboxItem
                       key={column.id}
                       className="capitalize"
                       checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
+                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
                     >
                       {column.id}
                     </DropdownMenuCheckboxItem>
-                  )
+                  );
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
@@ -543,32 +518,23 @@ export function TripsDataTable({
                         <TableHead key={header.id} colSpan={header.colSpan}>
                           {header.isPlaceholder
                             ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                            : flexRender(header.column.columnDef.header, header.getContext())}
                         </TableHead>
-                      )
+                      );
                     })}
                   </TableRow>
                 ))}
               </TableHeader>
               <TableBody className="**:data-[slot=table-cell]:first:w-8">
                 {table.getRowModel().rows?.length ? (
-                  <SortableContext
-                    items={dataIds}
-                    strategy={verticalListSortingStrategy}
-                  >
+                  <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
                     {table.getRowModel().rows.map((row) => (
                       <DraggableRow key={row.id} row={row} />
                     ))}
                   </SortableContext>
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
                       No trips found.
                     </TableCell>
                   </TableRow>
@@ -590,13 +556,11 @@ export function TripsDataTable({
               <Select
                 value={`${table.getState().pagination.pageSize}`}
                 onValueChange={(value) => {
-                  table.setPageSize(Number(value))
+                  table.setPageSize(Number(value));
                 }}
               >
                 <SelectTrigger className="w-20" id="rows-per-page">
-                  <SelectValue
-                    placeholder={table.getState().pagination.pageSize}
-                  />
+                  <SelectValue placeholder={table.getState().pagination.pageSize} />
                 </SelectTrigger>
                 <SelectContent side="top">
                   {[10, 20, 30, 40, 50].map((pageSize) => (
@@ -608,8 +572,7 @@ export function TripsDataTable({
               </Select>
             </div>
             <div className="flex w-fit items-center justify-center text-sm font-medium">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
+              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
             </div>
             <div className="ml-auto flex items-center gap-2 lg:ml-0">
               <Button
@@ -655,23 +618,17 @@ export function TripsDataTable({
           </div>
         </div>
       </TabsContent>
-      <TabsContent
-        value="completed"
-        className="flex flex-col px-4 lg:px-6"
-      >
+      <TabsContent value="completed" className="flex flex-col px-4 lg:px-6">
         <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
       </TabsContent>
       <TabsContent value="pending" className="flex flex-col px-4 lg:px-6">
         <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
       </TabsContent>
-      <TabsContent
-        value="cancelled"
-        className="flex flex-col px-4 lg:px-6"
-      >
+      <TabsContent value="cancelled" className="flex flex-col px-4 lg:px-6">
         <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
       </TabsContent>
     </Tabs>
-  )
+  );
 }
 
 const chartData = [
@@ -681,7 +638,7 @@ const chartData = [
   { month: "April", trips: 8, revenue: 1600 },
   { month: "May", trips: 22, revenue: 4400 },
   { month: "June", trips: 18, revenue: 3600 },
-]
+];
 
 const chartConfig = {
   trips: {
@@ -692,10 +649,10 @@ const chartConfig = {
     label: "Revenue",
     color: "var(--primary)",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 function TripCellViewer({ item }: { item: z.infer<typeof tripsSchema> }) {
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile();
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
@@ -707,9 +664,7 @@ function TripCellViewer({ item }: { item: z.infer<typeof tripsSchema> }) {
       <DrawerContent>
         <DrawerHeader className="gap-1">
           <DrawerTitle>Trip #{item.id}</DrawerTitle>
-          <DrawerDescription>
-            Trip details and commission information
-          </DrawerDescription>
+          <DrawerDescription>Trip details and commission information</DrawerDescription>
         </DrawerHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
           {!isMobile && (
@@ -732,10 +687,7 @@ function TripCellViewer({ item }: { item: z.infer<typeof tripsSchema> }) {
                     tickFormatter={(value) => value.slice(0, 3)}
                     hide
                   />
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent indicator="dot" />}
-                  />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
                   <Area
                     dataKey="trips"
                     type="natural"
@@ -757,11 +709,11 @@ function TripCellViewer({ item }: { item: z.infer<typeof tripsSchema> }) {
               <Separator />
               <div className="grid gap-2">
                 <div className="flex gap-2 leading-none font-medium">
-                  Commission earned: €{item.commission.toFixed(2)}{" "}
-                  <TrendingUp className="size-4" />
+                  Commission earned: €{item.commission.toFixed(2)} <TrendingUp className="size-4" />
                 </div>
                 <div className="text-muted-foreground">
-                  Trip status: {item.order_status.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+                  Trip status:{" "}
+                  {item.order_status.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                 </div>
               </div>
               <Separator />
@@ -796,11 +748,17 @@ function TripCellViewer({ item }: { item: z.infer<typeof tripsSchema> }) {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
                 <Label htmlFor="booking-date">Booking Date</Label>
-                <Input id="booking-date" defaultValue={new Date(item.booking_date).toLocaleDateString()} />
+                <Input
+                  id="booking-date"
+                  defaultValue={new Date(item.booking_date).toLocaleDateString()}
+                />
               </div>
               <div className="flex flex-col gap-3">
                 <Label htmlFor="travel-date">Travel Date</Label>
-                <Input id="travel-date" defaultValue={new Date(item.travel_date).toLocaleDateString()} />
+                <Input
+                  id="travel-date"
+                  defaultValue={new Date(item.travel_date).toLocaleDateString()}
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -823,5 +781,5 @@ function TripCellViewer({ item }: { item: z.infer<typeof tripsSchema> }) {
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }

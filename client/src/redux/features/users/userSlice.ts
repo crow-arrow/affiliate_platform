@@ -80,51 +80,39 @@ export const uploadAvatar = createAsyncThunk<
   { rejectValue: string }
 >("user/uploadAvatar", async (formData, { dispatch, rejectWithValue }) => {
   try {
-    const { data } = await axios.patch<UploadAvatarResponse>(
-      "/me/upload-avatar",
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
+    const { data } = await axios.patch<UploadAvatarResponse>("/me/upload-avatar", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     dispatch(fetchUsers());
     return data;
   } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message || "Error uploading avatar"
-    );
+    return rejectWithValue(error.response?.data?.message || "Error uploading avatar");
   }
 });
 
-export const fetchUsers = createAsyncThunk<
-  User[],
-  void,
-  { rejectValue: string }
->("user/fetchUsers", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.get<User[]>("/users/get-users");
-    return data;
-  } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message || "Error loading users"
-    );
+export const fetchUsers = createAsyncThunk<User[], void, { rejectValue: string }>(
+  "user/fetchUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get<User[]>("/users/get-users");
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Error loading users");
+    }
   }
-});
+);
 
-export const fetchTrips = createAsyncThunk<
-  TripsResponse,
-  void,
-  { rejectValue: string }
->("trips/fetchTrips", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.get<TripsResponse>("/me/trips");
-    return data;
-  } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message || "Error loading user trips"
-    );
+export const fetchTrips = createAsyncThunk<TripsResponse, void, { rejectValue: string }>(
+  "trips/fetchTrips",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get<TripsResponse>("/me/trips");
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Error loading user trips");
+    }
   }
-});
+);
 
 export const teamTrips = createAsyncThunk<
   TripsResponse,
@@ -135,9 +123,7 @@ export const teamTrips = createAsyncThunk<
     const { data } = await axios.get<TripsResponse>(`/users/${userId}/trips`);
     return data;
   } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message || "Error loading team trips"
-    );
+    return rejectWithValue(error.response?.data?.message || "Error loading team trips");
   }
 });
 
@@ -158,14 +144,11 @@ const userSlice = createSlice({
         state.avatarStatus = "loading";
         state.avatarError = null;
       })
-      .addCase(
-        uploadAvatar.fulfilled,
-        (state, action: PayloadAction<UploadAvatarResponse>) => {
-          state.avatarStatus = "succeeded";
-          state.currentUser.avatarUrl = action.payload.user.avatarUrl;
-          state.message = action.payload.message || null;
-        }
-      )
+      .addCase(uploadAvatar.fulfilled, (state, action: PayloadAction<UploadAvatarResponse>) => {
+        state.avatarStatus = "succeeded";
+        state.currentUser.avatarUrl = action.payload.user.avatarUrl;
+        state.message = action.payload.message || null;
+      })
       .addCase(uploadAvatar.rejected, (state, action) => {
         state.avatarStatus = "failed";
         state.avatarError = action.payload ?? "Unknown error";
@@ -190,13 +173,10 @@ const userSlice = createSlice({
         state.tripsStatus = "loading";
         state.tripsError = null;
       })
-      .addCase(
-        fetchTrips.fulfilled,
-        (state, action: PayloadAction<TripsResponse>) => {
-          state.tripsStatus = "succeeded";
-          state.trips = action.payload.trips;
-        }
-      )
+      .addCase(fetchTrips.fulfilled, (state, action: PayloadAction<TripsResponse>) => {
+        state.tripsStatus = "succeeded";
+        state.trips = action.payload.trips;
+      })
       .addCase(fetchTrips.rejected, (state, action) => {
         state.tripsStatus = "failed";
         state.tripsError = action.payload ?? "Unknown error";
@@ -207,13 +187,10 @@ const userSlice = createSlice({
         state.tripsStatus = "loading";
         state.tripsError = null;
       })
-      .addCase(
-        teamTrips.fulfilled,
-        (state, action: PayloadAction<TripsResponse>) => {
-          state.tripsStatus = "succeeded";
-          state.trips = action.payload.trips;
-        }
-      )
+      .addCase(teamTrips.fulfilled, (state, action: PayloadAction<TripsResponse>) => {
+        state.tripsStatus = "succeeded";
+        state.trips = action.payload.trips;
+      })
       .addCase(teamTrips.rejected, (state, action) => {
         state.tripsStatus = "failed";
         state.tripsError = action.payload ?? "Unknown error";

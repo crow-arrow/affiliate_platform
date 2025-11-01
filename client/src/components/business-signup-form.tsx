@@ -9,21 +9,23 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-const schema = z.object({
-  companyName: z.string().min(2, "Company name is required"),
-  first_name: z.string().min(2),
-  last_name: z.string().min(2),
-  email: z.string().email(),
-  phone: z.string().optional(),
-  password: z
-    .string()
-    .min(8)
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*+?&]).+/, "Weak password"),
-  confirmPassword: z.string(),
-}).refine((d) => d.password === d.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const schema = z
+  .object({
+    companyName: z.string().min(2, "Company name is required"),
+    first_name: z.string().min(2),
+    last_name: z.string().min(2),
+    email: z.string().email(),
+    phone: z.string().optional(),
+    password: z
+      .string()
+      .min(8)
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*+?&]).+/, "Weak password"),
+    confirmPassword: z.string(),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 type BizForm = z.infer<typeof schema>;
 
@@ -95,9 +97,7 @@ export function BusinessSignupForm() {
         <Field className="grid gap-2">
           <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input id="email" type="email" {...register("email")} disabled={loading} />
-          {errors.email && (
-            <span className="text-sm text-red-500">{errors.email.message}</span>
-          )}
+          {errors.email && <span className="text-sm text-red-500">{errors.email.message}</span>}
         </Field>
         <Field className="grid gap-2">
           <FieldLabel htmlFor="phone">Phone</FieldLabel>
@@ -112,7 +112,12 @@ export function BusinessSignupForm() {
         </Field>
         <Field className="grid gap-2">
           <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-          <Input id="confirmPassword" type="password" {...register("confirmPassword")} disabled={loading} />
+          <Input
+            id="confirmPassword"
+            type="password"
+            {...register("confirmPassword")}
+            disabled={loading}
+          />
           {errors.confirmPassword && (
             <span className="text-sm text-red-500">{errors.confirmPassword.message}</span>
           )}
@@ -125,5 +130,3 @@ export function BusinessSignupForm() {
     </form>
   );
 }
-
-

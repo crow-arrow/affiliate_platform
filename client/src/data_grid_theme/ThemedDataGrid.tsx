@@ -35,16 +35,14 @@ export const ThemedDataGrid = ({
           backgroundImage: "none !important",
           transition: "background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
         },
-        ".MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1":
-          {
-            backgroundColor: `${currentTheme.palette.secondary.alternative} !important`,
-            borderRadius: "10px", // Или 15px, как у вас было
-            boxShadow: "none !important",
-            "--Paper-overlay": "none !important",
-            backgroundImage: "none !important",
-            transition:
-              "background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-          },
+        ".MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1": {
+          backgroundColor: `${currentTheme.palette.secondary.alternative} !important`,
+          borderRadius: "10px", // Или 15px, как у вас было
+          boxShadow: "none !important",
+          "--Paper-overlay": "none !important",
+          backgroundImage: "none !important",
+          transition: "background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+        },
         // Целимся в отдельные пункты меню
         ".MuiMenuItem-root": {
           "&:hover": {
@@ -142,11 +140,9 @@ export const ThemedDataGrid = ({
           "& .MuiDataGrid-root": {
             padding: "16px",
             border: "none",
-            "--DataGrid-containerBackground":
-              currentTheme.palette.secondary.main,
+            "--DataGrid-containerBackground": currentTheme.palette.secondary.main,
             color: "#87888C !important",
-            transition:
-              "background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+            transition: "background-color 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
           },
           "& .MuiDataGrid-cell": {
             margin: "auto",
@@ -178,16 +174,14 @@ export const ThemedDataGrid = ({
             panel: {
               sx: {
                 "& .MuiPaper-root": {
-                  backgroundColor:
-                    currentTheme.palette.secondary.alternative + "!important",
+                  backgroundColor: currentTheme.palette.secondary.alternative + "!important",
                   color: currentTheme.palette.text.primary,
                   borderRadius: "15px",
                   boxShadow: "none",
                   "--Paper-overlay": "none !important",
                 },
                 "& .MuiInputBase-root::after": {
-                  transition:
-                    "transform 500ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
+                  transition: "transform 500ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
                 },
               },
             },

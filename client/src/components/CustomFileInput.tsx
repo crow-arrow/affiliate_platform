@@ -59,9 +59,7 @@ export const CustomFileInput = ({
     const file = event.target.files[0];
     if (file) {
       if (!allowedFileTypes.includes(file.type)) {
-        toast.error(
-          `Invalid format. Please choose one of: ${allowedFileTypes.join(", ")}`
-        );
+        toast.error(`Invalid format. Please choose one of: ${allowedFileTypes.join(", ")}`);
         event.target.value = "";
         return;
       }
@@ -81,9 +79,7 @@ export const CustomFileInput = ({
   const handleFile = (file) => {
     const allowedTypes = mimeTypes.split(",").map((type) => type.trim());
     if (!allowedTypes.includes(file.type)) {
-      toast.error(
-        `Invalid format. Please choose one of: ${allowedTypes.join(", ")}`
-      );
+      toast.error(`Invalid format. Please choose one of: ${allowedTypes.join(", ")}`);
       return;
     }
     const reader = new FileReader();
@@ -131,10 +127,7 @@ export const CustomFileInput = ({
               alt="Image"
               className="absolute top-0 left-0 w-full h-full object-contain opacity-10"
             />
-            <button
-              className="absolute top-4 right-4 text-xl z-30"
-              onClick={handleCloseImage}
-            >
+            <button className="absolute top-4 right-4 text-xl z-30" onClick={handleCloseImage}>
               <CloseOutlinedIcon />
             </button>
             <Cropper
@@ -147,10 +140,7 @@ export const CustomFileInput = ({
             />
           </div>
         ) : (
-          <button
-            onClick={triggerFileInput}
-            className="text-gray-400 font-bold w-full h-full"
-          >
+          <button onClick={triggerFileInput} className="text-gray-400 font-bold w-full h-full">
             <span>Choose a file</span>
           </button>
         )}
@@ -171,11 +161,7 @@ export const CustomFileInput = ({
             alt="Preview"
           />
         ) : (
-          <img
-            className="w-48 h-auto object-cover rounded-full"
-            src={profileBlank}
-            alt="Preview"
-          />
+          <img className="w-48 h-auto object-cover rounded-full" src={profileBlank} alt="Preview" />
         )}
       </div>
     </div>

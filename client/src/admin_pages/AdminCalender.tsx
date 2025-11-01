@@ -1,7 +1,5 @@
 // import React from 'react'
 
 export const AdminCalender = () => {
-    return (
-        <div>AdminCalender</div>
-    )
-}
+  return <div>AdminCalender</div>;
+};

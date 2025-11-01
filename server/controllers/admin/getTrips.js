@@ -12,11 +12,11 @@ export const getAllTrips = async (req, res) => {
     }
 
     // Конвертируем BigInt в строки для JSON сериализации
-    const serializedTrips = trips.map(trip => ({
+    const serializedTrips = trips.map((trip) => ({
       ...trip,
-      id: trip.id.toString()
+      id: trip.id.toString(),
     }));
-    
+
     res.json(serializedTrips);
   } catch (error) {
     console.error(error);
@@ -26,31 +26,50 @@ export const getAllTrips = async (req, res) => {
 
 export const getTripsByUserId = async (req, res) => {
   try {
-    const userId = parseInt(req.params.id, 10);
+    const identityId = req.params.id; // Теперь это Identity.id (строка)
+    const tenantId = req.user?.tenantId;
 
-    if (isNaN(userId)) {
+    if (!identityId) {
       return res.status(400).json({ message: "Invalid user ID" });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
+    if (!tenantId) {
+      return res.status(400).json({ message: "Tenant ID is required" });
+    }
+
+    // Получаем Membership и Profile
+    const membership = await prisma.membership.findUnique({
+      where: {
+        identityId_tenantId: {
+          identityId: identityId,
+          tenantId: tenantId,
+        },
+      },
       include: {
-        affiliateTrips: true,
+        profile: true,
       },
     });
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!membership || !membership.profile) {
+      return res.status(404).json({ message: "User profile not found" });
     }
 
-    const trips = user.affiliateTrips;
-    
+    const profile = membership.profile;
+
+    // Получаем trips по affiliateId из PartnerProfile
+    let trips = [];
+    if (profile.affiliateId) {
+      trips = await prisma.trips.findMany({
+        where: { affiliateId: profile.affiliateId },
+      });
+    }
+
     // Конвертируем BigInt в строки для JSON сериализации
-    const serializedTrips = trips.map(trip => ({
+    const serializedTrips = trips.map((trip) => ({
       ...trip,
-      id: trip.id.toString()
+      id: trip.id.toString(),
     }));
-    
+
     res.json({ trips: serializedTrips });
   } catch (error) {
     console.error(error);

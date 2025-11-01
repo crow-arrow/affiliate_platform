@@ -133,8 +133,7 @@ export const themeSettings = (mode) => {
               alternative: "#171821",
             },
             custom: {
-              gradient:
-                "linear-gradient(150deg, rgba(11,46,51,1) 0%, rgba(79,124,130,1) 100%)",
+              gradient: "linear-gradient(150deg, rgba(11,46,51,1) 0%, rgba(79,124,130,1) 100%)",
             },
             text: {
               primary: colors.grey[100],
@@ -151,8 +150,7 @@ export const themeSettings = (mode) => {
               alternative: "#EDEDF1",
             },
             custom: {
-              gradient:
-                "linear-gradient(150deg, rgba(11,46,51,1) 0%, rgba(79,124,130,1) 100%)",
+              gradient: "linear-gradient(150deg, rgba(11,46,51,1) 0%, rgba(79,124,130,1) 100%)",
             },
             text: {
               primary: colors.grey[100],

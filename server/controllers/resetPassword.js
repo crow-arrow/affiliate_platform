@@ -14,17 +14,17 @@ export const requestPasswordReset = async (req, res) => {
       return res.status(400).json({ message: "Email is required" });
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
+    const identity = await prisma.identity.findUnique({ where: { email } });
+    if (!identity) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const resetToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+    const resetToken = jwt.sign({ id: identity.id }, process.env.JWT_SECRET, {
       expiresIn: "15m",
     });
     const resetLink = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-    await sendPasswordResetEmail(email, user.first_name, resetLink);
+    await sendPasswordResetEmail(email, identity.firstName || "", resetLink);
 
     return res.json({ message: "Reset link sent to your email" });
   } catch (error) {
@@ -37,8 +37,10 @@ export const checkResetLink = async (req, res) => {
     const { token } = req.body;
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const identity = await prisma.identity.findUnique({
+      where: { id: decoded.id },
+    });
+    if (!identity) return res.status(404).json({ message: "User not found" });
 
     return res.json({ valid: true });
   } catch (error) {
@@ -73,14 +75,16 @@ export const resetPassword = async (req, res) => {
     const { token, newPassword } = req.body;
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    const identity = await prisma.identity.findUnique({
+      where: { id: decoded.id },
+    });
+    if (!identity) return res.status(404).json({ message: "User not found" });
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { password: hashedPassword },
+
+    await prisma.identity.update({
+      where: { id: identity.id },
+      data: { passwordHash: hashedPassword },
     });
 
     return res.json({ message: "Password reset successfully" });

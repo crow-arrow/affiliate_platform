@@ -25,9 +25,7 @@ export function getInputErrorClass<T extends Record<string, any>>(
   name: keyof T,
   errors: FieldErrors<T>
 ): string {
-  return errors[name]
-    ? "border-destructive focus-visible:ring-destructive"
-    : "";
+  return errors[name] ? "border-destructive focus-visible:ring-destructive" : "";
 }
 
 export function showErrorsInOrder<T extends Record<string, any>>(

@@ -94,8 +94,7 @@ const resetPasswordSlice = createSlice({
       })
       .addCase(checkResetLink.rejected, (state, action) => {
         state.linkValid = false;
-        state.linkError =
-          action.payload?.message || "An unexpected error occurred";
+        state.linkError = action.payload?.message || "An unexpected error occurred";
       })
       .addCase(resetPassword.pending, (state) => {
         state.status = "loading";

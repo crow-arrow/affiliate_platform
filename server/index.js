@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 import prisma from "./prisma/client.js";
 
 // Глобальный обработчик для BigInt сериализации
-BigInt.prototype.toJSON = function() {
+BigInt.prototype.toJSON = function () {
   return this.toString();
 };
 
@@ -32,7 +32,7 @@ app.use(
     origin: URL,
     credentials: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Tenant-Slug"],
   })
 );
 

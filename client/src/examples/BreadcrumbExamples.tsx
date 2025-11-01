@@ -1,8 +1,5 @@
 import { DynamicBreadcrumb } from "@/components/DynamicBreadcrumb";
-import {
-  useCustomBreadcrumbs,
-  useAdminBreadcrumbs,
-} from "@/hooks/use-custom-breadcrumbs";
+import { useCustomBreadcrumbs, useAdminBreadcrumbs } from "@/hooks/use-custom-breadcrumbs";
 import { BreadcrumbItem } from "@/hooks/use-breadcrumbs";
 
 // Пример 1: Стандартные breadcrumbs
@@ -32,10 +29,7 @@ export const AdminBreadcrumbExample = () => {
   return (
     <div className="p-4">
       <h3 className="text-lg font-semibold mb-2">Admin Breadcrumbs</h3>
-      <DynamicBreadcrumb
-        customBreadcrumbs={adminBreadcrumbs}
-        showHomeIcon={false}
-      />
+      <DynamicBreadcrumb customBreadcrumbs={adminBreadcrumbs} showHomeIcon={false} />
     </div>
   );
 };
@@ -53,11 +47,7 @@ export const FullyCustomBreadcrumbExample = () => {
   return (
     <div className="p-4">
       <h3 className="text-lg font-semibold mb-2">Fully Custom Breadcrumbs</h3>
-      <DynamicBreadcrumb
-        customBreadcrumbs={customBreadcrumbs}
-        showHomeIcon={true}
-        maxItems={5}
-      />
+      <DynamicBreadcrumb customBreadcrumbs={customBreadcrumbs} showHomeIcon={true} maxItems={5} />
     </div>
   );
 };
@@ -91,10 +81,7 @@ export const RoleBasedBreadcrumbExample = () => {
   return (
     <div className="p-4">
       <h3 className="text-lg font-semibold mb-2">Breadcrumbs by role</h3>
-      <DynamicBreadcrumb
-        customBreadcrumbs={getBreadcrumbsForRole(userRole)}
-        showHomeIcon={true}
-      />
+      <DynamicBreadcrumb customBreadcrumbs={getBreadcrumbsForRole(userRole)} showHomeIcon={true} />
     </div>
   );
 };

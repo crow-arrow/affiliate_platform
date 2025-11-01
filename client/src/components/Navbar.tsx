@@ -21,43 +21,31 @@ export const Navbar = ({ isOpen, setIsOpen }) => {
     {
       to: "../my-account",
       label: "Dashboard",
-      tooltip: (
-        <div className="sidebar-tooltip group-hover:scale-100">Dashboard</div>
-      ),
+      tooltip: <div className="sidebar-tooltip group-hover:scale-100">Dashboard</div>,
       icon: <RoofingRoundedIcon className="m-1" />,
     },
     {
       to: "../test/my-account",
       label: "Dashboard Copy",
-      tooltip: (
-        <div className="sidebar-tooltip group-hover:scale-100">
-          Dashboard Copy
-        </div>
-      ),
+      tooltip: <div className="sidebar-tooltip group-hover:scale-100">Dashboard Copy</div>,
       icon: <RoofingRoundedIcon className="m-1" />,
     },
     {
       to: "../trips",
       label: "Trips",
-      tooltip: (
-        <div className="sidebar-tooltip group-hover:scale-100">Trips</div>
-      ),
+      tooltip: <div className="sidebar-tooltip group-hover:scale-100">Trips</div>,
       icon: <LuggageOutlinedIcon className="m-1" />,
     },
     {
       to: "../clicks-list",
       label: "Clicks list",
-      tooltip: (
-        <div className="sidebar-tooltip group-hover:scale-100">Clicks list</div>
-      ),
+      tooltip: <div className="sidebar-tooltip group-hover:scale-100">Clicks list</div>,
       icon: <CalendarTodayOutlinedIcon className="m-1 p-0.5" />,
     },
     {
       to: "../documents",
       label: "Documents",
-      tooltip: (
-        <div className="sidebar-tooltip group-hover:scale-100">Documents</div>
-      ),
+      tooltip: <div className="sidebar-tooltip group-hover:scale-100">Documents</div>,
       icon: <InsertDriveFileOutlinedIcon className="m-1" />,
     },
   ];
@@ -74,9 +62,7 @@ export const Navbar = ({ isOpen, setIsOpen }) => {
               onClick={openNav}
             >
               <LastPageIcon
-                className={`transition-all duration-500 ${
-                  isOpen ? "rotate-180" : ""
-                }`}
+                className={`transition-all duration-500 ${isOpen ? "rotate-180" : ""}`}
               />
               <div className="open-button-tooltip pointer-events-none group-hover/button:tooltip-show">
                 {isOpen ? "Shrink sidebar" : "Expand sidebar"}

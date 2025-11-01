@@ -1,4 +1,5 @@
 import axios from "axios";
+import { extractTenantSlugFromPath } from "@/constants/routes";
 import { refreshAccessToken, logout } from "../redux/features/auth/authSlice";
 import type { StoreType } from "@/redux/store";
 
@@ -35,8 +36,8 @@ export const cancelFailedQueue = () => {
 };
 
 const isAuthRoute = (url?: string): boolean => {
-  return ["/auth/sign-in", "/auth/sign-up", "/auth/refresh-token"].some(
-    (path) => url?.includes(path)
+  return ["/auth/sign-in", "/auth/sign-up", "/auth/refresh-token"].some((path) =>
+    url?.includes(path)
   );
 };
 
@@ -47,20 +48,46 @@ instance.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // DEV helper: automatically pass ?tenant=slug from current URL to API requests
+    // Extract tenant slug from path (dev) or subdomain (production) and add to API requests
     try {
       const host = window.location.host.toLowerCase();
+      const pathname = window.location.pathname;
       const isLocal = host.startsWith("localhost") || host.startsWith("127.0.0.1");
+
+      let tenantSlug: string | null = null;
+
       if (isLocal) {
-        const search = new URLSearchParams(window.location.search);
-        const qsTenant = search.get("tenant") || search.get("slug");
-        if (qsTenant) {
-          // attach as query param unless already present
-          const urlHasTenant = typeof config.url === "string" && /[?&](tenant|slug)=/i.test(config.url);
-          const paramsHasTenant = config.params && ("tenant" in (config.params as any) || "slug" in (config.params as any));
-          if (!urlHasTenant && !paramsHasTenant) {
-            config.params = { ...(config.params as any), tenant: qsTenant };
-          }
+        // DEV: extract from path first (/:tenantSlug), then query parameter as fallback
+        // Используем централизованную функцию для извлечения tenant slug
+        tenantSlug = extractTenantSlugFromPath(pathname);
+
+        // Fallback to query parameter if not found in path
+        if (!tenantSlug) {
+          const search = new URLSearchParams(window.location.search);
+          tenantSlug = search.get("tenant") || search.get("slug");
+        }
+      } else {
+        // PRODUCTION: extract from subdomain
+        const parts = host.split(":")[0].split(".");
+        if (parts.length >= 3) {
+          tenantSlug = parts[0];
+        }
+      }
+
+      if (tenantSlug) {
+        // Add as header for backend (preferred method)
+        config.headers = config.headers || {};
+        if (!config.headers["X-Tenant-Slug"]) {
+          config.headers["X-Tenant-Slug"] = tenantSlug;
+        }
+
+        // Also add as query param for backward compatibility (unless already present)
+        const urlHasTenant =
+          typeof config.url === "string" && /[?&](tenant|slug)=/i.test(config.url);
+        const paramsHasTenant =
+          config.params && ("tenant" in (config.params as any) || "slug" in (config.params as any));
+        if (!urlHasTenant && !paramsHasTenant) {
+          config.params = { ...(config.params as any), tenant: tenantSlug };
         }
       }
     } catch (_) {

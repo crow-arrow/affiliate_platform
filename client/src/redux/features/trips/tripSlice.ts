@@ -33,20 +33,17 @@ const initialState: TripsState = {
 
 // ===== Async Thunks =====
 
-export const getAllTrips = createAsyncThunk<
-  Trip[],
-  void,
-  { rejectValue: string }
->("trips/getAllTrips", async (_, { rejectWithValue }) => {
-  try {
-    const { data } = await axios.get<Trip[]>("/trips/get-all-trips");
-    return data;
-  } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message || "Ошибка при загрузке поездок"
-    );
+export const getAllTrips = createAsyncThunk<Trip[], void, { rejectValue: string }>(
+  "trips/getAllTrips",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get<Trip[]>("/trips/get-all-trips");
+      return data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Ошибка при загрузке поездок");
+    }
   }
-});
+);
 
 // ===== WebSocket =====
 
@@ -99,13 +96,10 @@ const tripSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(
-        getAllTrips.fulfilled,
-        (state, action: PayloadAction<Trip[]>) => {
-          state.trips = action.payload;
-          state.error = null;
-        }
-      )
+      .addCase(getAllTrips.fulfilled, (state, action: PayloadAction<Trip[]>) => {
+        state.trips = action.payload;
+        state.error = null;
+      })
       .addMatcher(isPending, (state) => {
         state.isLoading = true;
         state.status = "loading";

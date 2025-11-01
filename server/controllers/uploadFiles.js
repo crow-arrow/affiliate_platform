@@ -10,22 +10,32 @@ export const uploadAvatar = async (req, res) => {
       });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: req.user.id },
-    });
+    // req.user.id это Identity.id (строка)
+    const identityId = req.user?.id;
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!identityId) {
+      return res.status(400).json({ message: "Missing identity in request" });
     }
 
-    const oldAvatar = user.avatarUrl
-      ? path.join("/var/www/uploads", path.basename(user.avatarUrl))
+    // Получаем Identity
+    const identity = await prisma.identity.findUnique({
+      where: { id: identityId },
+      select: { avatarUrl: true },
+    });
+
+    if (!identity) {
+      return res.status(404).json({ message: "Identity not found" });
+    }
+
+    const oldAvatar = identity.avatarUrl
+      ? path.join("/var/www/uploads", path.basename(identity.avatarUrl))
       : null;
 
     const newAvatarUrl = `uploads/${req.file.filename}`;
-    
-    await prisma.user.update({
-      where: { id: user.id },
+
+    // Сохраняем avatarUrl в Identity (глобально для пользователя)
+    const updatedIdentity = await prisma.identity.update({
+      where: { id: identityId },
       data: { avatarUrl: newAvatarUrl },
     });
 
@@ -39,11 +49,16 @@ export const uploadAvatar = async (req, res) => {
       fs.unlinkSync(oldAvatar);
     }
 
-    const updatedUser = await prisma.user.findUnique({
-      where: { id: user.id },
+    res.status(200).json({
+      message: "Avatar uploaded successfully!",
+      user: {
+        id: updatedIdentity.id,
+        email: updatedIdentity.email,
+        firstName: updatedIdentity.firstName,
+        lastName: updatedIdentity.lastName,
+        avatarUrl: updatedIdentity.avatarUrl,
+      },
     });
-
-    res.status(200).json({ message: "Avatar uploaded successfully!", user: updatedUser });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

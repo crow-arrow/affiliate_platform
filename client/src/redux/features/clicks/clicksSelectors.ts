@@ -6,34 +6,20 @@ import { Click } from "./clicksSlice";
 const selectClicksState = (state: RootState) => state.clicks;
 
 // 🔹 Все клики
-export const selectAllClicks = createSelector(
-  [selectClicksState],
-  (state) => state.clicks
-);
+export const selectAllClicks = createSelector([selectClicksState], (state) => state.clicks);
 
 // 🔹 Статус загрузки кликов
-export const selectClicksStatus = createSelector(
-  [selectClicksState],
-  (state) => state.status
-);
+export const selectClicksStatus = createSelector([selectClicksState], (state) => state.status);
 
 // 🔹 Ошибка загрузки
-export const selectClicksError = createSelector(
-  [selectClicksState],
-  (state) => state.error
-);
+export const selectClicksError = createSelector([selectClicksState], (state) => state.error);
 
 // 🔹 Количество кликов
-export const selectClicksCount = createSelector(
-  [selectAllClicks],
-  (clicks) => clicks.length
-);
+export const selectClicksCount = createSelector([selectAllClicks], (clicks) => clicks.length);
 
 // 🔹 Клики по определённому типу (например, "signup", "landing", ...)
 export const selectClicksByType = (type: string) =>
-  createSelector([selectAllClicks], (clicks) =>
-    clicks.filter((click) => click.type === type)
-  );
+  createSelector([selectAllClicks], (clicks) => clicks.filter((click) => click.type === type));
 
 // 🔹 Клики по устройству (например, "mobile", "desktop")
 export const selectClicksByDevice = (device: string) =>
@@ -48,13 +34,10 @@ export const selectClicksAfterDate = (date: Date) =>
   );
 
 // 🔹 Уникальные IP-адреса
-export const selectUniqueIpCount = createSelector(
-  [selectAllClicks],
-  (clicks) => {
-    const uniqueIps = new Set(clicks.map((click) => click.ip_address));
-    return uniqueIps.size;
-  }
-);
+export const selectUniqueIpCount = createSelector([selectAllClicks], (clicks) => {
+  const uniqueIps = new Set(clicks.map((click) => click.ip_address));
+  return uniqueIps.size;
+});
 
 // 🔹 Список всех user-agent'ов (например, для аналитики браузеров)
 export const selectUserAgents = createSelector([selectAllClicks], (clicks) =>

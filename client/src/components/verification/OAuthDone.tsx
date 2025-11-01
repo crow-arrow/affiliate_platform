@@ -33,10 +33,7 @@ export const OAuthDone = () => {
         toast.success(result.message || "You are signed in!");
         navigate("/");
       } catch (err: any) {
-        const msg =
-          err?.message ||
-          err?.[0]?.message ||
-          "SSO sign in failed. Please try again";
+        const msg = err?.message || err?.[0]?.message || "SSO sign in failed. Please try again";
 
         toast.error(msg);
         await signOut();

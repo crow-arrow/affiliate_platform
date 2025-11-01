@@ -12,8 +12,7 @@ export const verifyEmail = createAsyncThunk(
     } catch (error) {
       console.error("Error sending verification email:", error);
       return rejectWithValue(
-        error.response?.data?.message ||
-          "Something went wrong, please try again later"
+        error.response?.data?.message || "Something went wrong, please try again later"
       );
     }
   }
@@ -28,8 +27,7 @@ export const resendEmailVerification = createAsyncThunk(
     } catch (error) {
       console.error("Error resending verification email:", error);
       return rejectWithValue(
-        error.response?.data?.message ||
-          "Something went wrong, please try again later"
+        error.response?.data?.message || "Something went wrong, please try again later"
       );
     }
   }

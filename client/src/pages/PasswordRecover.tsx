@@ -66,11 +66,7 @@ export const PasswordRecover = () => {
     return (
       <div className="flex flex-col w-full h-screen bg-gradient-primary justify-center items-center">
         <Link to="/sign-in">
-          <img
-            alt="Jinn community"
-            src={logo}
-            className="mx-auto h-20 w-auto"
-          />
+          <img alt="Jinn community" src={logo} className="mx-auto h-20 w-auto" />
         </Link>
         <div className="flex flex-col bg-gray-100 relative w-1/3 h-1/4 p-8 mt-10 justify-between items-center rounded-xl shadow-custom">
           <div className="flex flex-col gap-4 items-center justify-between text-red-600">
@@ -99,22 +95,12 @@ export const PasswordRecover = () => {
     <div className="flex flex-col flex-1 h-screen bg-gradient-primary justify-center px-6 mx-auto lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <img alt="Jinn community" src={logo} className="mx-auto h-20 w-auto" />
-        <h2 className="mt-6 text-center text-2xl font-bold text-gray-100">
-          Password Recovery
-        </h2>
+        <h2 className="mt-6 text-center text-2xl font-bold text-gray-100">Password Recovery</h2>
       </div>
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form
-          noValidate
-          onSubmit={handleSubmit}
-          method="POST"
-          className="space-y-6"
-        >
+        <form noValidate onSubmit={handleSubmit} method="POST" className="space-y-6">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm/6 font-medium text-gray-100"
-            >
+            <label htmlFor="email" className="block text-sm/6 font-medium text-gray-100">
               New Password
             </label>
             <div className="mt-2">

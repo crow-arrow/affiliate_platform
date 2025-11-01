@@ -13,9 +13,7 @@ type ThemeProviderState = {
   setTheme: (theme: Theme) => void;
 };
 
-const ThemeProviderContext = createContext<ThemeProviderState | undefined>(
-  undefined
-);
+const ThemeProviderContext = createContext<ThemeProviderState | undefined>(undefined);
 
 export function ThemeProvider({
   children,
@@ -33,9 +31,7 @@ export function ThemeProvider({
     root.classList.remove("light", "dark");
 
     if (themeToApply === "system") {
-      const systemPrefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
+      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       root.classList.add(systemPrefersDark ? "dark" : "light");
     } else {
       root.classList.add(themeToApply);
@@ -60,8 +56,7 @@ export function ThemeProvider({
     };
 
     mediaQuery.addEventListener("change", handleSystemThemeChange);
-    return () =>
-      mediaQuery.removeEventListener("change", handleSystemThemeChange);
+    return () => mediaQuery.removeEventListener("change", handleSystemThemeChange);
   }, [theme]);
 
   return (

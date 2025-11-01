@@ -40,9 +40,7 @@ export const fetchClicks = createAsyncThunk<
     const { data } = await axios.get<ClicksResponse>("/me/clicks");
     return data;
   } catch (error: any) {
-    return rejectWithValue(
-      error.response?.data?.message || "Error loading clicks"
-    );
+    return rejectWithValue(error.response?.data?.message || "Error loading clicks");
   }
 });
 
@@ -56,14 +54,11 @@ const clicksSlice = createSlice({
         state.status = "loading";
         state.error = null;
       })
-      .addCase(
-        fetchClicks.fulfilled,
-        (state, action: PayloadAction<ClicksResponse>) => {
-          state.status = "succeeded";
-          state.clicks = action.payload.clicks;
-          state.error = null;
-        }
-      )
+      .addCase(fetchClicks.fulfilled, (state, action: PayloadAction<ClicksResponse>) => {
+        state.status = "succeeded";
+        state.clicks = action.payload.clicks;
+        state.error = null;
+      })
       .addCase(fetchClicks.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload ?? "Unknown error";

@@ -31,9 +31,7 @@ export const resolveTenant = createAsyncThunk<
     const { data } = await axios.get<TenantInfo>("/tenant/resolve-tenant", { params });
     return data;
   } catch (e: any) {
-    return rejectWithValue(
-      e?.response?.data?.message || e?.message || "Failed to resolve tenant"
-    );
+    return rejectWithValue(e?.response?.data?.message || e?.message || "Failed to resolve tenant");
   }
 });
 
@@ -61,18 +59,13 @@ export const businessSignUp = createAsyncThunk<
   { rejectValue: Array<{ message: string }> }
 >("tenant/businessSignUp", async (payload, { rejectWithValue }) => {
   try {
-    const { data } = await axios.post<AuthResponseLike>(
-      "/tenant/business-sign-up",
-      payload
-    );
+    const { data } = await axios.post<AuthResponseLike>("/tenant/business-sign-up", payload);
     if (data.token) {
       window.localStorage.setItem("token", data.token || "");
       window.localStorage.setItem("refreshToken", data.refreshToken || "");
       return data;
     }
-    return rejectWithValue([
-      { message: data.message || "Business signup failed" },
-    ]);
+    return rejectWithValue([{ message: data.message || "Business signup failed" }]);
   } catch (error: any) {
     return rejectWithValue(
       error.response?.data?.errors || [
@@ -113,4 +106,3 @@ const tenantSlice = createSlice({
 
 export const { setTenant } = tenantSlice.actions;
 export default tenantSlice.reducer;
-

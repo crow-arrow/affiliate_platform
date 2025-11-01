@@ -27,12 +27,7 @@ export const AllOrders = () => {
 
   if (status === "loading") {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
         <CircularProgress />
       </Box>
     );
@@ -40,12 +35,7 @@ export const AllOrders = () => {
 
   if (error) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
         <Typography variant="h6" color="error">
           Error: {error}
         </Typography>
@@ -55,12 +45,7 @@ export const AllOrders = () => {
 
   if (trips.length === 0) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100vh"
-      >
+      <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
         <Typography variant="h6">No trips available</Typography>
       </Box>
     );

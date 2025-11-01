@@ -22,8 +22,7 @@ export const formatNumberWithCommas = (number: number) => {
   return new Intl.NumberFormat("en-US").format(number);
 };
 
-export const formatPercentage = (value: number | string) =>
-  `${Number(value).toFixed(2)}%`;
+export const formatPercentage = (value: number | string) => `${Number(value).toFixed(2)}%`;
 export const formatLevel = (level: number) => `Level ${level}`;
 export const formatPhoneNumber = (phone: string) => {
   // Пример форматирования: +1 (123) 456-7890
