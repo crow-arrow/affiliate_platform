@@ -4,8 +4,8 @@ import { fetchUsers, User } from "../redux/features/users/userSlice";
 import { toast } from "sonner";
 import { Loader2, Copy, MoreVertical } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DataTable } from "@/components/DataTable";
-import { createDragColumn, createSelectColumn } from "@/components/data-table-columns";
+import { DataTable } from "@/components/data/DataTable";
+import { createDragColumn, createSelectColumn } from "@/components/data/data-table-columns";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,

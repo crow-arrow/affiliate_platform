@@ -5,7 +5,7 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import PropTypes from "prop-types";
 import { Cropper, CircleStencil } from "react-advanced-cropper";
 import "react-advanced-cropper/dist/themes/corners.css";
-import profileBlank from "../assets/avatar.webp";
+import profileBlank from "@/assets/avatar.webp";
 
 export const CustomFileInput = ({
   width = 390,
@@ -112,8 +112,8 @@ export const CustomFileInput = ({
     <div className="flex gap-16 items-start">
       <div
         ref={dropAreaRef}
-        className={`relative border-2 border-dashed overflow-hidden 
-					border-gray-400 rounded-xl flex items-center justify-center cursor-pointer 
+        className={`relative border-2 border-dashed overflow-hidden
+					border-gray-400 rounded-xl flex items-center justify-center cursor-pointer
 					${isDragging ? "bg-gray-100" : "bg-white"}`}
         style={{ width: `${width}px`, height: `${height}px` }}
         onDragOver={handleDragOver}

@@ -1,6 +1,6 @@
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
-import { resendEmailVerification } from "../redux/features/verification/emailVerificationSlice";
+import { resendOTPCode } from "../redux/features/verification/emailVerificationSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
@@ -85,14 +85,14 @@ export const EmailSentMessage = () => {
 
     setLoading(true);
     try {
-      const result = await dispatch(resendEmailVerification(email));
+      const result = await dispatch(resendOTPCode(email));
 
-      if (resendEmailVerification.fulfilled.match(result)) {
+      if (resendOTPCode.fulfilled.match(result)) {
         const endTime = Date.now() + TIMER_DURATION_SECONDS * 1000;
         localStorage.setItem(LOCAL_STORAGE_KEY, endTime.toString());
         setCountdown(TIMER_DURATION_SECONDS);
         startCountdownInterval(TIMER_DURATION_SECONDS);
-      } else if (resendEmailVerification.rejected.match(result)) {
+      } else if (resendOTPCode.rejected.match(result)) {
         toast.error(result.payload || "Something went wrong");
       }
     } catch (err) {

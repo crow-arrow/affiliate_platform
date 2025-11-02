@@ -1,6 +1,4 @@
 import { Layout } from "./components/Layout";
-import { TestLayout } from "./components/layout-test";
-import { AdminLayout } from "./components/AdminLayout";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useAppSelector } from "./redux/hooks";
@@ -24,26 +22,27 @@ import { Documents } from "./pages/Documents";
 import { Settings } from "./pages/Settings";
 import { Account } from "./pages/Account";
 
-import { EmailVerification } from "./components/verification/EmailVerification";
 import { PasswordRecover } from "./pages/PasswordRecover";
 import { RequestPasswordReset } from "./pages/RequestPasswordReset";
 import { EmailSentMessage } from "./pages/EmailSentMessage";
 import { LoginPage } from "./pages/LoginPage";
 import { SignUpPage } from "./pages/SignUpPage";
 import { BusinessSignUpPage } from "./pages/BusinessSignUpPage";
+import { CreateWorkspacePage } from "./pages/CreateWorkspacePage";
 import { NotFound } from "./pages/NotFound";
 import { HomePage } from "./pages/HomePage";
-import AdminProtectedRoute from "./components/protected-routes/AdminProtectedRoute";
+import { ProtectedRoute } from "./components/protected-routes/ProtectedRoute";
 import { SSOCallback } from "./components/verification/SSOCallback";
 import { OAuthDone } from "./components/verification/OAuthDone";
 
 import { Toaster } from "@/components/ui/sonner";
-import { CropAvatar } from "./components/Avatar";
+import { CropAvatar } from "./components/profile/Avatar";
 import {
   isPublicRoute as checkIsPublicRoute,
   isAppRouteWithoutTenant as checkIsAppRouteWithoutTenant,
   extractTenantSlugFromPath,
 } from "@/constants/routes";
+import { OTPPage } from "./pages/OTPPage";
 
 // Обертка для CropAvatar с дефолтными пропсами
 const CropAvatarWrapper = () => {
@@ -76,9 +75,48 @@ const TenantScopedRouteElement = () => {
     // Пользователь авторизован - проверяем email verification
     if (emailVerified) {
       return (
-        <AdminProtectedRoute allowedRoles={["ADMIN", "PARTNER"]}>
-          <TestLayout />
-        </AdminProtectedRoute>
+        <ProtectedRoute allowedRoles={["ADMIN", "PARTNER"]}>
+          <Layout />
+        </ProtectedRoute>
+      );
+    } else {
+      return <Navigate to="/email-verification" />;
+    }
+  }
+
+  // Пользователь не авторизован - редиректим на sign-in
+  // Но только если загрузка завершена и токена нет
+  return <Navigate to="/sign-in" />;
+};
+
+// Компонент для админ tenant-scoped маршрутов с правильной обработкой загрузки
+const AdminTenantScopedRouteElement = () => {
+  const { isLoading, isAuth: isAuthFromHook, user, tenant, tenantStatus } = useAuthTenantResolver();
+  const isAuth = useAppSelector(checkIsAuth);
+  const emailVerified = user?.emailVerified === true;
+  const effectiveIsAuth = isAuthFromHook || isAuth;
+
+  // КРИТИЧЕСКИ ВАЖНО: для tenant-scoped маршрутов показываем loader во время загрузки
+  // НЕ редиректим на /sign-in пока идет загрузка, так как это может быть перезагрузка страницы
+  // Также проверяем наличие токена - если есть токен, значит пользователь может быть авторизован
+  const hasToken = !!window.localStorage.getItem("token");
+  const shouldWaitForAuth = isLoading || (hasToken && !user);
+
+  if (shouldWaitForAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (effectiveIsAuth && user) {
+    // Пользователь авторизован - проверяем email verification и роль ADMIN
+    if (emailVerified) {
+      return (
+        <ProtectedRoute allowedRoles={["ADMIN"]}>
+          <Layout />
+        </ProtectedRoute>
       );
     } else {
       return <Navigate to="/email-verification" />;
@@ -284,8 +322,9 @@ function App() {
         <Route path="/sign-in" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/business-sign-up" element={<BusinessSignUpPage />} />
-        <Route path="/verify-email/:token" element={<EmailVerification />} />
-        <Route path="/reset-password/:token" element={<PasswordRecover />} />
+        <Route path="/create-workspace" element={<CreateWorkspacePage />} />
+        <Route path="/verify-otp" element={<OTPPage />} />
+        <Route path="/reset-password" element={<PasswordRecover />} />
         <Route path="/request-reset" element={<RequestPasswordReset />} />
         <Route path="/email-verification" element={<EmailSentMessage />} />
         <Route path="/sso-callback" element={<SSOCallback />} />
@@ -294,7 +333,7 @@ function App() {
         {/*Test pages*/}
         <Route path="/test/*">
           <Route index element={<Dashboard />} />
-          <Route path="my-account" element={<DashboardCopy />} />
+          <Route path="overview" element={<DashboardCopy />} />
         </Route>
 
         {/* Homepage - выбор workspace */}
@@ -302,35 +341,27 @@ function App() {
 
         {/* Tenant-scoped routes: /:tenantSlug/... */}
         <Route path="/:tenantSlug" element={<TenantScopedRouteElement />}>
-          <Route index element={<Dashboard />} />
-          <Route path="my-account" element={<Dashboard />} />
+          <Route index element={<Navigate to="overview" replace />} />
+          <Route path="overview" element={<Dashboard />} />
           <Route path="trips" element={<Trips />} />
           <Route path="clicks-list" element={<CklicksList />} />
           <Route path="documents" element={<Documents />} />
           <Route path="settings" element={<Settings />} />
           <Route path="settings/account" element={<Account />} />
           <Route path="crop-avatar" element={<CropAvatarWrapper />} />
+        </Route>
 
-          {/* Используем защищенные маршруты для админов - путь относительный к /:tenantSlug */}
-          {/* Полный путь будет: /:tenantSlug/admin/* */}
-          <Route
-            path="admin/*"
-            element={
-              <AdminProtectedRoute allowedRoles={["ADMIN"]}>
-                <AdminLayout />
-              </AdminProtectedRoute>
-            }
-          >
-            <Route index element={<AdminDashboard />} />
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="team" element={<Team />} />
-            <Route path="orders" element={<AllOrders />} />
-            <Route path="calendar" element={<Calendar />} />
-            <Route path="invoices" element={<Invoices />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="settings/level-settings" element={<LevelSettingsAdmin />} />
-            <Route path="settings/level-settings-test" element={<LevelSettingsTest />} />
-          </Route>
+        {/* Tenant-scoped admin routes: /:tenantSlug/admin/... */}
+        <Route path="/:tenantSlug/admin" element={<AdminTenantScopedRouteElement />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="team" element={<Team />} />
+          <Route path="orders" element={<AllOrders />} />
+          <Route path="calendar" element={<Calendar />} />
+          <Route path="invoices" element={<Invoices />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="settings/level-settings" element={<LevelSettingsAdmin />} />
+          <Route path="settings/level-settings-test" element={<LevelSettingsTest />} />
         </Route>
 
         {/* Это маршрут для страницы 404 */}

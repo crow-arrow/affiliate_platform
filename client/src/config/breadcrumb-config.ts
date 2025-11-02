@@ -1,7 +1,7 @@
 // Централизованная конфигурация для breadcrumbs
 export const BREADCRUMB_LABELS: Record<string, string> = {
   // Основные страницы
-  "my-account": "Dashboard",
+  overview: "Dashboard",
   trips: "Trips",
   "clicks-list": "Clicks list",
   documents: "Documents",
@@ -48,13 +48,13 @@ export const ROLE_BREADCRUMB_CONFIGS = {
     invoices: "Invoice Management",
   },
   genie: {
-    "my-account": "Genie Dashboard",
+    overview: "Genie Dashboard",
     trips: "My Trips",
     "clicks-list": "My Clicks",
     documents: "My Documents",
   },
   user: {
-    "my-account": "User Dashboard",
+    overview: "User Dashboard",
     trips: "Available Trips",
     "clicks-list": "Click History",
     documents: "Documents",

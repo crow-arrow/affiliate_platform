@@ -75,7 +75,9 @@ export function SignupForm({ className, ...props }: React.ComponentProps<"form">
       ).unwrap();
 
       toast.dismiss();
-      navigate("/email-verification", { state: { email: data.email } });
+      // Сохраняем email в localStorage для надежности
+      localStorage.setItem("pendingVerificationEmail", data.email);
+      navigate(`/verify-otp?email=${encodeURIComponent(data.email)}`);
     } catch (errors) {
       if (Array.isArray(errors) && errors.length > 0) {
         toast.error(errors[0].message || "Server error");

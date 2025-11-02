@@ -19,7 +19,7 @@ import { formatCurrency, formatDate } from "@/components/utils/formatters";
 import { ProgressBar } from "../components/levelProgressBar";
 import { CommissionChartCopy } from "../components/charts/commissionChart-copy";
 import { AnimatedNumber } from "../components/utils/AnimatedNumber";
-import { TripsDataTable } from "../components/trips-data-table";
+import { TripsDataTable } from "../components/data/trips-data-table";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -361,7 +361,7 @@ export const Dashboard: React.FC = () => {
                     const statusStyle = getStatusBadge(trip.orderStatus || "PENDING");
                     return (
                       <TableRow key={trip.id}>
-                        <TableCell className="font-medium">#{trip.id}</TableCell>
+                        <TableCell className="font-medium">{trip.id}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-muted-foreground" />

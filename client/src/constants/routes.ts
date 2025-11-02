@@ -19,7 +19,7 @@ export const PUBLIC_ROUTES = [
 
 // Стандартные пути приложения (требуют tenant slug)
 export const APP_ROUTES = [
-  "my-account",
+  "overview",
   "trips",
   "clicks-list",
   "documents",

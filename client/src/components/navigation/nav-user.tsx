@@ -27,7 +27,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-import { checkIsAuth, checkRole, logout } from "../redux/features/auth/authSlice";
+import { checkIsAuth, checkRole, logout } from "../../redux/features/auth/authSlice";
 
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { useClerk } from "@clerk/clerk-react";

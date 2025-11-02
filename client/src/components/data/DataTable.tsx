@@ -111,7 +111,7 @@ function DraggableRow<TData>({
       data-state={row.getIsSelected() && "selected"}
       data-dragging={isDragging}
       ref={setNodeRef}
-      className={`relative z-0 ${enableDragAndDrop ? "data-[dragging=true]:z-10 data-[dragging=true]:opacity-80" : ""}`}
+      className={`relative z-0 min-h-[38px] whitespace-nowrap ${enableDragAndDrop ? "data-[dragging=true]:z-10 data-[dragging=true]:opacity-80" : ""}`}
       style={style}
     >
       {row.getVisibleCells().map((cell) => (
@@ -138,7 +138,7 @@ function TableSkeletonRow({
   const stableSeed = rowIndex * 7919; // Простое число для генерации
 
   return (
-    <TableRow>
+    <TableRow className="min-h-[38px] whitespace-nowrap">
       {headers.map((header: any, index: number) => {
         // Безопасно получаем columnId
         const columnId = header?.column?.id || header?.id || `col-${index}`;
@@ -153,7 +153,7 @@ function TableSkeletonRow({
         const showSecond = (stableSeed + index) % 10 > 2; // ~70% показывают второй элемент
 
         return (
-          <TableCell key={header.id || index} className="py-4">
+          <TableCell key={header.id || index} className="py-2">
             <div className="flex items-center gap-2">
               {/* Для drag колонки */}
               {isDrag && <GripVertical className="h-5 w-5 rounded" />}
@@ -379,7 +379,7 @@ export function DataTable<TData extends Record<string, any>>({
             {table.getFilteredSelectedRowModel().rows.length} of{" "}
             {table.getFilteredRowModel().rows.length} row(s) selected.
           </div>
-          <div className="flex w-full items-center gap-8 lg:w-fit">
+          <div className="flex w-full items-center gap-8 lg:w-fit lg:gap-4">
             <div className="hidden items-center gap-2 lg:flex">
               <Label htmlFor="rows-per-page" className="text-sm font-medium">
                 Rows per page

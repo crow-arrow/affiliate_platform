@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { checkIsAuth } from "@/redux/features/auth/authSlice";
 import { resolveTenant } from "@/redux/features/tenant/tenantSlice";
-import { WorkspaceSwitcher } from "@/components/WorkspaceSwitcher";
+import { WorkspaceSwitcher } from "@/components/profile/WorkspaceSwitcher";
 import { Button } from "@/components/ui/button";
 import Logo from "@/assets/logo.png";
 import { Building2, Sparkles } from "lucide-react";
@@ -88,7 +88,7 @@ export function HomePage() {
       // Продолжаем редирект даже если не удалось резолвить (tenant будет разрешен в App.tsx)
     }
 
-    const targetPath = `/${slug}/my-account`;
+    const targetPath = `/${slug}/overview`;
     console.log("🚀 Navigating to:", targetPath);
 
     if (isLocal) {
@@ -98,7 +98,7 @@ export function HomePage() {
       // PRODUCTION: subdomain-based роутинг - нужна полная перезагрузка для смены домена
       const parts = host.split(".");
       const baseHost = parts.slice(-2).join(".");
-      window.location.href = `${window.location.protocol}//${slug}.${baseHost}/my-account`;
+      window.location.href = `${window.location.protocol}//${slug}.${baseHost}/overview`;
     }
   };
 

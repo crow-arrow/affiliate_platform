@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchTrips } from "../redux/features/users/userSlice";
-import { DataTable } from "@/components/DataTable";
-import { createDragColumn, createSelectColumn } from "@/components/data-table-columns";
+import { DataTable } from "@/components/data/DataTable";
+import { createDragColumn, createSelectColumn } from "@/components/data/data-table-columns";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   Loader2,
@@ -86,12 +86,12 @@ function TripCellViewer({ item }: { item: TripData }) {
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
         <Button variant="link" className="text-foreground w-fit px-0 text-left">
-          #{item.id}
+          {item.id}
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent direction={isMobile ? "bottom" : "right"}>
         <DrawerHeader className="gap-1">
-          <DrawerTitle>Trip #{item.id}</DrawerTitle>
+          <DrawerTitle>Trip {item.id}</DrawerTitle>
           <DrawerDescription>Trip details and commission information</DrawerDescription>
         </DrawerHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">

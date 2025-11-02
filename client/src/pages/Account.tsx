@@ -6,31 +6,76 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { User, Mail, Phone, MapPin, Calendar, Shield, Edit, Save, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { updateUserProfile } from "@/redux/features/auth/authSlice";
+import { toast } from "sonner";
 
 export const Account = () => {
+  const { user, message, errors, status, isLoading } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    location: "New York, NY",
-    joinDate: "January 15, 2024",
-    role: "PARTNER",
-    status: "Active",
-    level: "Gold",
+    firstName: user?.first_name || "",
+    lastName: user?.last_name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    location: user?.location || "New York, NY",
+    joinDate: user?.createdAt || "",
+    role: user?.role || "",
+    status: user?.status || "Active",
+    level: user?.level || "BRONZE",
   });
 
+  useEffect(() => {
+    if (user) {
+      setUserData({
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        phone: user.phone || "",
+        location: user.location || "New York, NY",
+        joinDate: user.createdAt || "",
+        role: user.role || "",
+        status: user.status || "Active",
+        level: user.level || "BRONZE",
+      });
+    }
+  }, [user]);
+
   const handleSave = () => {
-    setIsEditing(false);
-    // Здесь будет логика сохранения
-    console.log("Saving user data:", userData);
+    try {
+      dispatch(
+        updateUserProfile({
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          phone: userData.phone,
+          email: userData.email,
+        })
+      );
+      setIsEditing(false);
+      toast.success(message || "Profile updated successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update profile");
+    }
   };
 
   const handleCancel = () => {
+    if (user) {
+      setUserData({
+        firstName: user.first_name || "",
+        lastName: user.last_name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        location: user.location || "New York, NY",
+        joinDate: user.createdAt || "",
+        role: user.role || "",
+        status: user.status || "Active",
+        level: user.level || "BRONZE",
+      });
+    }
     setIsEditing(false);
-    // Здесь можно добавить логику отмены изменений
   };
 
   return (
@@ -39,25 +84,6 @@ export const Account = () => {
         <div>
           <h1 className="text-3xl font-bold">Account Settings</h1>
           <p className="text-muted-foreground">Manage your account information and preferences</p>
-        </div>
-        <div className="flex gap-2">
-          {!isEditing ? (
-            <Button onClick={() => setIsEditing(true)} className="flex items-center gap-2">
-              <Edit className="h-4 w-4" />
-              Edit Profile
-            </Button>
-          ) : (
-            <div className="flex gap-2">
-              <Button onClick={handleSave} className="flex items-center gap-2">
-                <Save className="h-4 w-4" />
-                Save Changes
-              </Button>
-              <Button variant="outline" onClick={handleCancel} className="flex items-center gap-2">
-                <X className="h-4 w-4" />
-                Cancel
-              </Button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -115,9 +141,36 @@ export const Account = () => {
 
         {/* Account Information */}
         <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>Update your personal information and account details</CardDescription>
+          <CardHeader className="flex flex-row justify-between items-center">
+            <div className="flex flex-col justify-between items-start">
+              <CardTitle>Account Information</CardTitle>
+              <CardDescription>
+                Update your personal information and account details
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+              {!isEditing ? (
+                <Button onClick={() => setIsEditing(true)} className="flex items-center gap-2">
+                  <Edit className="h-4 w-4" />
+                  Edit Profile
+                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button onClick={handleSave} className="flex items-center gap-2">
+                    <Save className="h-4 w-4" />
+                    Save Changes
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    className="flex items-center gap-2"
+                  >
+                    <X className="h-4 w-4" />
+                    Cancel
+                  </Button>
+                </div>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

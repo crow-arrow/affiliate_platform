@@ -38,7 +38,24 @@ model Identity {
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  memberships Membership[]
+  memberships       Membership[]
+  verificationCodes VerificationCode[]
+}
+
+// Коды верификации для OTP
+model VerificationCode {
+  id         String   @id @default(cuid())
+  identityId String
+  identity   Identity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  code       String   @db.VarChar(6)
+  type       String   @default("EMAIL_VERIFICATION") @db.VarChar(50)
+  expiresAt  DateTime
+  used       Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([identityId, type, used])
+  @@index([code, identityId])
+  @@map("verification_codes")
 }
 
 // Членство глобальной Identity в конкретном Tenant с ролью

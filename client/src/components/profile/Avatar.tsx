@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import PropTypes from "prop-types";
-import { fetchUsers, uploadAvatar, resetAvatarStatus } from "../redux/features/users/userSlice";
+import { fetchUsers, uploadAvatar, resetAvatarStatus } from "../../redux/features/users/userSlice";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { CustomFileInput } from "./CustomFileInput";
 import "react-advanced-cropper/dist/themes/corners.css";
@@ -103,7 +103,7 @@ export const CropAvatar = ({ isOpen, onClose }) => {
             <button
               onClick={handleUploadAvatar}
               disabled={isButtonDisabled}
-              className="w-[390px] p-2 mt-8 text-s rounded-xl bg-white text-gray-900 
+              className="w-[390px] p-2 mt-8 text-s rounded-xl bg-white text-gray-900
                     disabled:shadow-inset-2 disabled:bg-slate-500 disabled:animate-pulse disabled:cursor-progress"
             >
               {loading ? "Loading..." : "Upload Avatar"}

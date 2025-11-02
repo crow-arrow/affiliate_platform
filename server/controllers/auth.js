@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import dotenv from "dotenv";
 import { signUpSchema, loginSchema } from "../middleware/validationSchemas.js";
-import { sendVerificationEmail } from "../utils/mailer.js";
+import { sendVerificationOTP } from "../utils/mailer.js";
 import { generateTokens, verifyToken } from "../utils/jwt.js";
 
 dotenv.config();
@@ -74,23 +74,16 @@ export const signUp = async (req, res) => {
 
     const hash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
-    // Определяем tenant: prefer request resolve; fallback к tenantSlug
+    // Определяем tenant: prefer request resolve; fallback к tenantSlug (опционально)
     let tenantId = await resolveTenantIdFromRequest(req);
     if (!tenantId && tenantSlug) {
       const tenant = await prisma.tenant
         .findFirst({ where: { domain: tenantSlug } })
         .catch(() => null);
-      if (!tenant)
-        return res
-          .status(400)
-          .json({ message: "Tenant not found for provided slug" });
-      tenantId = tenant.id;
-    }
-
-    if (!tenantId) {
-      return res
-        .status(400)
-        .json({ message: "Tenant ID is required for registration" });
+      if (tenant) {
+        tenantId = tenant.id;
+      }
+      // Если tenant не найден по slug - продолжаем без tenant (не возвращаем ошибку)
     }
 
     // Создаем Identity
@@ -104,47 +97,69 @@ export const signUp = async (req, res) => {
       },
     });
 
-    // Создаем Membership
-    const membership = await prisma.membership.create({
+    let membership = null;
+    // Создаем Membership только если есть tenantId
+    if (tenantId) {
+      membership = await prisma.membership.create({
+        data: {
+          identityId: newIdentity.id,
+          tenantId: tenantId,
+          role: "PARTNER",
+        },
+      });
+
+      // Создаем PartnerProfile с affiliateId только если есть membership
+      const affiliateId = `${first_name.toLowerCase()}_${Math.floor(
+        Math.random() * 90000 + 10000
+      )}`;
+
+      await prisma.partnerProfile.create({
+        data: {
+          membershipId: membership.id,
+          affiliateId: affiliateId,
+          phone: phone || null,
+          level: "BRONZE",
+        },
+      });
+    }
+
+    // Генерируем OTP код
+    const otpCode = crypto.randomInt(100000, 999999).toString();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 минут
+
+    // Сохраняем OTP код в базе
+    await prisma.verificationCode.create({
       data: {
         identityId: newIdentity.id,
-        tenantId: tenantId,
-        role: "PARTNER",
+        code: otpCode,
+        type: "EMAIL_VERIFICATION",
+        expiresAt,
       },
     });
 
-    // Создаем PartnerProfile с affiliateId
-    const affiliateId = `${first_name.toLowerCase()}_${Math.floor(
-      Math.random() * 90000 + 10000
-    )}`;
+    // Отправляем OTP код на email
+    await sendVerificationOTP(
+      newIdentity.email,
+      newIdentity.firstName || first_name,
+      otpCode
+    );
 
-    await prisma.partnerProfile.create({
-      data: {
-        membershipId: membership.id,
-        affiliateId: affiliateId,
-        phone: phone || null,
-        level: "BRONZE",
-      },
-    });
+    // Определяем роль: если есть membership - используем роль из него, иначе null
+    const role = membership?.role || null;
 
     const tokenPayload = {
       id: newIdentity.id,
-      role: "PARTNER",
-      tenantId: tenantId,
+      role: role,
+      tenantId: tenantId || null,
     };
     const { accessToken, refreshToken } = generateTokens(tokenPayload);
-
-    await sendVerificationEmail(
-      newIdentity.email,
-      newIdentity.firstName || first_name,
-      accessToken
-    );
 
     res.status(201).json({
       user: { id: newIdentity.id, email: newIdentity.email },
       token: accessToken,
       refreshToken,
-      message: "Account created successfully. Please check your email.",
+      message:
+        "Account created successfully. Please check your email for verification code.",
     });
   } catch (error) {
     console.error("❌ signUp error:", error);
@@ -402,15 +417,18 @@ export const getMe = async (req, res) => {
     if (identity) {
       const membership = await prisma.membership.findUnique({
         where: { identityId_tenantId: { identityId: identity.id, tenantId } },
+        include: { profile: true },
       });
       const safeUser = {
         id: identity.id,
         email: identity.email,
+        phone: membership?.profile?.phone || null,
         first_name: identity.firstName || "",
         last_name: identity.lastName || "",
         role: membership?.role || "PARTNER",
-        emailVerified: identity.emailVerified || false, // Используем реальное значение из базы
+        emailVerified: identity.emailVerified || false,
         tenantId,
+        affiliateId: membership?.profile?.affiliateId || null,
       };
       return res.status(200).json({ user: safeUser });
     }

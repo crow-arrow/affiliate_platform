@@ -24,7 +24,7 @@ interface WorkspaceSwitcherProps {
   tenants?: TenantItem[]; // опционально можно передать готовый список
   userRole?: string | false; // если false - не показывать, если undefined - использовать из Redux
   variant?: "sidebar" | "standalone"; // вариант отображения
-  redirectTo?: "root" | "dashboard"; // куда редиректить: root (/) или dashboard (/my-account)
+  redirectTo?: "root" | "dashboard"; // куда редиректить: root (/) или dashboard (/overview)
   onSelectTenant?: (tenant: TenantItem) => void; // callback при выборе tenant (если передан, автоматический редирект не происходит)
   autoRedirect?: boolean; // автоматический редирект при выборе (по умолчанию true, если onSelectTenant не передан)
 }
@@ -95,7 +95,7 @@ export function WorkspaceSwitcher({
     // Автоматический редирект (старое поведение)
     const host = window.location.host.toLowerCase();
     const isLocal = host.startsWith("localhost") || host.startsWith("127.0.0.1");
-    const path = redirectTo === "dashboard" ? "/my-account" : "";
+    const path = redirectTo === "dashboard" ? "/overview" : "";
 
     if (isLocal) {
       // DEV: path-based роутинг

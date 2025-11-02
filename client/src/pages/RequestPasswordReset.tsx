@@ -15,12 +15,13 @@ export const RequestPasswordReset = () => {
     if (status === "succeeded" && message) {
       toast.success(message);
       dispatch(clearErrors());
-      navigate("/sign-in");
+      // Редирект на страницу ввода OTP кода
+      navigate(`/verify-otp?email=${encodeURIComponent(email)}&type=password-reset`);
     } else if (status === "failed" && requestResetError) {
       toast.error(requestResetError);
       dispatch(clearErrors());
     }
-  }, [status, message, requestResetError, dispatch, navigate]);
+  }, [status, message, requestResetError, dispatch, navigate, email]);
 
   const loading = status === "loading";
 
@@ -69,9 +70,9 @@ export const RequestPasswordReset = () => {
               disabled={loading}
               tabIndex={2}
               className="
-                flex w-full justify-center rounded-3xl bg-accent mt-10 px-3 py-1.5 
-                text-sm font-semibold text-gray-100 shadow-sm hover:bg-accentDark 
-                focus-visible:outline focus-visible:outline-2 
+                flex w-full justify-center rounded-3xl bg-accent mt-10 px-3 py-1.5
+                text-sm font-semibold text-gray-100 shadow-sm hover:bg-accentDark
+                focus-visible:outline focus-visible:outline-2
                 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-95 transition-all
                 disabled:scale-100 disabled:shadow-inset-2 disabled:bg-accentDark disabled:animate-pulse disabled:cursor-progress"
             >

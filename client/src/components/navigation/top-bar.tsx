@@ -5,8 +5,8 @@ import InsertLinkRoundedIcon from "@mui/icons-material/InsertLinkRounded";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { toast } from "sonner";
 import { useAppSelector } from "@/redux/hooks";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
 import { Check } from "lucide-react";
@@ -30,7 +30,7 @@ export const TopBar = () => {
 
   const { user } = useAppSelector((state) => state.auth);
   if (!user) return null;
-  const userAffiliateId = user.affiliate_id;
+  const userAffiliateId = user.affiliateId;
   const refLink = `https://jinn-travel.com/?affiliateId=${userAffiliateId}`;
 
   return (

@@ -67,7 +67,7 @@ export const RoleBasedBreadcrumbExample = () => {
       case "genie":
         return [
           { label: "Home", href: "/" },
-          { label: "My Account", href: "/my-account" },
+          { label: "My Account", href: "/overview" },
           { label: "Profile", isActive: true },
         ];
       default:

@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchClicks, Click } from "../redux/features/clicks/clicksSlice";
-import { DataTable } from "@/components/DataTable";
-import { createDragColumn, createSelectColumn } from "@/components/data-table-columns";
+import { DataTable } from "@/components/data/DataTable";
+import { createDragColumn, createSelectColumn } from "@/components/data/data-table-columns";
 import { ColumnDef } from "@tanstack/react-table";
 import { Loader2, Calendar, MoreVertical } from "lucide-react";
 import {

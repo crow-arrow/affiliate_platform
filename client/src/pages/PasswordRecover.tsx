@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
   resetPassword,
-  checkResetLink,
   clearErrors,
 } from "../redux/features/password/resetPasswordSlice";
 import { toast } from "sonner";
@@ -12,18 +11,21 @@ import logo from "../assets/logo.png";
 import ErrorIcon from "@mui/icons-material/Error";
 
 export const PasswordRecover = () => {
-  const { token } = useParams();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { linkValid, linkError } = useSelector((state) => state.password);
-  const { status, message, errors } = useSelector((state) => state.password);
+  const { status, message, errors, resetToken } = useSelector((state) => state.password);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(checkResetLink(token));
-  }, [token, dispatch]);
+    // Проверяем наличие токена для сброса пароля
+    const token = resetToken || localStorage.getItem("passwordResetToken");
+    if (!token) {
+      toast.error("Reset token not found. Please request a new password reset.");
+      navigate("/request-reset");
+    }
+  }, [resetToken, navigate]);
 
   useEffect(() => {
     if (status === "succeeded" && message) {
@@ -42,6 +44,12 @@ export const PasswordRecover = () => {
       return;
     }
 
+    const token = resetToken || localStorage.getItem("passwordResetToken");
+    if (!token) {
+      toast.error("Reset token not found");
+      return;
+    }
+
     try {
       await dispatch(
         resetPassword({
@@ -50,6 +58,7 @@ export const PasswordRecover = () => {
           confirmPassword,
         })
       ).unwrap();
+      localStorage.removeItem("passwordResetToken");
       setNewPassword("");
       setConfirmPassword("");
     } catch (errors) {
@@ -61,35 +70,6 @@ export const PasswordRecover = () => {
       setConfirmPassword("");
     }
   };
-
-  if (!linkValid === true) {
-    return (
-      <div className="flex flex-col w-full h-screen bg-gradient-primary justify-center items-center">
-        <Link to="/sign-in">
-          <img alt="Jinn community" src={logo} className="mx-auto h-20 w-auto" />
-        </Link>
-        <div className="flex flex-col bg-gray-100 relative w-1/3 h-1/4 p-8 mt-10 justify-between items-center rounded-xl shadow-custom">
-          <div className="flex flex-col gap-4 items-center justify-between text-red-600">
-            <ErrorIcon sx={{ fontSize: "3rem" }} />
-            <p className="w-full text-2xl text-center">
-              <span className="ml-2">{linkError}</span>
-            </p>
-            <Link
-              to="/request-reset"
-              // disabled={loading}
-              tabIndex={1}
-              className="flex w-full justify-center rounded-3xl bg-gradient-primary px-3 py-1.5 
-                            text-sm font-semibold text-gray-100 shadow-custom hover:shadow-inset-2
-                            focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-950
-                            active:scale-90 transition-all"
-            >
-              Resend the Link
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col flex-1 h-screen bg-gradient-primary justify-center px-6 mx-auto lg:px-8">
@@ -146,8 +126,8 @@ export const PasswordRecover = () => {
               disabled={loading}
               className="
                                 flex w-full justify-center rounded-3xl bg-accent mt-10 px-3 py-1.5
-                                text-sm font-semibold text-gray-100 shadow-sm hover:bg-accentDark 
-                                focus-visible:outline focus-visible:outline-2 
+                                text-sm font-semibold text-gray-100 shadow-sm hover:bg-accentDark
+                                focus-visible:outline focus-visible:outline-2
                                 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-95 transition-all
                                 disabled:scale-100 disabled:shadow-inset-2 disabled:bg-saccentDark disabled:animate-pulse disabled:cursor-progress"
             >

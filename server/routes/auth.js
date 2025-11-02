@@ -1,11 +1,15 @@
 import express from "express";
-import { signUp, login, oauthLogin, getMe, getUserTenants, getMyTenants } from "../controllers/auth.js";
+import {
+  signUp,
+  login,
+  oauthLogin,
+  getMe,
+  getUserTenants,
+  getMyTenants,
+} from "../controllers/auth.js";
 import { businessSignUp } from "../controllers/tenant/businessSignUp.js";
 import { passwordResetLimiter } from "../middleware/rateLimiter.js";
-import {
-  verifyEmail,
-  resendEmailController,
-} from "../controllers/emailController.js";
+import { sendOTPCode, verifyOTPCode } from "../controllers/emailController.js";
 import { checkAuth } from "../middleware/checkAuth.js";
 import { clerkMiddleware } from "@clerk/express";
 
@@ -15,12 +19,12 @@ const router = express.Router();
 // http://localhost:3002/api/auth/sign-up
 router.post("/sign-up", signUp);
 
+// OTP верификация email
+// http://localhost:3002/api/auth/send-otp
+router.post("/send-otp", passwordResetLimiter, sendOTPCode);
 
-// http://localhost:3002/api/auth/verify-email
-router.get("/verify-email/:token", verifyEmail);
-
-// http://localhost:3002/api/auth/resend-email
-router.post("/resend-email", passwordResetLimiter, resendEmailController);
+// http://localhost:3002/api/auth/verify-otp
+router.post("/verify-otp", verifyOTPCode);
 
 // Login
 // http://localhost:3002/api/auth/sign-in

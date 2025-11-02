@@ -3,30 +3,28 @@
 import * as React from "react";
 import {
   BookOpen,
-  Bot,
-  Frame,
+  Calendar,
+  FileText,
+  Package,
+  LayoutDashboard,
   LifeBuoy,
-  Map,
-  PieChart,
   Send,
   Settings2,
   SquareTerminal,
+  Users,
 } from "lucide-react";
 
 import {} from "react";
 
-import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
-import { NavSecondary } from "@/components/nav-secondary";
-import { NavUser } from "@/components/nav-user";
+import { NavMain } from "@/components/navigation/nav-main";
+import { NavSecondary } from "@/components/navigation/nav-secondary";
+import { NavUser } from "@/components/navigation/nav-user";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
 import { useAppSelector } from "@/redux/hooks";
@@ -38,7 +36,7 @@ import LogoWhite from "@/assets/jinn.svg";
 import LogoDark from "@/assets/jinn-dark.svg";
 import {} from "@/components/ui/dropdown-menu";
 import {} from "lucide-react";
-import { WorkspaceSwitcher } from "./WorkspaceSwitcher";
+import { WorkspaceSwitcher } from "../profile/WorkspaceSwitcher";
 import { useMemo } from "react";
 import { extractTenantSlugFromPath, addTenantSlugToPath } from "@/constants/routes";
 
@@ -49,6 +47,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const userEmail = user?.email ?? "exemple@jinn-travel.com";
   const tenant = useAppSelector((state: RootState) => state.tenant.current);
   const location = useLocation();
+  const isAdmin = useAppSelector(checkRole) === "ADMIN";
 
   // Получаем tenant slug из Redux или из URL пути
   const tenantSlug = useMemo(() => {
@@ -56,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (tenant?.slug) {
       return tenant.slug;
     }
-    // Приоритет 2: из URL пути (для development)
+    // Приоритет 2: из URL пути
     return extractTenantSlugFromPath(location.pathname);
   }, [tenant?.slug, location.pathname]);
 
@@ -66,7 +65,62 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     [tenantSlug]
   );
 
-  // Workspace switching handled inside WorkspaceSwitcher component
+  const navMain = [
+    {
+      title: "Dashboard",
+      url: getUrl("/my-account"),
+      icon: SquareTerminal, // или LayoutDashboard
+    },
+    {
+      title: "Trips",
+      url: getUrl("/trips"),
+      icon: BookOpen,
+    },
+    {
+      title: "Clicks list",
+      url: getUrl("/clicks-list"),
+      icon: Settings2,
+    },
+    {
+      title: "Documents",
+      url: getUrl("/documents"),
+      icon: BookOpen,
+    },
+  ].map((item) => ({
+    ...item,
+    isActive: location.pathname === item.url || location.pathname.startsWith(`${item.url}/`),
+  }));
+
+  const adminNav = [
+    {
+      title: "Dashboard",
+      url: getUrl("/admin/dashboard"),
+      icon: LayoutDashboard,
+    },
+    {
+      title: "Team",
+      url: getUrl("/admin/team"),
+      icon: Users,
+    },
+    {
+      title: "Orders",
+      url: getUrl("/admin/orders"),
+      icon: Package,
+    },
+    {
+      title: "Calendar",
+      url: getUrl("/admin/calendar"),
+      icon: Calendar,
+    },
+    {
+      title: "Invoices",
+      url: getUrl("/admin/invoices"),
+      icon: FileText,
+    },
+  ].map((item) => ({
+    ...item,
+    isActive: location.pathname === item.url || location.pathname.startsWith(`${item.url}/`),
+  }));
 
   const data = {
     user: {
@@ -74,29 +128,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       email: userEmail,
       avatar: avatar,
     },
-    navMain: [
-      {
-        title: "Dashboard",
-        url: getUrl("/my-account"),
-        icon: SquareTerminal,
-        isActive: true,
-      },
-      {
-        title: "Trips",
-        url: getUrl("/trips"),
-        icon: BookOpen,
-      },
-      {
-        title: "Clicks list",
-        url: getUrl("/clicks-list"),
-        icon: Settings2,
-      },
-      {
-        title: "Documents",
-        url: getUrl("/documents"),
-        icon: BookOpen,
-      },
-    ],
+    adminNav,
+    navMain,
     navSecondary: [
       {
         title: "Support",
@@ -109,27 +142,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Send,
       },
     ],
-    projects: [
-      {
-        name: "Design Engineering",
-        url: "#",
-        icon: Frame,
-      },
-      {
-        name: "Sales & Marketing",
-        url: "#",
-        icon: PieChart,
-      },
-      {
-        name: "Travel",
-        url: "#",
-        icon: Map,
-      },
-    ],
   };
 
   return (
-    <Sidebar variant="inset" {...props}>
+    <Sidebar variant="floating" {...props}>
       <SidebarHeader>
         <SidebarMenuButton size="lg" asChild>
           <Link to="/">
@@ -144,8 +160,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={data.navMain} label="Overview" />
+        {isAdmin && <NavMain items={adminNav} label="Admin Panel" />}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>

@@ -3,26 +3,27 @@ import axios from "../../../utils/axios";
 
 export const requestPasswordReset = createAsyncThunk(
   "password/requestReset",
-  async (email, { rejectWithValue }) => {
+  async (email: string, { rejectWithValue }) => {
     try {
       const { data } = await axios.post("/password/request-reset", { email });
       return data;
-    } catch (error) {
+    } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || "Error");
     }
   }
 );
 
-export const checkResetLink = createAsyncThunk(
-  "password/checkResetLink",
-  async (token, { rejectWithValue }) => {
+export const verifyPasswordResetOTP = createAsyncThunk(
+  "password/verifyOTP",
+  async ({ email, code }: { email: string; code: string }, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post(`/password/check-reset-link`, {
-        token,
+      const { data } = await axios.post("/password/verify-otp", {
+        email,
+        code,
       });
       return data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Invalid code");
     }
   }
 );
@@ -31,12 +32,13 @@ export const resetPassword = createAsyncThunk(
   "password/resetPassword",
   async ({ token, newPassword, confirmPassword }, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post(`/password/reset-password/${token}`, {
+      const { data } = await axios.post("/password/reset-password", {
+        token,
         newPassword,
         confirmPassword,
       });
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
       return rejectWithValue(
         error.response?.data?.errors || [
@@ -54,6 +56,7 @@ const resetPasswordSlice = createSlice({
   initialState: {
     user: null,
     token: null,
+    resetToken: null, // Токен для сброса пароля после верификации OTP
     status: "idle",
     requestResetError: null,
     errors: [],
@@ -82,19 +85,24 @@ const resetPasswordSlice = createSlice({
       })
       .addCase(requestPasswordReset.rejected, (state, action) => {
         state.status = "failed";
-        state.requestResetError = action.payload;
+        state.requestResetError = action.payload as string;
       })
-      .addCase(checkResetLink.pending, (state) => {
-        state.linkValid = null;
-        state.linkError = null;
+      // Верификация OTP для восстановления пароля
+      .addCase(verifyPasswordResetOTP.pending, (state) => {
+        state.status = "loading";
+        state.requestResetError = null;
       })
-      .addCase(checkResetLink.fulfilled, (state, action) => {
+      .addCase(verifyPasswordResetOTP.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.resetToken = action.payload.token;
         state.linkValid = action.payload.valid;
-        state.linkError = null;
+        state.message = action.payload.message;
+        state.requestResetError = null;
       })
-      .addCase(checkResetLink.rejected, (state, action) => {
+      .addCase(verifyPasswordResetOTP.rejected, (state, action) => {
+        state.status = "failed";
+        state.requestResetError = action.payload as string;
         state.linkValid = false;
-        state.linkError = action.payload?.message || "An unexpected error occurred";
       })
       .addCase(resetPassword.pending, (state) => {
         state.status = "loading";

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { toast } from "sonner";
 import { getMe, registerUser } from "../redux/features/auth/authSlice";
-import { CropAvatar } from "../components/Avatar";
+import { CropAvatar } from "../components/profile/Avatar";
 import avatarLogo from "../assets/avatar.webp";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";

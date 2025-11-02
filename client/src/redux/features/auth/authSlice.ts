@@ -11,10 +11,10 @@ import axios, { cancelFailedQueue } from "../../../utils/axios";
 export interface User {
   id: string;
   email: string;
-  phone: string;
+  phone: string | null;
   first_name: string;
   last_name: string;
-  affiliate_id: string;
+  affiliateId: string;
   avatarUrl?: string;
   role: "PARTNER" | "ADMIN";
   emailVerified: boolean;
@@ -23,6 +23,8 @@ export interface User {
   current_year_travellers?: number;
   total_commission?: number;
   level?: "BRONZE" | "SILVER" | "GOLD" | "PLATINUM";
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AuthResponse {
@@ -66,6 +68,22 @@ interface RegisterParams {
   password: string;
 }
 
+interface LoginParams {
+  email: string;
+  password: string;
+}
+
+interface OAuthParams {
+  token: string;
+}
+
+interface UpdateProfileParams {
+  firstName?: string;
+  lastName?: string;
+  phone?: string | null;
+  email?: string;
+}
+
 export const registerUser = createAsyncThunk<
   AuthResponse,
   RegisterParams,
@@ -96,11 +114,6 @@ export const registerUser = createAsyncThunk<
   }
 );
 
-interface LoginParams {
-  email: string;
-  password: string;
-}
-
 export const loginUser = createAsyncThunk<
   AuthResponse,
   LoginParams,
@@ -124,10 +137,6 @@ export const loginUser = createAsyncThunk<
     );
   }
 });
-
-interface OAuthParams {
-  token: string;
-}
 
 export const loginWithOAuth = createAsyncThunk<
   AuthResponse,
@@ -174,6 +183,26 @@ export const getMe = createAsyncThunk<AuthResponse, void, { rejectValue: string 
     }
   }
 );
+
+export const updateUserProfile = createAsyncThunk<
+  AuthResponse,
+  UpdateProfileParams,
+  { rejectValue: Array<{ message: string }> }
+>("auth/updateUserProfile", async (profileData, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.patch<AuthResponse>("/me/update-profile", profileData);
+    if (data.user) {
+      return data;
+    }
+    return rejectWithValue([{ message: data.message || "Profile update failed" }]);
+  } catch (error: any) {
+    return rejectWithValue(
+      error.response?.data?.errors || [
+        { message: error.response?.data?.message || "Profile update failed" },
+      ]
+    );
+  }
+});
 
 export const refreshAccessToken = createAsyncThunk<
   { token: string; refreshToken: string },
@@ -259,6 +288,12 @@ const authSlice = createSlice({
       // Check authorization
       .addCase(getMe.fulfilled, (state, action) => {
         state.user = action.payload?.user ?? null;
+        state.errors = [];
+      })
+      // Update User Profile
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.user = action.payload?.user ?? null;
+        state.message = action.payload?.message ?? null;
         state.errors = [];
       })
       // Refresh Token
