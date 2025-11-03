@@ -68,7 +68,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const navMain = [
     {
       title: "Dashboard",
-      url: getUrl("/my-account"),
+      url: getUrl("/overview"),
       icon: SquareTerminal, // или LayoutDashboard
     },
     {

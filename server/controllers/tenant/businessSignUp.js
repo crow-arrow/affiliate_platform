@@ -11,16 +11,24 @@ const slugify = (name) =>
 // POST /api/tenant/business-sign-up
 export const businessSignUp = async (req, res) => {
   try {
-    const { companyName, email, phone, first_name, last_name, password } =
-      req.body || {};
-    if (!companyName || !email || !password || !first_name || !last_name) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "companyName, first_name, last_name, email, password are required",
-        });
+    const {
+      companyName,
+      email,
+      phone,
+      first_name,
+      last_name,
+      password,
+      plan,
+      invitedEmails,
+    } = req.body || {};
+    if (!companyName || !email || !first_name || !last_name) {
+      return res.status(400).json({
+        message: "companyName, first_name, last_name, email are required",
+      });
     }
+
+    // Password требуется только для новых пользователей
+    // Для существующих пользователей (авторизованных) password не обязателен
 
     const normalizedEmail = email.trim().toLowerCase();
     // Проверяем уникальность названия компании (не email!)
@@ -46,27 +54,44 @@ export const businessSignUp = async (req, res) => {
       },
     });
 
-    // Создаем/обновляем глобальную Identity и Membership (ADMIN) для нового tenant
-    const passwordHash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-    const identity = await prisma.identity.upsert({
+    // Проверяем, существует ли Identity
+    let identity = await prisma.identity.findUnique({
       where: { email: normalizedEmail },
-      update: {
-        firstName: first_name,
-        lastName: last_name,
-        // Обновлять пароль ТОЛЬКО если явно пришёл новый пароль
-        passwordHash,
-        // emailVerified не обновляем при update (оставляем существующее значение)
-      },
-      create: {
-        email: normalizedEmail,
-        firstName: first_name,
-        lastName: last_name,
-        passwordHash,
-        emailVerified: false, // Email требует подтверждения при кастомной регистрации
-      },
     });
 
-    await prisma.membership.upsert({
+    if (identity) {
+      // Обновляем существующего пользователя
+      identity = await prisma.identity.update({
+        where: { email: normalizedEmail },
+        data: {
+          firstName: first_name,
+          lastName: last_name,
+          // Обновляем пароль только если он предоставлен
+          ...(password && {
+            passwordHash: bcrypt.hashSync(password, bcrypt.genSaltSync(10)),
+          }),
+        },
+      });
+    } else {
+      // Создаем нового пользователя (password обязателен)
+      if (!password) {
+        return res.status(400).json({
+          message: "Password is required for new users",
+        });
+      }
+      const passwordHash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+      identity = await prisma.identity.create({
+        data: {
+          email: normalizedEmail,
+          firstName: first_name,
+          lastName: last_name,
+          passwordHash,
+          emailVerified: false,
+        },
+      });
+    }
+
+    const membership = await prisma.membership.upsert({
       where: {
         identityId_tenantId: { identityId: identity.id, tenantId: tenant.id },
       },
@@ -74,13 +99,29 @@ export const businessSignUp = async (req, res) => {
       create: { identityId: identity.id, tenantId: tenant.id, role: "ADMIN" },
     });
 
-    // Вариант A: больше не создаём пер-tenant профиль `User`.
-    // Управление доступом и принадлежностью делаем через Identity + Membership.
-    const adminUser = null;
+    // Создаем PartnerProfile для ADMIN
+    const existingProfile = await prisma.partnerProfile.findUnique({
+      where: { membershipId: membership.id },
+    });
 
-    // tokens формируются в auth.js; здесь не создает токены специально,
-    // но для обратной совместимости можно вернуть минимум
-    // Автологин: выдаём токены из Identity+Membership
+    if (!existingProfile) {
+      const affiliateId = `${first_name.toLowerCase()}_${Math.floor(
+        Math.random() * 90000 + 10000
+      )}`;
+      await prisma.partnerProfile.create({
+        data: {
+          membershipId: membership.id,
+          affiliateId: affiliateId,
+          phone: phone || null,
+          level: "BRONZE",
+        },
+      });
+    }
+
+    // TODO: Сохранить plan в tenant settings или отдельной таблице
+    // TODO: Отправить приглашения по email, если provided
+
+    // Генерируем токены
     const { generateTokens } = await import("../../utils/jwt.js");
     const tokens = generateTokens({
       id: identity.id,
@@ -98,7 +139,7 @@ export const businessSignUp = async (req, res) => {
       tenant: { id: tenant.id, name: tenant.name, slug: tenant.domain },
       token: tokens.accessToken,
       refreshToken: tokens.refreshToken,
-      message: "Business account created",
+      message: "Workspace created successfully",
     });
   } catch (error) {
     console.error("❌ businessSignUp error:", error);

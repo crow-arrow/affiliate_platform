@@ -1,4 +1,5 @@
 import { OTPForm } from "@/components/verification/OPTForm";
+import placeholder from "@/assets/placeholder.svg";
 
 export const OTPPage = () => {
   return (
@@ -13,7 +14,7 @@ export const OTPPage = () => {
           alt="Authentication"
           className="absolute inset-0 h-full w-full object-cover"
           height={1080}
-          src="/placeholder.svg"
+          src={placeholder}
           width={1920}
         />
       </div>

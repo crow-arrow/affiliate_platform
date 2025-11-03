@@ -140,7 +140,7 @@ export const CustomFileInput = ({
             />
           </div>
         ) : (
-          <button onClick={triggerFileInput} className="text-gray-400 font-bold w-full h-full">
+          <button onClick={triggerFileInput} className="text-gray-400 dark:text-gray-500 font-bold w-full h-full">
             <span>Choose a file</span>
           </button>
         )}

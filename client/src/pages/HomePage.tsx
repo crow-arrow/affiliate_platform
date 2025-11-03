@@ -9,6 +9,8 @@ import { WorkspaceSwitcher } from "@/components/profile/WorkspaceSwitcher";
 import { Button } from "@/components/ui/button";
 import Logo from "@/assets/logo.png";
 import { Building2, Sparkles } from "lucide-react";
+import { useAuthTenantResolver } from "@/hooks/useAuthTenantResolver";
+import { MenuBar } from "@/components/navigation/MenuBar";
 
 type TenantItem = { id: string; name: string; domain: string };
 
@@ -20,6 +22,7 @@ export function HomePage() {
   const [currentTenant, setCurrentTenant] = useState<TenantItem | null>(null);
   const [selectedTenant, setSelectedTenant] = useState<TenantItem | null>(null);
   const [availableTenants, setAvailableTenants] = useState<TenantItem[]>([]);
+  const { isLoading } = useAuthTenantResolver();
 
   useEffect(() => {
     // Если не авторизован - редиректим на страницу входа
@@ -28,13 +31,13 @@ export function HomePage() {
     const pathname = window.location.pathname;
     const isOnHomePage = pathname === "/" || pathname === "";
 
-    if (isOnHomePage && (!isAuth || !user)) {
+    if (isOnHomePage && isLoading) {
       navigate("/sign-in", { replace: true });
       return;
     }
 
     // Если не на HomePage или еще загружается - не редиректим
-    if (!isAuth || !user) {
+    if (isLoading) {
       return;
     }
 
@@ -106,17 +109,11 @@ export function HomePage() {
     setSelectedTenant(tenant);
   };
 
-  // Показываем загрузку пока проверяем авторизацию
-  if (!isAuth || !user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl">Loading...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-4">
+      <header className="absolute top-6 self-center">
+        <MenuBar />
+      </header>
       <div className="w-full max-w-2xl space-y-8 text-center">
         {/* Logo */}
         <div className="flex justify-center mb-8">
@@ -126,7 +123,7 @@ export function HomePage() {
         {/* Welcome Message */}
         <div className="space-y-2">
           <h1 className="text-4xl font-bold tracking-tight">
-            Welcome back{user.first_name ? `, ${user.first_name}` : ""}!
+            Welcome back{user?.first_name ? `, ${user.first_name}` : ""}!
           </h1>
           <p className="text-lg text-muted-foreground">
             Select a workspace and connect to continue
@@ -134,14 +131,14 @@ export function HomePage() {
         </div>
 
         {/* User Email */}
-        {user.email && (
+        {user?.email && (
           <div className="bg-muted/50 rounded-lg px-4 py-2.5 text-sm text-muted-foreground border inline-block">
-            Signed in as <span className="font-medium text-foreground">{user.email}</span>
+            Signed in as <span className="font-medium text-foreground">{user?.email}</span>
           </div>
         )}
 
         {/* Workspace Selection */}
-        {availableTenants.length > 0 ? (
+        {availableTenants.length > 0 && (
           <div className="py-8 space-y-4">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <WorkspaceSwitcher
@@ -168,17 +165,16 @@ export function HomePage() {
               </Button>
             </div>
           </div>
-        ) : (
-          <div className="py-8 space-y-4">
-            <p className="text-muted-foreground">
-              You don't have any workspaces yet. Create one to get started.
-            </p>
-            <Button onClick={() => navigate("/business-sign-up")} size="lg" className="gap-2">
-              <Sparkles className="h-5 w-5" />
-              Create a Workspace
-            </Button>
-          </div>
         )}
+        <div className="py-8 space-y-4">
+          <p className="text-muted-foreground">
+            You don't have any workspaces yet. Create one to get started.
+          </p>
+          <Button onClick={() => navigate("/create-workspace")} size="lg" className="gap-2">
+            <Sparkles className="h-5 w-5" />
+            Create a Workspace
+          </Button>
+        </div>
       </div>
     </div>
   );

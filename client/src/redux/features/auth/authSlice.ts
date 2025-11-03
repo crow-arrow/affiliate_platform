@@ -268,6 +268,9 @@ const authSlice = createSlice({
         state.refreshToken = action.payload.refreshToken ?? null;
         state.message = action.payload.message ?? null;
         state.errors = [];
+        // НЕ сохраняем токен в localStorage при регистрации, так как email еще не верифицирован
+        // Токен будет сохранен после успешной верификации OTP
+        // Это предотвращает автоматические редиректы до верификации email
       })
       // Login
       .addCase(loginUser.fulfilled, (state, action) => {

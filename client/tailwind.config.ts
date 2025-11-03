@@ -107,26 +107,24 @@ export default {
       backgroundImage: {
         "gradient-custom":
           "linear-gradient(150deg, rgba(242,200,237,1) 0%, rgba(169,223,216,1) 100%)",
-        "gradient-primary":
-          "linear-gradient(150deg, rgba(11,46,51,1) 0%, rgba(79,124,130,1) 100%)",
+        "gradient-primary": "linear-gradient(150deg, rgba(11,46,51,1) 0%, rgba(79,124,130,1) 100%)",
         "gradient-secondary":
           "linear-gradient(150deg, rgba(242,240,239,1) 0%, rgba(255,255,255,1) 100%)",
         "gradient-blur": "linear-gradient(rgba(255,255,255,0.3),transparent)",
         "gradient-blurLite": "linear-gradient(rgba(0,0,0,0.3),transparent)",
-        "gradient-bronze":
-          "linear-gradient(160deg, #8f4e38, #ba7552, #fecb9e, #ba7552, #8f4e38)",
-        "gradient-silver":
-          "linear-gradient(160deg, #909090, #bbbbbb, #ffffff, #bbbbbb, #909090)",
-        "gradient-gold":
-          "linear-gradient(160deg, #a54e07, #b47e11, #fef1a2, #bc881b, #a54e07)",
+        "gradient-bronze": "linear-gradient(160deg, #8f4e38, #ba7552, #fecb9e, #ba7552, #8f4e38)",
+        "gradient-silver": "linear-gradient(160deg, #909090, #bbbbbb, #ffffff, #bbbbbb, #909090)",
+        "gradient-gold": "linear-gradient(160deg, #a54e07, #b47e11, #fef1a2, #bc881b, #a54e07)",
+        "gradient-radial-dark":
+          "radial-gradient(circle, transparent 0%, rgba(96, 165, 250, 0.3) 30%, rgba(192, 132, 252, 0.3) 60%, rgba(248, 113, 113, 0.3) 90%, transparent 100%)",
+        "gradient-radial-light":
+          "radial-gradient(circle, transparent 0%, rgba(96, 165, 250, 0.2) 30%, rgba(192, 132, 252, 0.2) 60%, rgba(248, 113, 113, 0.2) 90%, transparent 100%)",
       },
       boxShadow: {
-        custom:
-          "-4px -4px 12px hsla(0, 0%, 100%, .05), 4px 4px 12px rgba(0, 0, 0, 0.8)",
+        custom: "-4px -4px 12px hsla(0, 0%, 100%, .05), 4px 4px 12px rgba(0, 0, 0, 0.8)",
         "inset-custom":
           "inset -22px -14px 14px 2px hsla(0, 0%, 100%, .015), inset 8px 4px 20px 12px rgba(0, 0, 0, .8)",
-        "inset-2":
-          "inset -2px -2px 4px hsla(0, 0%, 100%, .1), inset 2px 2px 4px rgba(0, 0, 0, .5)",
+        "inset-2": "inset -2px -2px 4px hsla(0, 0%, 100%, .1), inset 2px 2px 4px rgba(0, 0, 0, .5)",
         "custom-white":
           "-4px -4px 12px hsla(0, 0%, 100%, .05), 4px 4px 12px rgba(255, 255, 255, 0.8)",
         "inset-white":

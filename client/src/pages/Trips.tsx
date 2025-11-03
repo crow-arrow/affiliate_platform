@@ -274,7 +274,7 @@ export const Trips = () => {
 
           if (status === "CANCEL") {
             bgColor = "bg-red-100";
-            textColor = "text-red-800";
+            textColor = "text-red-600";
           } else if (status === "REJECTED") {
             bgColor = "bg-gray-100";
             textColor = "text-gray-800";
@@ -330,7 +330,7 @@ export const Trips = () => {
         header: () => <div className="w-full text-right">Commission</div>,
         cell: ({ row }) => {
           const { commission, isCompleted, isCanceled } = row.original;
-          let textColor = "text-gray-400";
+          let textColor = "text-gray-400 dark:text-gray-500";
 
           if (isCompleted) {
             textColor = "text-green-400";

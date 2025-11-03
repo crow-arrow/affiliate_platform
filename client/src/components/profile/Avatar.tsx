@@ -103,7 +103,7 @@ export const CropAvatar = ({ isOpen, onClose }) => {
             <button
               onClick={handleUploadAvatar}
               disabled={isButtonDisabled}
-              className="w-[390px] p-2 mt-8 text-s rounded-xl bg-white text-gray-900
+              className="w-[390px] p-2 mt-8 text-s rounded-xl bg-white dark:bg-secondary text-gray-900 dark:text-foreground
                     disabled:shadow-inset-2 disabled:bg-slate-500 disabled:animate-pulse disabled:cursor-progress"
             >
               {loading ? "Loading..." : "Upload Avatar"}

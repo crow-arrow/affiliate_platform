@@ -5,6 +5,7 @@ import { useAppSelector } from "./redux/hooks";
 import { useLocation } from "react-router-dom";
 import { checkIsAuth } from "./redux/features/auth/authSlice";
 import { useAuthTenantResolver } from "./hooks/useAuthTenantResolver";
+import { Loader2Icon } from "lucide-react";
 
 import { AdminDashboard } from "./admin_pages/AdminDashboard";
 import { Team } from "./admin_pages/Team";
@@ -15,18 +16,15 @@ import { LevelSettingsAdmin } from "./admin_pages/LevelSettings";
 import { LevelSettingsTest } from "./admin_pages/LevelSettingsTest";
 
 import { Dashboard } from "./pages/Dashboard";
-import { DashboardCopy } from "./pages/DashboardCopy";
 import { Trips } from "./pages/Trips";
 import { CklicksList } from "./pages/CklicksList";
 import { Documents } from "./pages/Documents";
 import { Settings } from "./pages/Settings";
 import { Account } from "./pages/Account";
 
-import { PasswordRecover } from "./pages/PasswordRecover";
-import { RequestPasswordReset } from "./pages/RequestPasswordReset";
-import { EmailSentMessage } from "./pages/EmailSentMessage";
-import { LoginPage } from "./pages/LoginPage";
-import { SignUpPage } from "./pages/SignUpPage";
+import { PasswordRecover } from "./pages/auth/PasswordRecover";
+import { LoginPage } from "./pages/auth/LoginPage";
+import { SignUpPage } from "./pages/auth/SignUpPage";
 import { BusinessSignUpPage } from "./pages/BusinessSignUpPage";
 import { CreateWorkspacePage } from "./pages/CreateWorkspacePage";
 import { NotFound } from "./pages/NotFound";
@@ -43,6 +41,7 @@ import {
   extractTenantSlugFromPath,
 } from "@/constants/routes";
 import { OTPPage } from "./pages/OTPPage";
+import { DropdownMenuTest } from "./pages/test/DropdownMenuTest";
 
 // Обертка для CropAvatar с дефолтными пропсами
 const CropAvatarWrapper = () => {
@@ -65,8 +64,9 @@ const TenantScopedRouteElement = () => {
 
   if (shouldWaitForAuth) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl">Loading...</div>
+      <div className="flex items-center justify-center gap-2 min-h-screen">
+        <Loader2Icon className="animate-spin" />
+        <span className="text-xl">Loading...</span>
       </div>
     );
   }
@@ -104,8 +104,9 @@ const AdminTenantScopedRouteElement = () => {
 
   if (shouldWaitForAuth) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl">Loading...</div>
+      <div className="flex items-center justify-center gap-2 min-h-screen">
+        <Loader2Icon className="animate-spin" />
+        <span className="text-xl">Loading...</span>
       </div>
     );
   }
@@ -281,7 +282,22 @@ function App() {
     // - уже был редирект
     // - пользователь не авторизован (не редиректим неавторизованных на HomePage)
     // - это не публичный маршрут (публичные маршруты обрабатываются здесь)
-    if (isLoading || hasRedirectedRef.current || !effectiveIsAuth || !user || !isPublicRoute) {
+    // - это страница верификации OTP (пользователь должен сначала верифицировать email)
+    // - email не верифицирован (не редиректим на HomePage, пока email не подтвержден)
+    // - нет токена в localStorage (значит пользователь еще не полностью авторизован)
+    const tokenInStorage = window.localStorage.getItem("token");
+    if (
+      isLoading ||
+      hasRedirectedRef.current ||
+      !effectiveIsAuth ||
+      !user ||
+      !isPublicRoute ||
+      location.pathname === "/verify-otp" ||
+      location.pathname === "/reset-password" ||
+      location.pathname.startsWith("/test/") ||
+      (user && !user.emailVerified) ||
+      !tokenInStorage
+    ) {
       return;
     }
 
@@ -304,8 +320,9 @@ function App() {
 
   if (shouldShowLoader) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl">Loading...</div>
+      <div className="flex items-center justify-center gap-2 min-h-screen">
+        <Loader2Icon className="animate-spin" />
+        <span className="text-xl">Loading...</span>
       </div>
     );
   }
@@ -313,7 +330,7 @@ function App() {
   return (
     <>
       {import.meta.env.VITE_SHOW_DEV_BANNER === "true" && (
-        <div className="bg-yellow-500 text-black p-2 text-center">
+        <div className="bg-yellow-500 dark:bg-yellow-600 text-black dark:text-yellow-50 p-2 text-center">
           🛠 You are in development environment
         </div>
       )}
@@ -325,16 +342,11 @@ function App() {
         <Route path="/create-workspace" element={<CreateWorkspacePage />} />
         <Route path="/verify-otp" element={<OTPPage />} />
         <Route path="/reset-password" element={<PasswordRecover />} />
-        <Route path="/request-reset" element={<RequestPasswordReset />} />
-        <Route path="/email-verification" element={<EmailSentMessage />} />
         <Route path="/sso-callback" element={<SSOCallback />} />
         <Route path="/oauth-done" element={<OAuthDone />} />
 
         {/*Test pages*/}
-        <Route path="/test/*">
-          <Route index element={<Dashboard />} />
-          <Route path="overview" element={<DashboardCopy />} />
-        </Route>
+        <Route path="/test/dropdown-menu" element={<DropdownMenuTest />} />
 
         {/* Homepage - выбор workspace */}
         <Route path="/" element={<HomePage />} />

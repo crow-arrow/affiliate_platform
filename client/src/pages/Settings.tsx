@@ -6,6 +6,7 @@ import { CropAvatar } from "../components/profile/Avatar";
 import avatarLogo from "../assets/avatar.webp";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ChangePasswordForm } from "@/pages/settings/ChangePasswordForm";
 
 import PartyModeOutlinedIcon from "@mui/icons-material/PartyModeOutlined";
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
@@ -164,7 +165,7 @@ export const Settings = () => {
                           userLevel === "Bronze"
                             ? "bg-gradient-bronze border-[1px] border-solid border-bronze-border text-bronze-text [text-shadow:0_2px_1px_rgba(205,_127,_50,_1)]"
                             : userLevel === "Silver"
-                              ? "bg-gradient-silver border-[1px] border-solid border-silver-border text-gray-700 [text-shadow:0_2px_1px_rgba(187,_187,_187,_1)]"
+                              ? "bg-gradient-silver border-[1px] border-solid border-silver-border text-gray-700 dark:text-gray-300 [text-shadow:0_2px_1px_rgba(187,_187,_187,_1)] dark:[text-shadow:none]"
                               : userLevel === "Gold"
                                 ? "bg-gradient-gold border-[1px] border-solid border-gold-border text-gold-text [text-shadow:0_2px_1px_rgba(180,_126,_17,_1)]"
                                 : "bg-none"
@@ -213,7 +214,7 @@ export const Settings = () => {
                 onChange={(e) => setPhone(e.target.value)}
                 readOnly
                 autoComplete="phone"
-                className="block w-full rounded-xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-xl shadow-inset-2 bg-white dark:bg-secondary px-3 py-1.5 text-base text-gray-900 dark:text-foreground placeholder:text-gray-400 dark:placeholder:text-muted-foreground focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -232,7 +233,7 @@ export const Settings = () => {
                 onChange={(e) => setFirstName(e.target.value)}
                 readOnly
                 autoComplete="given-name"
-                className="block w-full rounded-xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-xl shadow-inset-2 bg-white dark:bg-secondary px-3 py-1.5 text-base text-gray-900 dark:text-foreground placeholder:text-gray-400 dark:placeholder:text-muted-foreground focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -251,7 +252,7 @@ export const Settings = () => {
                 onChange={(e) => setLastName(e.target.value)}
                 readOnly
                 autoComplete="family-name"
-                className="block w-full rounded-xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-xl shadow-inset-2 bg-white dark:bg-secondary px-3 py-1.5 text-base text-gray-900 dark:text-foreground placeholder:text-gray-400 dark:placeholder:text-muted-foreground focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -272,7 +273,7 @@ export const Settings = () => {
                 readOnly
                 placeholder="*********"
                 autoComplete="current-password"
-                className="block w-full rounded-xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
+                className="block w-full rounded-xl shadow-inset-2 bg-white dark:bg-secondary px-3 py-1.5 text-base text-gray-900 dark:text-foreground placeholder:text-gray-400 dark:placeholder:text-muted-foreground focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-accent sm:text-sm"
               />
             </div>
           </div>
@@ -292,7 +293,7 @@ export const Settings = () => {
                 readOnly
                 placeholder="*********"
                 autoComplete="current-password"
-                className="block w-full rounded-xl shadow-inset-2 bg-white px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400  sm:text-sm"
+                className="block w-full rounded-xl shadow-inset-2 bg-white dark:bg-secondary px-3 py-1.5 text-base text-gray-900 dark:text-foreground placeholder:text-gray-400 dark:placeholder:text-muted-foreground sm:text-sm"
               />
             </div>
           </div>
@@ -336,6 +337,10 @@ export const Settings = () => {
             </button>
           </div>
         </form>
+      </div>
+      <div className="flex flex-col w-full bg-white dark:bg-secondary backdrop-blur-sm rounded-2xl px-4 py-6 gap-y-4 items-start justify-between">
+        <h2 className="text-2xl">Change Password</h2>
+        <ChangePasswordForm />
       </div>
       {isModalOpen && <CropAvatar isOpen={isModalOpen} onClose={handleCloseModal} />}
     </div>

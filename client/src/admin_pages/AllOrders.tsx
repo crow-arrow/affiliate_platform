@@ -82,33 +82,33 @@ export const AllOrders = () => {
         header: "Order Status",
         cell: ({ row }) => {
           const orderStatus = (row.original as any).order_status || "PENDING";
-          let bgColor = "bg-gray-100";
-          let textColor = "text-gray-800";
+          let bgColor = "bg-gray-100 dark:bg-gray-800";
+          let textColor = "text-gray-800 dark:text-gray-200";
 
           if (orderStatus === "CANCEL") {
-            bgColor = "bg-red-100";
-            textColor = "text-red-800";
+            bgColor = "bg-red-100 dark:bg-red-900/30";
+            textColor = "text-red-800 dark:text-red-300";
           } else if (orderStatus === "REJECTED") {
-            bgColor = "bg-gray-100";
-            textColor = "text-gray-800";
+            bgColor = "bg-gray-100 dark:bg-gray-800";
+            textColor = "text-gray-800 dark:text-gray-200";
           } else if (orderStatus === "PENDING") {
-            bgColor = "bg-orange-100";
-            textColor = "text-orange-800";
+            bgColor = "bg-orange-100 dark:bg-orange-900/30";
+            textColor = "text-orange-800 dark:text-orange-300";
           } else if (orderStatus === "WAIT_FOR_APPROVAL") {
-            bgColor = "bg-blue-100";
-            textColor = "text-blue-800";
+            bgColor = "bg-blue-100 dark:bg-blue-900/30";
+            textColor = "text-blue-800 dark:text-blue-300";
           } else if (orderStatus === "COMPLETED") {
-            bgColor = "bg-green-100";
-            textColor = "text-green-800";
+            bgColor = "bg-green-100 dark:bg-green-900/30";
+            textColor = "text-green-800 dark:text-green-300";
           } else if (orderStatus === "APPROVED") {
-            bgColor = "bg-green-100";
-            textColor = "text-green-800";
+            bgColor = "bg-green-100 dark:bg-green-900/30";
+            textColor = "text-green-800 dark:text-green-300";
           } else if (orderStatus === "CONFIRMED") {
-            bgColor = "bg-green-100";
-            textColor = "text-green-800";
+            bgColor = "bg-green-100 dark:bg-green-900/30";
+            textColor = "text-green-800 dark:text-green-300";
           } else if (orderStatus === "DEPOSIT_PAID") {
-            bgColor = "bg-blue-100";
-            textColor = "text-blue-800";
+            bgColor = "bg-blue-100 dark:bg-blue-900/30";
+            textColor = "text-blue-800 dark:text-blue-300";
           }
 
           const displayStatus = orderStatus

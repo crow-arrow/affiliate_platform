@@ -6,6 +6,7 @@ import { getUserTrips } from "../controllers/me/getTrips.js";
 import { getUserClicks } from "../controllers/getClicks.js";
 import { updateUserProfile } from "../controllers/me/updateProfile.js";
 import { uploadAvatar } from "../controllers/uploadFiles.js";
+import { changePassword } from "../controllers/me/changePassword.js";
 
 const router = express.Router();
 
@@ -17,6 +18,9 @@ router.get("/clicks", checkAuth, getUserClicks);
 
 // http://localhost:3002/api/me/update-profile for Profile settings
 router.patch("/update-profile", checkAuth, updateUserProfile);
+
+// Change password for authenticated user
+router.patch("/change-password", checkAuth, changePassword);
 
 // router.post("/upload-avatar", upload.single("avatar"), updateUserAvatar); // Маршрут для загрузки аватара
 router.patch(

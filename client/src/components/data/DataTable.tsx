@@ -26,8 +26,8 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  LayoutGrid,
   GripVertical,
+  LayoutGrid,
 } from "lucide-react";
 import {
   ColumnDef,
@@ -46,6 +46,14 @@ import {
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty";
+import { EmptyGridAnimation } from "@/components/ui/empty-grid-animation";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -360,14 +368,26 @@ export function DataTable<TData extends Record<string, any>>({
                       ))}
                     </SortableContext>
                   ) : (
-                    // Показываем placeholder строки когда данных нет (но не во время загрузки)
-                    Array.from({ length: Math.min(skeletonRows, 7) }).map((_, index) => (
-                      <TableSkeletonRow
-                        key={`empty-${index}`}
-                        headerGroups={table.getHeaderGroups()}
-                        rowIndex={index}
-                      />
-                    ))
+                    // Показываем Empty компонент когда данных нет
+                    <TableRow>
+                      <TableCell
+                        colSpan={table.getAllColumns().length}
+                        className="h-[calc(100vh-340px)] min-h-[450px] p-0"
+                      >
+                        <div className="flex h-full w-full items-center justify-center">
+                          <Empty>
+                            <EmptyHeader>
+                              <EmptyMedia variant="icon">
+                                <EmptyGridAnimation />
+                              </EmptyMedia>
+                              <EmptyTitle className="text-muted-foreground">
+                                {emptyMessage}
+                              </EmptyTitle>
+                            </EmptyHeader>
+                          </Empty>
+                        </div>
+                      </TableCell>
+                    </TableRow>
                   )}
                 </TableBody>
               </Table>

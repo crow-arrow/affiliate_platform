@@ -124,8 +124,8 @@ export function BusinessSignupForm() {
         </Field>
       </FieldGroup>
 
-      <Button type="submit" className="w-full mt-2" disabled={loading}>
-        {loading ? "Creating..." : "Create company"}
+      <Button type="submit" loading={loading} loadingText="Creating..." className="w-full mt-2">
+        Create company
       </Button>
     </form>
   );

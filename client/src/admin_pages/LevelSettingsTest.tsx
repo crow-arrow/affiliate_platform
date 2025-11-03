@@ -38,8 +38,8 @@ export const LevelSettingsTest = () => {
           <CardDescription>Testing the level settings API endpoint</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button onClick={fetchSettings} disabled={loading}>
-            {loading ? "Loading..." : "Refresh Settings"}
+          <Button onClick={fetchSettings} loading={loading} loadingText="Loading...">
+            Refresh Settings
           </Button>
 
           {error && (
@@ -65,7 +65,7 @@ export const LevelSettingsTest = () => {
                       <Badge variant="outline" className="mr-2">
                         {level.levelName}
                       </Badge>
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
                         Order: {level.levelOrder} | Required: {level.requiredAmount}
                       </span>
                     </div>

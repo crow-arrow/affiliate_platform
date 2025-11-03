@@ -160,9 +160,9 @@ export const LevelSettingsAdmin = () => {
 
           {/* Save Button */}
           <div className="flex justify-end">
-            <Button onClick={saveSettings} disabled={loading}>
+            <Button onClick={saveSettings} loading={loading} loadingText="Saving...">
               <Save className="w-4 h-4 mr-2" />
-              {loading ? "Saving..." : "Save Settings"}
+              Save Settings
             </Button>
           </div>
         </CardContent>

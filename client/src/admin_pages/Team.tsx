@@ -88,7 +88,7 @@ export const Team = () => {
                   level === "Bronze"
                     ? "bg-gradient-bronze border-[1px] border-solid border-bronze-border text-bronze-text [text-shadow:0_2px_1px_rgba(205,_127,_50,_1)]"
                     : level === "Silver"
-                      ? "bg-gradient-silver border-[1px] border-solid border-silver-border text-gray-700 [text-shadow:0_2px_1px_rgba(187,_187,_187,_1)]"
+                      ? "bg-gradient-silver border-[1px] border-solid border-silver-border text-gray-700 dark:text-gray-300 [text-shadow:0_2px_1px_rgba(187,_187,_187,_1)] dark:[text-shadow:none]"
                       : level === "Gold"
                         ? "bg-gradient-gold border-[1px] border-solid border-gold-border text-gold-text [text-shadow:0_2px_1px_rgba(180,_126,_17,_1)]"
                         : "bg-none"

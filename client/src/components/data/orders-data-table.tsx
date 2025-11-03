@@ -510,4 +510,3 @@ function OrdersDataTable({ data: initialData }: { data: z.infer<typeof ordersSch
 }
 
 export { OrdersDataTable };
-

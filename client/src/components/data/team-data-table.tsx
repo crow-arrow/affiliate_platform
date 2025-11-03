@@ -187,9 +187,7 @@ function TeamDataTable({ data: initialData }: { data: z.infer<typeof teamSchema>
               }
               alt={row.original.first_name}
             />
-            <AvatarFallback>
-              {row.original.first_name?.[0]?.toUpperCase() || "U"}
-            </AvatarFallback>
+            <AvatarFallback>{row.original.first_name?.[0]?.toUpperCase() || "U"}</AvatarFallback>
           </Avatar>
         </div>
       ),
@@ -229,7 +227,7 @@ function TeamDataTable({ data: initialData }: { data: z.infer<typeof teamSchema>
                 level === "Bronze"
                   ? "bg-gradient-bronze border-[1px] border-solid border-bronze-border text-bronze-text [text-shadow:0_2px_1px_rgba(205,_127,_50,_1)]"
                   : level === "Silver"
-                    ? "bg-gradient-silver border-[1px] border-solid border-silver-border text-gray-700 [text-shadow:0_2px_1px_rgba(187,_187,_187,_1)]"
+                    ? "bg-gradient-silver border-[1px] border-solid border-silver-border text-gray-700 dark:text-gray-300 [text-shadow:0_2px_1px_rgba(187,_187,_187,_1)] dark:[text-shadow:none]"
                     : level === "Gold"
                       ? "bg-gradient-gold border-[1px] border-solid border-gold-border text-gold-text [text-shadow:0_2px_1px_rgba(180,_126,_17,_1)]"
                       : "bg-none"
@@ -253,8 +251,7 @@ function TeamDataTable({ data: initialData }: { data: z.infer<typeof teamSchema>
       cell: ({ row }) => {
         const affiliateId = row.original.affiliate_id;
         if (!affiliateId) return null;
-        const truncatedRef =
-          affiliateId.length > 5 ? affiliateId.slice(0, 5) + "..." : affiliateId;
+        const truncatedRef = affiliateId.length > 5 ? affiliateId.slice(0, 5) + "..." : affiliateId;
         const refLink = `https://jinn-travel.com/?affiliateId=${affiliateId}`;
 
         return (
@@ -532,4 +529,3 @@ function TeamDataTable({ data: initialData }: { data: z.infer<typeof teamSchema>
 }
 
 export { TeamDataTable };
-

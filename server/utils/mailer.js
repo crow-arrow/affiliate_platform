@@ -36,7 +36,7 @@ export const sendVerificationOTP = async (email, username, code) => {
                 <tr>
                   <td style="padding: 25px; vertical-align: top">
                     <div style="text-align: center; margin: 0 50px 0 0">
-                      <a href="https://www.jinn-travel.com">
+                      <a href=${import.meta.env.VITE_URL || ""}>
                         <img
                           src="https://jinn-travel.com/wp-content/uploads/2024/11/logo-scaled.png"
                           alt="Jinn Travel Logo"

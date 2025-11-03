@@ -7,9 +7,10 @@ export const PUBLIC_ROUTES = [
   "sign-in",
   "sign-up",
   "business-sign-up",
+  "create-workspace",
+  "verify-otp",
   "verify-email",
   "reset-password",
-  "request-reset",
   "email-verification",
   "sso-callback",
   "oauth-done",
@@ -44,7 +45,9 @@ export const extractTenantSlugFromPath = (pathname: string): string | null => {
   // Проверяем, что это не публичный и не app-маршрут
   const isPublic = PUBLIC_ROUTES.includes(first as any);
   const isApp = APP_ROUTES.includes(first as any);
-  const isSpecial = ["404-not-found", "oauth-done", "sso-callback"].includes(first);
+  const isSpecial = ["404-not-found", "oauth-done", "sso-callback", "create-workspace"].includes(
+    first
+  );
 
   if (!isPublic && !isApp && !isSpecial) {
     return first;

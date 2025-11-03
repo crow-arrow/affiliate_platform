@@ -24,6 +24,13 @@ import { TripsDataTable } from "../components/data/trips-data-table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty";
+import {
   Table,
   TableBody,
   TableCell,
@@ -51,17 +58,46 @@ function getStatusBadge(status: string) {
     string,
     { variant: "default" | "secondary" | "destructive" | "outline"; className: string }
   > = {
-    COMPLETED: { variant: "default", className: "bg-green-100 text-green-800" },
-    APPROVED: { variant: "default", className: "bg-green-100 text-green-800" },
-    CONFIRMED: { variant: "default", className: "bg-green-100 text-green-800" },
-    CANCEL: { variant: "destructive", className: "bg-red-100 text-red-800" },
-    REJECTED: { variant: "destructive", className: "bg-red-100 text-red-800" },
-    PENDING: { variant: "secondary", className: "bg-orange-100 text-orange-800" },
-    WAIT_FOR_APPROVAL: { variant: "secondary", className: "bg-blue-100 text-blue-800" },
-    DEPOSIT_PAID: { variant: "secondary", className: "bg-blue-100 text-blue-800" },
+    COMPLETED: {
+      variant: "default",
+      className: "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300",
+    },
+    APPROVED: {
+      variant: "default",
+      className: "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300",
+    },
+    CONFIRMED: {
+      variant: "default",
+      className: "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300",
+    },
+    CANCEL: {
+      variant: "destructive",
+      className: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300",
+    },
+    REJECTED: {
+      variant: "destructive",
+      className: "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300",
+    },
+    PENDING: {
+      variant: "secondary",
+      className: "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300",
+    },
+    WAIT_FOR_APPROVAL: {
+      variant: "secondary",
+      className: "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300",
+    },
+    DEPOSIT_PAID: {
+      variant: "secondary",
+      className: "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300",
+    },
   };
 
-  return statusMap[status] || { variant: "outline", className: "bg-gray-100 text-gray-800" };
+  return (
+    statusMap[status] || {
+      variant: "outline",
+      className: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200",
+    }
+  );
 }
 
 export const Dashboard: React.FC = () => {
@@ -181,10 +217,101 @@ export const Dashboard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-6 w-6 rounded-full" />
-          <span className="text-lg">Loading dashboard...</span>
+      <div className="w-full space-y-6 p-4">
+        {/* Stats Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-5 w-5 rounded-full" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-8 w-20 mb-2" />
+                <Skeleton className="h-3 w-32" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* User Level Card + Recent Trips Table Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* User Level Card Skeleton */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-5 w-5 rounded-full" />
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-3/4" />
+              <div className="text-center">
+                <Skeleton className="h-6 w-32 mx-auto" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recent Trips Table Skeleton */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <Skeleton className="h-6 w-32 mb-2" />
+              <Skeleton className="h-4 w-48" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex gap-4 pb-2 border-b">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex gap-4 py-2">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-20" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Commission Chart + Affiliate Manager Card Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Commission Chart Skeleton */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <Skeleton className="h-6 w-40 mb-2" />
+              <Skeleton className="h-4 w-56" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
+
+          {/* Affiliate Manager Card Skeleton */}
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40 mb-2" />
+              <Skeleton className="h-4 w-24" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+              <Separator />
+              <div>
+                <Skeleton className="h-4 w-24 mb-2" />
+                <Skeleton className="h-4 w-40" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -345,7 +472,15 @@ export const Dashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             {lastThreeTrips?.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">No recent trips found.</div>
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Calendar className="size-6" />
+                  </EmptyMedia>
+                  <EmptyTitle>No recent trips found</EmptyTitle>
+                  <EmptyDescription>Your recent trip bookings will appear here</EmptyDescription>
+                </EmptyHeader>
+              </Empty>
             ) : (
               <Table>
                 <TableHeader>

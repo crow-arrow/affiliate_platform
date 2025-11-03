@@ -47,8 +47,8 @@ export const DynamicBreadcrumb = ({
       <BreadcrumbList>
         {displayBreadcrumbs.map((breadcrumb, index) => (
           <div key={breadcrumb.label} className="flex items-center">
-            {index > 0 && (
-              <BreadcrumbSeparator className="hidden md:block">
+            {index > 1 && (
+              <BreadcrumbSeparator className="hidden md:block pr-2">
                 <ChevronRight className="h-4 w-4" />
               </BreadcrumbSeparator>
             )}

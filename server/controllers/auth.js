@@ -532,6 +532,12 @@ export const getMyTenants = async (req, res) => {
     const identityId = req.user?.id;
     if (!identityId) return res.status(401).json({ message: "Unauthorized" });
 
+    const identity = await prisma.identity.findUnique({
+      where: { id: identityId },
+    });
+    if (!identity.emailVerified)
+      return res.status(401).json({ message: "Email not verified" });
+
     const memberships = await prisma.membership.findMany({
       where: { identityId },
       include: { tenant: { select: { id: true, name: true, domain: true } } },

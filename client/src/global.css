@@ -14,6 +14,21 @@
     height: 100%;
   }
 
+  body {
+    background: hsl(var(--background));
+    background-image:
+      radial-gradient(ellipse at top left, hsl(var(--muted) / 0.04) 0%, transparent 40%),
+      radial-gradient(ellipse at bottom right, hsl(var(--muted) / 0.04) 0%, transparent 40%);
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(ellipse at top left, hsl(var(--muted) / 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, hsl(var(--muted) / 0.08) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+
   #root {
     height: 100%;
   }
@@ -24,7 +39,7 @@
   .sidebar-tooltip {
     @apply absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md
     text-gray-500 bg-white dark:text-white dark:bg-secondary2
-    text-xs font-bold 
+    text-xs font-bold
     transition-all duration-100 scale-0 origin-left;
   }
   .open-button-tooltip {
@@ -33,7 +48,7 @@
     text-xs font-bold transition-all duration-0 scale-0 origin-left;
   }
   .info-tooltip {
-    @apply absolute z-50 left-1/2 mt-2 max-[500px]:-translate-x-1/2 
+    @apply absolute z-50 left-1/2 mt-2 max-[500px]:-translate-x-1/2
     w-40 max-[400px]:w-fit p-2 rounded-md shadow-md drop-shadow-xl max-[500px]:origin-top
     text-gray-500 bg-white dark:text-white dark:bg-secondary2
     text-xs transition-all duration-100 scale-0 origin-top-left;
@@ -145,7 +160,80 @@
     stroke-dashoffset: 848;
   }
 }
-/* 
+
+@keyframes grid-wave {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes location-pulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+@keyframes location-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes route-fade {
+  0%,
+  100% {
+    opacity: 0.3;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    opacity: 0.1;
+    stroke-dashoffset: 20;
+  }
+}
+
+@keyframes question-blink {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes map-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+}
+/*
 .animate-thumb {
   animation: thumbMove 1s ease forwards;
 }
