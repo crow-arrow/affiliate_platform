@@ -1,9 +1,18 @@
 import prisma from "../../prisma/client.js";
 
-// Get All Trips
+// Get All Trips для текущего тенанта
 export const getAllTrips = async (req, res) => {
   try {
+    const tenantId = req.user?.tenantId;
+
+    if (!tenantId) {
+      return res.status(400).json({ message: "Tenant ID is required" });
+    }
+
     const trips = await prisma.trips.findMany({
+      where: {
+        tenantId: tenantId,
+      },
       orderBy: { id: "asc" },
     });
 
@@ -56,11 +65,14 @@ export const getTripsByUserId = async (req, res) => {
 
     const profile = membership.profile;
 
-    // Получаем trips по affiliateId из PartnerProfile
+    // Получаем trips по affiliateId из PartnerProfile и tenantId
     let trips = [];
     if (profile.affiliateId) {
       trips = await prisma.trips.findMany({
-        where: { affiliateId: profile.affiliateId },
+        where: {
+          affiliateId: profile.affiliateId,
+          tenantId: tenantId,
+        },
       });
     }
 

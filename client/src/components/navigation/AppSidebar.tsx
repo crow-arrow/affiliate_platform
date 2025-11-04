@@ -43,7 +43,9 @@ import { extractTenantSlugFromPath, addTenantSlugToPath } from "@/constants/rout
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAppSelector((state) => state.auth);
   const avatar = user?.avatarUrl ? `${import.meta.env.VITE_API_URL}${user.avatarUrl}` : "";
-  const userName = user?.first_name ?? "Guest User";
+  const userName = user?.first_name && user?.last_name
+    ? `${user.first_name} ${user.last_name}`
+    : user?.first_name || user?.last_name || "Guest User";
   const userEmail = user?.email ?? "exemple@jinn-travel.com";
   const tenant = useAppSelector((state: RootState) => state.tenant.current);
   const location = useLocation();

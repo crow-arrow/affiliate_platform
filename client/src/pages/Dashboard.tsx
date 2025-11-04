@@ -132,88 +132,12 @@ export const Dashboard: React.FC = () => {
     // dispatch(fetchClicks(currentUser?.id));
   }, [currentUser?.id, dispatch]);
 
-  const getNextLevel = (level?: string): string => {
-    switch (level) {
-      case "BRONZE":
-        return "SILVER";
-      case "SILVER":
-        return "GOLD";
-      case "GOLD":
-        return "PLATINUM";
-      default:
-        return "-";
+  // Обновляем данные пользователя после получения туров
+  useEffect(() => {
+    if (tripsStatus === "succeeded") {
+      dispatch(getMe());
     }
-  };
-
-  const getLevelName = (level?: string): string => {
-    // Если это строка в верхнем регистре (из базы данных)
-    if (typeof level === "string") {
-      switch (level.toUpperCase()) {
-        case "BRONZE":
-          return "BRONZE";
-        case "SILVER":
-          return "SILVER";
-        case "GOLD":
-          return "GOLD";
-        case "PLATINUM":
-          return "PLATINUM";
-        default:
-          return "BRONZE";
-      }
-    }
-
-    return "BRONZE";
-  };
-
-  const getLevelCardStyle = (level?: string) => {
-    switch (level) {
-      case "BRONZE":
-        return {
-          className:
-            "relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-950 dark:to-amber-900 border-orange-200 dark:border-orange-800",
-          iconColor: "text-orange-600 dark:text-orange-400",
-          titleColor: "text-orange-700 dark:text-orange-300",
-          descriptionColor: "text-orange-700 dark:text-orange-300",
-          accentColor: "bg-orange-200 dark:bg-orange-800",
-        };
-      case "SILVER":
-        return {
-          className:
-            "relative overflow-hidden bg-gradient-to-br from-gray-50 to-slate-100 dark:from-gray-900 dark:to-slate-500 border-gray-200 dark:border-slate-700",
-          iconColor: "text-gray-600 dark:text-gray-400",
-          titleColor: "text-gray-700 dark:text-gray-300",
-          descriptionColor: "text-gray-600 dark:text-gray-400",
-          accentColor: "bg-gray-200 dark:bg-gray-800",
-        };
-      case "GOLD":
-        return {
-          className:
-            "relative overflow-hidden bg-gradient-to-br from-[#f4e6d7] to-[#cbaf87] dark:from-[#8b6f47] dark:to-[#6b5b3a] border-[#cbaf87] dark:border-[#8b6f47]",
-          iconColor: "text-[#8b6f47] dark:text-[#f4e6d7]",
-          titleColor: "text-[#6b5b3a] dark:text-[#f4e6d7]",
-          descriptionColor: "text-[#8b6f47] dark:text-[#f4e6d7]",
-          accentColor: "bg-[#cbaf87] dark:bg-[#8b6f47]",
-        };
-      case "PLATINUM":
-        return {
-          className:
-            "relative overflow-hidden bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-700 dark:to-gray-600 border-slate-200 dark:border-slate-400",
-          iconColor: "text-slate-600 dark:text-slate-400",
-          titleColor: "text-slate-700 dark:text-slate-300",
-          descriptionColor: "text-slate-600 dark:text-slate-400",
-          accentColor: "bg-slate-200 dark:bg-slate-800",
-        };
-      default:
-        return {
-          className:
-            "relative overflow-hidden bg-gradient-to-br from-gray-50 to-slate-100 dark:from-gray-950 dark:to-slate-900 border-gray-200 dark:border-gray-800",
-          iconColor: "text-gray-600 dark:text-gray-400",
-          titleColor: "text-gray-700 dark:text-gray-300",
-          descriptionColor: "text-gray-600 dark:text-gray-400",
-          accentColor: "bg-gray-200 dark:bg-gray-800",
-        };
-    }
-  };
+  }, [tripsStatus, dispatch]);
 
   if (isLoading) {
     return (
@@ -429,40 +353,7 @@ export const Dashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* User Level Card */}
-        <Card className={getLevelCardStyle(getLevelName(userLevel)).className}>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle
-                className={`flex items-center gap-2 ${getLevelCardStyle(getLevelName(userLevel)).titleColor}`}
-              >
-                <Badge
-                  variant="outline"
-                  className={`px-3 py-1 gap-2 text-lg font-bold ${getLevelCardStyle(getLevelName(userLevel)).descriptionColor}`}
-                >
-                  {getLevelName(userLevel)}
-                </Badge>
-              </CardTitle>
-              <CardDescription
-                className={`p-2 ${getLevelCardStyle(getLevelName(userLevel)).descriptionColor}`}
-              >
-                <User
-                  className={`h-5 w-5 ${getLevelCardStyle(getLevelName(userLevel)).iconColor}`}
-                />
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <ProgressBar />
-            <div className="text-center">
-              <Badge variant="outline" className="px-3 py-1">
-                Next level: {getNextLevel(getLevelName(userLevel))}
-              </Badge>
-            </div>
-          </CardContent>
-          <div
-            className={`absolute -top-4 -right-4 w-24 h-24 ${getLevelCardStyle(getLevelName(userLevel)).accentColor} rounded-full opacity-20`}
-          ></div>
-        </Card>
+        <ProgressBar />
 
         {/* Recent Trips Table */}
         <Card className="lg:col-span-2">
@@ -482,8 +373,8 @@ export const Dashboard: React.FC = () => {
                 </EmptyHeader>
               </Empty>
             ) : (
-              <Table>
-                <TableHeader>
+              <Table className="border border-border rounded-lg overflow-hidden">
+                <TableHeader className="bg-muted sticky top-0 z-10">
                   <TableRow>
                     <TableHead>ID</TableHead>
                     <TableHead>Booking Date</TableHead>

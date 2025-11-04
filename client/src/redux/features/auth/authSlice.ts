@@ -63,8 +63,8 @@ const initialState: AuthState = {
 interface RegisterParams {
   email: string;
   phone: string;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   password: string;
 }
 
@@ -90,13 +90,13 @@ export const registerUser = createAsyncThunk<
   { rejectValue: Array<{ message: string }> }
 >(
   "auth/registerUser",
-  async ({ email, phone, first_name, last_name, password }, { rejectWithValue }) => {
+  async ({ email, phone, firstName, lastName, password }, { rejectWithValue }) => {
     try {
       const { data } = await axios.post<AuthResponse>("/auth/sign-up", {
         email,
         phone,
-        first_name,
-        last_name,
+        firstName,
+        lastName,
         password,
       });
       if (data.message) return data;

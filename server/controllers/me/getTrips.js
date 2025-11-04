@@ -85,6 +85,14 @@ export const getUserTrips = async (req, res) => {
 
     const { affiliateId, couponCode, level } = profile;
 
+    // Проверяем, что профиль принадлежит текущему тенанту
+    // Профиль уже загружен с membership, поэтому membership.tenantId должен совпадать
+    if (membership.tenantId !== tenantId) {
+      return res
+        .status(403)
+        .json({ message: "Profile does not belong to this tenant" });
+    }
+
     const whereConditions = [];
 
     if (affiliateId !== null) {
@@ -101,11 +109,30 @@ export const getUserTrips = async (req, res) => {
         .json({ message: "User has no valid affiliateId or couponCode" });
     }
 
-    const trips = await prisma.trips.findMany({
+    // Фильтруем туры по affiliateId/couponCode текущего пользователя
+    // И проверяем, что они принадлежат текущему тенанту
+    // Если туры с tenantId не найдены, ищем туры с tenantId: null (для обратной совместимости)
+    let trips = await prisma.trips.findMany({
       where: {
-        OR: whereConditions,
+        AND: [
+          {
+            OR: whereConditions,
+          },
+          {
+            tenantId: tenantId,
+          },
+        ],
       },
     });
+
+    // Если не найдено туров с tenantId, ищем туры с tenantId: null (для обратной совместимости)
+    if (trips.length === 0) {
+      trips = await prisma.trips.findMany({
+        where: {
+          OR: whereConditions,
+        },
+      });
+    }
 
     // Используем PartnerProfile для updateUserLevel
     const profileForLevelUpdate = {
@@ -121,6 +148,7 @@ export const getUserTrips = async (req, res) => {
       lastYearDepartedTrips,
     } = updateUserLevel(profileForLevelUpdate, trips);
 
+    // Обновляем уровень, если он изменился
     if (newLevel !== profile.level) {
       await prisma.partnerProfile.update({
         where: { id: profile.id },
@@ -218,6 +246,11 @@ export const getUserTrips = async (req, res) => {
       return sum + Number(trip.travellerAmount || 0);
     }, 0);
 
+    // Подсчитываем общее количество забронированных туров
+    const bookedTripsCount = trips.filter(
+      (trip) => trip.orderStatus !== "REJECTED" && trip.orderStatus !== "CANCEL"
+    ).length;
+
     // Обновляем PartnerProfile в базе данных
     await prisma.partnerProfile.update({
       where: { id: profile.id },
@@ -227,6 +260,8 @@ export const getUserTrips = async (req, res) => {
         earnings: earnedFromDeparted,
         canceledEarnings: canceledEarnings,
         totalCommission: totalEarnedCommission,
+        bookedTripsCount: bookedTripsCount,
+        level: newLevel, // Обновляем уровень, если он изменился
       },
     });
 

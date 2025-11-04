@@ -186,7 +186,7 @@ const userSlice = createSlice({
       })
       .addCase(fetchTrips.fulfilled, (state, action: PayloadAction<TripsResponse>) => {
         state.tripsStatus = "succeeded";
-        state.trips = action.payload.trips;
+        state.trips = action.payload.trips || [];
       })
       .addCase(fetchTrips.rejected, (state, action) => {
         state.tripsStatus = "failed";

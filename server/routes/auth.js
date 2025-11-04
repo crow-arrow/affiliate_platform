@@ -11,6 +11,7 @@ import { businessSignUp } from "../controllers/tenant/businessSignUp.js";
 import { passwordResetLimiter } from "../middleware/rateLimiter.js";
 import { sendOTPCode, verifyOTPCode } from "../controllers/emailController.js";
 import { checkAuth } from "../middleware/checkAuth.js";
+import { resolveTenantFromHeader } from "../middleware/resolveTenantFromHeader.js";
 import { clerkMiddleware } from "@clerk/express";
 
 const router = express.Router();
@@ -40,8 +41,7 @@ router.get("/user/tenants", getUserTenants);
 // Вернуть компании текущего пользователя (по JWT)
 router.get("/my-tenants", checkAuth, getMyTenants);
 
-// Get Me
-// http://localhost:3002/api/auth/me
-router.get("/me", checkAuth, getMe);
+// Get Me - требует аутентификации и резолвит tenant из заголовка
+router.get("/me", checkAuth, resolveTenantFromHeader, getMe);
 
 export default router;

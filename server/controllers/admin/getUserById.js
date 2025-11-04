@@ -60,11 +60,14 @@ export const getUserById = async (req, res) => {
 
     const profile = membership.profile;
 
-    // Получаем trips по affiliateId из PartnerProfile
+    // Получаем trips по affiliateId из PartnerProfile и tenantId
     let affiliateTrips = [];
     if (profile?.affiliateId) {
       affiliateTrips = await prisma.trips.findMany({
-        where: { affiliateId: profile.affiliateId },
+        where: {
+          affiliateId: profile.affiliateId,
+          tenantId: tenantId,
+        },
       });
     }
 

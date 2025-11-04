@@ -251,11 +251,20 @@ export const login = async (req, res) => {
     const safeUser = {
       id: identity.id,
       email: normalizedEmail,
+      phone: membership?.profile?.phone || null,
       first_name: identity.firstName || "",
       last_name: identity.lastName || "",
       role: membership?.role || "PARTNER",
-      emailVerified: identity.emailVerified || false, // Используем реальное значение из базы
+      emailVerified: identity.emailVerified || false,
       tenantId: tenantId || null,
+      affiliateId: membership?.profile?.affiliateId || null,
+      avatarUrl: identity.avatarUrl || null,
+      level: membership?.profile?.level || "BRONZE",
+      current_year_travellers: membership?.profile?.currentYearTravellers || 0,
+      total_commission: membership?.profile?.totalCommission || 0,
+      booked_trips_count: membership?.profile?.bookedTripsCount || 0,
+      createdAt: identity.createdAt,
+      updatedAt: identity.updatedAt,
     };
 
     console.log("LOGIN:", {
@@ -376,12 +385,20 @@ export const oauthLogin = async (req, res) => {
     const safeUser = {
       id: identity.id,
       email,
+      phone: membership?.profile?.phone || null,
       first_name: firstName,
       last_name: lastName,
       avatarUrl: imageUrl,
       role: membership?.role || "PARTNER",
-      emailVerified: identity.emailVerified || false, // Используем реальное значение из базы
+      emailVerified: identity.emailVerified || false,
       tenantId: tenantId || null,
+      affiliateId: membership?.profile?.affiliateId || null,
+      level: membership?.profile?.level || "BRONZE",
+      current_year_travellers: membership?.profile?.currentYearTravellers || 0,
+      total_commission: membership?.profile?.totalCommission || 0,
+      booked_trips_count: membership?.profile?.bookedTripsCount || 0,
+      createdAt: identity.createdAt,
+      updatedAt: identity.updatedAt,
     };
 
     console.log("OAUTH LOGIN:", {
@@ -419,16 +436,52 @@ export const getMe = async (req, res) => {
         where: { identityId_tenantId: { identityId: identity.id, tenantId } },
         include: { profile: true },
       });
+
+      // Если membership не существует, создаем его
+      let finalMembership = membership;
+      if (!membership) {
+        finalMembership = await prisma.membership.create({
+          data: {
+            identityId: identity.id,
+            tenantId: tenantId,
+            role: "PARTNER",
+          },
+          include: { profile: true },
+        });
+      }
+
+      // Если profile не существует, создаем его
+      let profile = finalMembership?.profile;
+      if (!profile && finalMembership) {
+        const affiliateId = `${(
+          identity.firstName || "user"
+        ).toLowerCase()}_${Math.floor(Math.random() * 90000 + 10000)}`;
+        profile = await prisma.partnerProfile.create({
+          data: {
+            membershipId: finalMembership.id,
+            affiliateId: affiliateId,
+            level: "BRONZE",
+          },
+        });
+      }
+
       const safeUser = {
         id: identity.id,
         email: identity.email,
-        phone: membership?.profile?.phone || null,
+        phone: profile?.phone || null,
         first_name: identity.firstName || "",
         last_name: identity.lastName || "",
-        role: membership?.role || "PARTNER",
+        role: finalMembership?.role || "PARTNER",
         emailVerified: identity.emailVerified || false,
-        tenantId,
-        affiliateId: membership?.profile?.affiliateId || null,
+        tenantId: tenantId || null,
+        affiliateId: profile?.affiliateId || null,
+        avatarUrl: identity.avatarUrl || null,
+        level: profile?.level || "BRONZE",
+        current_year_travellers: profile?.currentYearTravellers || 0,
+        total_commission: profile?.totalCommission || 0,
+        booked_trips_count: profile?.bookedTripsCount || 0,
+        createdAt: identity.createdAt,
+        updatedAt: identity.updatedAt,
       };
       return res.status(200).json({ user: safeUser });
     }

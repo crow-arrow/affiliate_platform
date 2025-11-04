@@ -18,7 +18,9 @@ import tripsRoutes from "./routes/tripsRoutes.js";
 import redirectRoutes from "./routes/redirect.js";
 import conversionRoutes from "./routes/conversion.js";
 import levelSettingsRoutes from "./routes/admin/levelSettings.js";
+import integrationAdminRoutes from "./routes/admin/integration.js";
 import tenantRoutes from "./routes/tenant.js";
+import integrationRoutes from "./routes/integration.js";
 
 dotenv.config();
 
@@ -32,7 +34,12 @@ app.use(
     origin: URL,
     credentials: true,
     methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Tenant-Slug"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Tenant-Slug",
+      "X-API-Key",
+    ],
   })
 );
 
@@ -47,7 +54,9 @@ app.use("/api/password", resetPasswordRoutes);
 app.use("/r", redirectRoutes);
 app.use("/api/prisma", conversionRoutes);
 app.use("/api/admin/level-settings", levelSettingsRoutes);
+app.use("/api/admin/integration", integrationAdminRoutes);
 app.use("/api/tenant", tenantRoutes);
+app.use("/api/integration", integrationRoutes);
 
 // Static upload folder
 const __filename = fileURLToPath(import.meta.url);

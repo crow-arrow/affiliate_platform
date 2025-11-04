@@ -2,6 +2,7 @@ import express from "express";
 import multer from "../middleware/file.js";
 
 import { checkAuth } from "../middleware/checkAuth.js";
+import { resolveTenantFromHeader } from "../middleware/resolveTenantFromHeader.js";
 import { getUserTrips } from "../controllers/me/getTrips.js";
 import { getUserClicks } from "../controllers/getClicks.js";
 import { updateUserProfile } from "../controllers/me/updateProfile.js";
@@ -10,24 +11,23 @@ import { changePassword } from "../controllers/me/changePassword.js";
 
 const router = express.Router();
 
+// Все роуты требуют аутентификации и резолвят tenant из заголовка
+router.use(checkAuth);
+router.use(resolveTenantFromHeader);
+
 // http://localhost:3002/api/me/trips for Users
-router.get("/trips", checkAuth, getUserTrips);
+router.get("/trips", getUserTrips);
 
 // http://localhost:3002/api/me/clicks for Clicks analytic
-router.get("/clicks", checkAuth, getUserClicks);
+router.get("/clicks", getUserClicks);
 
 // http://localhost:3002/api/me/update-profile for Profile settings
-router.patch("/update-profile", checkAuth, updateUserProfile);
+router.patch("/update-profile", updateUserProfile);
 
 // Change password for authenticated user
-router.patch("/change-password", checkAuth, changePassword);
+router.patch("/change-password", changePassword);
 
 // router.post("/upload-avatar", upload.single("avatar"), updateUserAvatar); // Маршрут для загрузки аватара
-router.patch(
-  "/upload-avatar",
-  checkAuth,
-  multer.single("avatar"),
-  uploadAvatar
-);
+router.patch("/upload-avatar", multer.single("avatar"), uploadAvatar);
 
 export default router;

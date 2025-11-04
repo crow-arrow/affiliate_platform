@@ -6,22 +6,33 @@ export const updateUserLevel = (user, trips) => {
   const month = now.getMonth(); // from 0 tо 11
   const day = now.getDate();
 
+  // Фильтруем туры текущего года, которые уже состоялись и не отменены
   const currentYearDepartedTrips = trips.filter((trip) => {
+    if (!trip.travelDate) return false;
     const year = new Date(trip.travelDate).getFullYear();
     const travelDate = new Date(trip.travelDate);
-    return travelDate <= now && year === currentYear;
+    const isCancelled =
+      trip.orderStatus === "REJECTED" || trip.orderStatus === "CANCEL";
+
+    return travelDate <= now && year === currentYear && !isCancelled;
   });
+
   const currentYearTravellers = currentYearDepartedTrips.reduce(
-    (sum, t) => sum + (t.travellerAmount || 0),
+    (sum, t) => sum + (Number(t.travellerAmount) || 0),
     0
   );
 
+  // Фильтруем туры прошлого года, которые не отменены
   const lastYearDepartedTrips = trips.filter((trip) => {
+    if (!trip.travelDate) return false;
     const year = new Date(trip.travelDate).getFullYear();
-    return year === lastYear;
+    const isCancelled =
+      trip.orderStatus === "REJECTED" || trip.orderStatus === "CANCEL";
+
+    return year === lastYear && !isCancelled;
   });
   const lastYearTravellers = lastYearDepartedTrips.reduce(
-    (sum, t) => sum + (t.travellerAmount || 0),
+    (sum, t) => sum + (Number(t.travellerAmount) || 0),
     0
   );
 

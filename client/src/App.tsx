@@ -1,8 +1,7 @@
 import { Layout } from "./components/Layout";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState, useMemo, useRef } from "react";
 import { useAppSelector } from "./redux/hooks";
-import { useLocation } from "react-router-dom";
 import { checkIsAuth } from "./redux/features/auth/authSlice";
 import { useAuthTenantResolver } from "./hooks/useAuthTenantResolver";
 import { Loader2Icon } from "lucide-react";
@@ -14,6 +13,9 @@ import { Invoices } from "./admin_pages/Invoices";
 import { AllOrders } from "./admin_pages/AllOrders";
 import { LevelSettingsAdmin } from "./admin_pages/LevelSettings";
 import { LevelSettingsTest } from "./admin_pages/LevelSettingsTest";
+import { ApiKeys } from "./admin_pages/ApiKeys";
+import { FieldMappings } from "./admin_pages/FieldMappings";
+import { AdminSettings } from "./admin_pages/AdminSettings";
 
 import { Dashboard } from "./pages/Dashboard";
 import { Trips } from "./pages/Trips";
@@ -371,9 +373,13 @@ function App() {
           <Route path="orders" element={<AllOrders />} />
           <Route path="calendar" element={<Calendar />} />
           <Route path="invoices" element={<Invoices />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="settings/level-settings" element={<LevelSettingsAdmin />} />
-          <Route path="settings/level-settings-test" element={<LevelSettingsTest />} />
+          <Route path="settings" element={<AdminSettings />}>
+            <Route index element={<Navigate to="level-settings" replace />} />
+            <Route path="level-settings" element={<LevelSettingsAdmin />} />
+            <Route path="level-settings-test" element={<LevelSettingsTest />} />
+            <Route path="api-keys" element={<ApiKeys />} />
+            <Route path="field-mappings" element={<FieldMappings />} />
+          </Route>
         </Route>
 
         {/* Это маршрут для страницы 404 */}
