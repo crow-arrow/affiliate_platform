@@ -1,148 +1,73 @@
-import { sendVerificationOTP } from "../utils/mailer.js";
+import { sendVerificationEmail } from "../utils/mailer.js";
 import jwt from "jsonwebtoken";
-import prisma from "../prisma/client.js";
-import crypto from "crypto";
+import User from "../models/User.js";
 import dotenv from "dotenv";
 dotenv.config();
 
-// Генерация 6-значного кода
-const generateOTPCode = () => {
-  return crypto.randomInt(100000, 999999).toString();
-};
-
-// Отправка OTP кода для верификации email
-export const sendOTPCode = async (req, res) => {
+// Send email with varification link function
+export const resendEmailController = async (req, res) => {
   const { email } = req.body;
 
   try {
-    const normalizedEmail = email?.trim().toLowerCase();
+    const user = await User.findOne({ where: { email } });
 
-    if (!normalizedEmail) {
-      return res.status(400).json({ message: "Email is required" });
-    }
-
-    const identity = await prisma.identity.findUnique({
-      where: { email: normalizedEmail },
-    });
-
-    if (!identity) {
+    if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Генерируем код
-    const code = generateOTPCode();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 минут
+    if (user.emailVerified) {
+      return res.status(400).json({ message: "Email already verified." });
+    }
 
-    // Инвалидируем предыдущие неиспользованные коды для этого пользователя
-    await prisma.verificationCode.updateMany({
-      where: {
-        identityId: identity.id,
-        type: "EMAIL_VERIFICATION",
-        used: false,
-      },
-      data: {
-        used: true,
-      },
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "15m",
     });
 
-    // Создаем новый код
-    await prisma.verificationCode.create({
-      data: {
-        identityId: identity.id,
-        code,
-        type: "EMAIL_VERIFICATION",
-        expiresAt,
-      },
-    });
+    if (!user.email) {
+      throw new Error("User email is undefined");
+    }
 
-    // Отправляем email
-    await sendVerificationOTP(identity.email, identity.firstName || "", code);
+    await sendVerificationEmail(user.email, user.first_name || "", token);
 
     res.status(200).json({
-      message: "Verification code sent successfully.",
+      message: "Email resent successfully.",
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Failed to send verification code." });
+    res.status(500).json({ message: "Failed to send verification email." });
   }
 };
 
-// Верификация OTP кода
-export const verifyOTPCode = async (req, res) => {
-  const { email, code } = req.body;
+// Email Confirmation Function
+export const verifyEmail = async (req, res) => {
+  const { token } = req.params;
 
   try {
-    if (!email || !code) {
-      return res.status(400).json({ message: "Email and code are required." });
-    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findByPk(decoded.id);
 
-    const normalizedEmail = email.trim().toLowerCase();
+    if (!user) return res.status(404).json({ message: "User not found." });
 
-    const identity = await prisma.identity.findUnique({
-      where: { email: normalizedEmail },
-    });
-
-    if (!identity) {
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    // Ищем валидный код
-    const verificationCode = await prisma.verificationCode.findFirst({
-      where: {
-        identityId: identity.id,
-        code,
-        type: "EMAIL_VERIFICATION",
-        used: false,
-        expiresAt: {
-          gt: new Date(), // Код не истек
-        },
-      },
-      orderBy: {
-        createdAt: "desc", // Берем самый свежий
-      },
-    });
-
-    if (!verificationCode) {
-      return res.status(400).json({
-        message: "Invalid or expired verification code.",
+    if (user.emailVerified) {
+      return res.status(409).json({
+        message: "Email is already verified.",
       });
     }
 
-    // Помечаем код как использованный
-    await prisma.verificationCode.update({
-      where: { id: verificationCode.id },
-      data: { used: true },
-    });
+    user.emailVerified = true;
+    await user.save();
 
-    // Обновляем emailVerified
-    await prisma.identity.update({
-      where: { id: identity.id },
-      data: { emailVerified: true },
-    });
-
-    // Получаем membership для генерации токена (может быть null, если пользователь без tenant)
-    const membership = await prisma.membership.findFirst({
-      where: { identityId: identity.id },
-    });
-
-    // Генерируем auth token (работает с tenant или без него)
     const authToken = jwt.sign(
-      {
-        id: identity.id,
-        role: membership?.role || null,
-        tenantId: membership?.tenantId || null,
-        avatarUrl: identity.avatarUrl || null,
-      },
+      { id: user.id, role: user.role, avatarUrl: user.avatarUrl },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-
     res.status(200).json({
       message: "Email verified successfully.",
       token: authToken,
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error." });
+    res.status(400).json({ message: "Invalid or expired token." });
   }
 };
