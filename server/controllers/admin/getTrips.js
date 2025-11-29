@@ -1,32 +1,18 @@
-import prisma from "../../prisma/client.js";
+import Trips from "../../models/Trips.js";
+import User from "../../models/User.js";
 
-// Get All Trips для текущего тенанта
+// Get All Trips
 export const getAllTrips = async (req, res) => {
   try {
-    const tenantId = req.user?.tenantId;
-
-    if (!tenantId) {
-      return res.status(400).json({ message: "Tenant ID is required" });
-    }
-
-    const trips = await prisma.trips.findMany({
-      where: {
-        tenantId: tenantId,
-      },
-      orderBy: { id: "asc" },
+    const trips = await Trips.findAll({
+      order: [["id", "ASC"]],
     });
 
     if (trips.length === 0) {
       return res.status(404).json({ message: "No trips found" });
     }
 
-    // Конвертируем BigInt в строки для JSON сериализации
-    const serializedTrips = trips.map((trip) => ({
-      ...trip,
-      id: trip.id.toString(),
-    }));
-
-    res.json(serializedTrips);
+    res.json(trips);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -35,56 +21,19 @@ export const getAllTrips = async (req, res) => {
 
 export const getTripsByUserId = async (req, res) => {
   try {
-    const identityId = req.params.id; // Теперь это Identity.id (строка)
-    const tenantId = req.user?.tenantId;
+    const userId = req.params.id;
 
-    if (!identityId) {
-      return res.status(400).json({ message: "Invalid user ID" });
-    }
-
-    if (!tenantId) {
-      return res.status(400).json({ message: "Tenant ID is required" });
-    }
-
-    // Получаем Membership и Profile
-    const membership = await prisma.membership.findUnique({
-      where: {
-        identityId_tenantId: {
-          identityId: identityId,
-          tenantId: tenantId,
-        },
-      },
-      include: {
-        profile: true,
-      },
+    const user = await User.findByPk(userId, {
+      include: [{ model: Trips, as: "affiliateTrips" }],
     });
-
-    if (!membership || !membership.profile) {
-      return res.status(404).json({ message: "User profile not found" });
+    if (!user) {
+      return res.status(404).json({ massege: "User not found" });
     }
 
-    const profile = membership.profile;
-
-    // Получаем trips по affiliateId из PartnerProfile и tenantId
-    let trips = [];
-    if (profile.affiliateId) {
-      trips = await prisma.trips.findMany({
-        where: {
-          affiliateId: profile.affiliateId,
-          tenantId: tenantId,
-        },
-      });
-    }
-
-    // Конвертируем BigInt в строки для JSON сериализации
-    const serializedTrips = trips.map((trip) => ({
-      ...trip,
-      id: trip.id.toString(),
-    }));
-
-    res.json({ trips: serializedTrips });
+    const trips = user.affiliateTrips;
+    res.json({ trips });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ massege: "Server error", error: error.massege });
   }
 };

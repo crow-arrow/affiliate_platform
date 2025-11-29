@@ -4,20 +4,20 @@ The **Affiliate Platform** is designed to empower users to drive sales through u
 
 ## 🚀 Features
 
-- ✅ **User Roles**: ADMIN and Affiliate ("PARTNER") with dynamic status levels: Bronze, Silver, Gold
-- 🎯 **Referral Tracking**: Real-time analytics on clicks, bookings, commissions
-- 🛡️ **Secure Registration**: Email verification and data protection
-- 📊 **Advanced Analytics**: Track user performance, bookings, referral traffic
-- 📱 **Responsive Design**: Mobile-optimized for seamless experience across devices
-- 🔐 **Password Recovery**: Step-by-step recovery flow with secure email verification
-- 💼 **ADMIN Dashboard**: Overview of all team members, orders, and performance metrics
+- ✅ **User Roles**: Admin and Affiliate ("Genie") with dynamic status levels: Bronze, Silver, Gold  
+- 🎯 **Referral Tracking**: Real-time analytics on clicks, bookings, commissions  
+- 🛡️ **Secure Registration**: Email verification and data protection  
+- 📊 **Advanced Analytics**: Track user performance, bookings, referral traffic  
+- 📱 **Responsive Design**: Mobile-optimized for seamless experience across devices  
+- 🔐 **Password Recovery**: Step-by-step recovery flow with secure email verification  
+- 💼 **Admin Dashboard**: Overview of all team members, orders, and performance metrics
 
 ---
 
 ## 🔐 Authentication
 
-- **Sign Up & Login** with email and password
-- **Email verification** upon registration
+- **Sign Up & Login** with email and password  
+- **Email verification** upon registration  
 - **Password recovery** flow with reset link via email
 
 <p align="center">
@@ -31,10 +31,10 @@ The **Affiliate Platform** is designed to empower users to drive sales through u
 
 Track your referral performance in one place:
 
-- Clicks on referral links
-- Number of bookings
-- Revenue generated
-- Earned commissions
+- Clicks on referral links  
+- Number of bookings  
+- Revenue generated  
+- Earned commissions  
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/e8e47c70-e296-4c0a-80b8-3d04ab28c963" width="800" />
@@ -46,9 +46,9 @@ Track your referral performance in one place:
 
 Manage your profile and referral tools:
 
-1. Copy your referral link and share it on social media or ad platforms
-2. Update your personal data
-3. Upload/change your avatar
+1. Copy your referral link and share it on social media or ad platforms  
+2. Update your personal data  
+3. Upload/change your avatar  
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/68776f10-2825-4ba3-b9b0-492ede002943" width="800" />
@@ -60,11 +60,11 @@ Manage your profile and referral tools:
 
 Detailed view of bookings made through your link:
 
-- **Traveler count** affects your level (10 for Silver, 25 for Gold)
-- **Booking date** determines commission payout timing
-- **Order status** shows if a trip is confirmed, canceled, or completed
-- **Total price** lets you track your potential income
-- **Commission** is calculated automatically based on your level
+- **Traveler count** affects your level (10 for Silver, 25 for Gold)  
+- **Booking date** determines commission payout timing  
+- **Order status** shows if a trip is confirmed, canceled, or completed  
+- **Total price** lets you track your potential income  
+- **Commission** is calculated automatically based on your level  
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/d9656aaf-4426-447c-9a45-18ffa8434197" width="800" />
@@ -72,9 +72,9 @@ Detailed view of bookings made through your link:
 
 ---
 
-## 👥 ADMIN: Team Overview
+## 👥 Admin: Team Overview
 
-ADMINs have access to full data insights of all PARTNERs:
+Admins have access to full data insights of all Genies:
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/3e9ec730-a9b6-4764-9081-9954761d4116" width="800" />
@@ -82,7 +82,7 @@ ADMINs have access to full data insights of all PARTNERs:
 
 ---
 
-## 📋 ADMIN: All Orders
+## 📋 Admin: All Orders
 
 Complete list of all bookings for management and tracking purposes:
 
@@ -94,9 +94,9 @@ Complete list of all bookings for management and tracking purposes:
 
 ## 🔁 Password Recovery
 
-1. Request a reset link via email
-2. Confirm by clicking the email link
-3. Set a new secure password
+1. Request a reset link via email  
+2. Confirm by clicking the email link  
+3. Set a new secure password  
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/531466c7-6387-40b1-8b0b-dae6a41dc57d" width="400" />
@@ -108,11 +108,11 @@ Complete list of all bookings for management and tracking purposes:
 
 ## 🛠 Tech Stack
 
-- **Frontend**: React, Tailwind CSS
-- **Backend**: Node.js, Express
-- **Database**: MySQL
-- **Authentication**: JWT, bcrypt, Email verification
-- **Deployment**: _Coming soon_
+- **Frontend**: React, Tailwind CSS  
+- **Backend**: Node.js, Express  
+- **Database**: MySQL  
+- **Authentication**: JWT, bcrypt, Email verification  
+- **Deployment**: *Coming soon*  
 
 ---
 

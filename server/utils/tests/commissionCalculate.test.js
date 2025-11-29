@@ -3,19 +3,19 @@ import { getCommission } from "../commissionCalculate.js";
 
 describe("getCommission", () => {
   test("should return correct commission for Bronze level", () => {
-    expect(getCommission("BRONZE", 1000)).toBe(70);
+    expect(getCommission("Bronze", 1000)).toBe(70);
   });
 
   test("should return correct commission for Silver level", () => {
-    expect(getCommission("SILVER", 1000)).toBe(100);
+    expect(getCommission("Silver", 1000)).toBe(100);
   });
 
   test("should return correct commission for Gold level", () => {
-    expect(getCommission("GOLD", 1000)).toBe(120);
+    expect(getCommission("Gold", 1000)).toBe(120);
   });
 
   test("should return correct value with decimal totalPrice", () => {
-    expect(getCommission("SILVER", 1234.56)).toBeCloseTo(123.46, 2);
+    expect(getCommission("Silver", 1234.56)).toBeCloseTo(123.46, 2);
   });
 
   test("should throw error for unknown level", () => {
