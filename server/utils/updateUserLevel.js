@@ -6,22 +6,33 @@ export const updateUserLevel = (user, trips) => {
   const month = now.getMonth(); // from 0 tо 11
   const day = now.getDate();
 
+  // Фильтруем туры текущего года, которые уже состоялись и не отменены
   const currentYearDepartedTrips = trips.filter((trip) => {
-    const year = new Date(trip.travel_date).getFullYear();
-    const travelDate = new Date(trip.travel_date);
-    return travelDate <= now && year === currentYear;
+    if (!trip.travelDate) return false;
+    const year = new Date(trip.travelDate).getFullYear();
+    const travelDate = new Date(trip.travelDate);
+    const isCancelled =
+      trip.orderStatus === "REJECTED" || trip.orderStatus === "CANCEL";
+
+    return travelDate <= now && year === currentYear && !isCancelled;
   });
+
   const currentYearTravellers = currentYearDepartedTrips.reduce(
-    (sum, t) => sum + (t.traveller_amount || 0),
+    (sum, t) => sum + (Number(t.travellerAmount) || 0),
     0
   );
 
+  // Фильтруем туры прошлого года, которые не отменены
   const lastYearDepartedTrips = trips.filter((trip) => {
-    const year = new Date(trip.travel_date).getFullYear();
-    return year === lastYear;
+    if (!trip.travelDate) return false;
+    const year = new Date(trip.travelDate).getFullYear();
+    const isCancelled =
+      trip.orderStatus === "REJECTED" || trip.orderStatus === "CANCEL";
+
+    return year === lastYear && !isCancelled;
   });
   const lastYearTravellers = lastYearDepartedTrips.reduce(
-    (sum, t) => sum + (t.traveller_amount || 0),
+    (sum, t) => sum + (Number(t.travellerAmount) || 0),
     0
   );
 
@@ -30,8 +41,8 @@ export const updateUserLevel = (user, trips) => {
 
   const lastChangedDate = Array.isArray(user.levelHistory)
     ? [...user.levelHistory].sort(
-        (a, b) => new Date(b.changed_at) - new Date(a.changed_at)
-      )[0]?.changed_at
+        (a, b) => new Date(b.changedAt) - new Date(a.changedAt)
+      )[0]?.changedAt
     : null;
 
   const levelYear = lastChangedDate
@@ -40,22 +51,29 @@ export const updateUserLevel = (user, trips) => {
 
   if (month === 0 && day === 1 && levelYear < currentYear) {
     if (lastYearTravellers >= 25) {
-      newLevel = "Gold";
+      newLevel = "GOLD";
     } else if (lastYearTravellers >= 10) {
-      newLevel = "Silver";
+      newLevel = "SILVER";
     } else if (lastYearTravellers < 10) {
-      if (user.level === "Gold") {
-        newLevel = "Silver";
+      if (user.level === "GOLD" || user.level === "Gold") {
+        newLevel = "SILVER";
       } else {
-        newLevel = "Bronze";
+        newLevel = "BRONZE";
       }
     }
   }
 
-  if (currentYearTravellers >= 25 && initialLevel !== "Gold") {
-    newLevel = "Gold";
-  } else if (currentYearTravellers >= 10 && initialLevel === "Bronze") {
-    newLevel = "Silver";
+  if (
+    currentYearTravellers >= 25 &&
+    initialLevel !== "GOLD" &&
+    initialLevel !== "Gold"
+  ) {
+    newLevel = "GOLD";
+  } else if (
+    currentYearTravellers >= 10 &&
+    (initialLevel === "BRONZE" || initialLevel === "Bronze")
+  ) {
+    newLevel = "SILVER";
   }
 
   return {

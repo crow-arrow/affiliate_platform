@@ -1,9 +1,9 @@
 // utils/commissionUtils.js
 export const getCommission = (level, totalPrice) => {
   const commissionRates = {
-    Bronze: 0.07, // 7%
-    Silver: 0.1, // 10%
-    Gold: 0.12, // 12%
+    BRONZE: 0.07, // 7%
+    SILVER: 0.1, // 10%
+    GOLD: 0.12, // 12%
   };
 
   if (!commissionRates[level]) {

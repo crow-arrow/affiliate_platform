@@ -1,18 +1,45 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getUserClicks } from "../getClicks.js";
-import { ClicksData, User } from "../../models/models.js";
 
-vi.mock("../../models/models.js", () => ({
-  User: {
-    findByPk: vi.fn(),
-  },
-  ClicksData: {
-    findAll: vi.fn(),
+// Создаем объект для хранения моков
+const mocks = {
+  identityFindUnique: vi.fn(),
+  membershipFindUnique: vi.fn(),
+  membershipCreate: vi.fn(),
+  profileUpsert: vi.fn(),
+  clicksFindMany: vi.fn(),
+};
+
+vi.mock("../../prisma/client.js", () => ({
+  default: {
+    identity: {
+      get findUnique() {
+        return mocks.identityFindUnique;
+      },
+    },
+    membership: {
+      get findUnique() {
+        return mocks.membershipFindUnique;
+      },
+      get create() {
+        return mocks.membershipCreate;
+      },
+    },
+    partnerProfile: {
+      get upsert() {
+        return mocks.profileUpsert;
+      },
+    },
+    clicksData: {
+      get findMany() {
+        return mocks.clicksFindMany;
+      },
+    },
   },
 }));
 
 describe("getUserClicks", () => {
-  const mockReq = { user: { id: 1 } };
+  const mockReq = { user: { id: "identity_id", tenantId: "tenant_id" } };
   const mockRes = {
     status: vi.fn().mockReturnThis(),
     json: vi.fn(),
@@ -20,44 +47,51 @@ describe("getUserClicks", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Настройка моков для успешного сценария
+    mocks.identityFindUnique.mockResolvedValue({
+      email: "test@test.com",
+      firstName: "Test",
+      lastName: "User",
+    });
+    mocks.membershipFindUnique.mockResolvedValue({
+      id: "membership_id",
+      profile: { affiliateId: "aff123" },
+    });
+    mocks.profileUpsert.mockResolvedValue({ affiliateId: "aff123" });
   });
 
   it("should return clicks for a valid user", async () => {
-    const mockUser = { id: 1 };
-    const mockClicks = [{ id: 101 }, { id: 102 }];
+    const mockClicks = [{ id: BigInt(101), referralProfileId: "profile_id" }, { id: BigInt(102), referralProfileId: "profile_id" }];
 
-    User.findByPk.mockResolvedValue(mockUser);
-    ClicksData.findAll.mockResolvedValue(mockClicks);
+    mocks.profileUpsert.mockResolvedValue({ id: "profile_id", affiliateId: "aff123" });
+    mocks.clicksFindMany.mockResolvedValue(mockClicks);
 
     await getUserClicks(mockReq, mockRes);
 
-    expect(User.findByPk).toHaveBeenCalledWith(1, {
-      include: [{ model: ClicksData, as: "clicksData" }],
-    });
-    expect(ClicksData.findAll).toHaveBeenCalledWith({
-      where: { referral_user_id: 1 },
-    });
+    expect(mocks.clicksFindMany).toHaveBeenCalled();
     expect(mockRes.json).toHaveBeenCalledWith({
-      success: true,
-      userId: 1,
-      clicks: mockClicks,
+      clicks: [
+        { id: "101", referralProfileId: "profile_id" },
+        { id: "102", referralProfileId: "profile_id" },
+      ],
     });
   });
 
-  it("should return 404 if user not found", async () => {
-    User.findByPk.mockResolvedValue(null);
+  it("should return 400 if identity or tenant is missing", async () => {
+    const mockReqNoUser = { user: {} };
 
-    await getUserClicks(mockReq, mockRes);
+    await getUserClicks(mockReqNoUser, mockRes);
 
-    expect(mockRes.status).toHaveBeenCalledWith(404);
-    expect(mockRes.json).toHaveBeenCalledWith({ message: "User not found" });
+    expect(mockRes.status).toHaveBeenCalledWith(400);
+    expect(mockRes.json).toHaveBeenCalledWith({
+      message: "Missing identity or tenant in request",
+    });
   });
 
   it("should return 500 on error", async () => {
-    expect.assertions(2);
     const error = new Error("DB error");
 
-    User.findByPk.mockRejectedValue(error);
+    mocks.identityFindUnique.mockRejectedValue(error);
 
     await getUserClicks(mockReq, mockRes);
 
