@@ -1,8 +1,33 @@
-vi.mock("../../../models/User.js", () => ({
+// Создаем моки для Prisma
+const mocks = {
+  identityFindUnique: vi.fn(),
+  identityUpdate: vi.fn(),
+  identityCreate: vi.fn(),
+  membershipUpsert: vi.fn(),
+  membershipFindMany: vi.fn(),
+};
+
+vi.mock("../../../prisma/client.js", () => ({
   default: {
-    create: vi.fn(),
-    findOne: vi.fn(),
-    findByPk: vi.fn(),
+    identity: {
+      get findUnique() {
+        return mocks.identityFindUnique;
+      },
+      get update() {
+        return mocks.identityUpdate;
+      },
+      get create() {
+        return mocks.identityCreate;
+      },
+    },
+    membership: {
+      get upsert() {
+        return mocks.membershipUpsert;
+      },
+      get findMany() {
+        return mocks.membershipFindMany;
+      },
+    },
   },
 }));
 
@@ -33,10 +58,11 @@ vi.mock("../../../utils/generateTokens.js", () => ({
   })),
 }));
 
+// resolveTenantIdFromRequest определен в auth.js, не нужно мокать отдельно
+
 import request from "supertest";
 import express from "express";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
-import { clerkMiddleware } from "@clerk/express";
 
 const authRoutes = (await import("../../../routes/auth.js")).default;
 
@@ -45,53 +71,73 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 
 describe("POST /api/auth/oauth-login", () => {
-  let User;
   let clerkClient;
 
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    User = (await import("../../../models/User.js")).default;
     clerkClient = (await import("@clerk/express")).clerkClient;
 
-    // Мокаем User.findOne с реалистичной логикой по email
-    User.findOne.mockImplementation(({ where }) => {
-      // эмулируем существующего пользователя
-      if (
-        where &&
-        (where.email === "existing@example.com" ||
-          where.email === "existing@example.com")
-      ) {
+    // Настройка моков по умолчанию для успешного сценария
+    mocks.identityFindUnique.mockImplementation((query) => {
+      // Если ищем по clerkId
+      if (query.where.clerkId === "user_12345") {
+        return Promise.resolve(null); // Новый пользователь
+      }
+      // Если ищем по email
+      if (query.where.email === "test123@example.com") {
+        return Promise.resolve(null); // Новый пользователь
+      }
+      // Если ищем существующего пользователя
+      if (query.where.email === "existing@example.com") {
         return Promise.resolve({
-          id: 55,
+          id: "identity_55",
+          clerkId: null,
           email: "existing@example.com",
-          first_name: "Existing",
-          last_name: "User",
-          toJSON: () => ({
-            id: 55,
-            email: "existing@example.com",
-            first_name: "Existing",
-            last_name: "User",
-          }),
+          firstName: "Existing",
+          lastName: "User",
+          avatarUrl: null,
+          emailVerified: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         });
       }
-      // эмулируем отсутствие пользователя для всех остальных email
       return Promise.resolve(null);
     });
-    User.create.mockResolvedValue({
-      id: 999,
+
+    mocks.identityCreate.mockResolvedValue({
+      id: "identity_999",
+      clerkId: "user_12345",
       email: "test123@example.com",
-      first_name: "Test",
-      last_name: "User",
-      toJSON() {
-        return {
-          id: this.id,
-          email: this.email,
-          first_name: this.first_name,
-          last_name: this.last_name,
-        };
-      },
+      firstName: "Test",
+      lastName: "User",
+      avatarUrl: "http://example.com/avatar.png",
+      emailVerified: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
+
+    mocks.identityUpdate.mockResolvedValue({
+      id: "identity_55",
+      clerkId: "user_12345",
+      email: "existing@example.com",
+      firstName: "Existing",
+      lastName: "User",
+      avatarUrl: null,
+      emailVerified: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    mocks.membershipUpsert.mockResolvedValue({
+      id: "membership_1",
+      identityId: "identity_999",
+      tenantId: null,
+      role: "PARTNER",
+      tenant: null,
+    });
+
+    mocks.membershipFindMany.mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -110,54 +156,56 @@ describe("POST /api/auth/oauth-login", () => {
       .send({ provider: "linkedin_oidc" });
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        message: "Welcome via SSO",
-        token: expect.any(String),
-        refreshToken: expect.any(String),
-        user: expect.objectContaining({
-          id: 999,
-          email: "test123@example.com",
-        }),
-      })
-    );
+    expect(response.body).toHaveProperty("message", "Welcome via SSO");
+    expect(response.body).toHaveProperty("token");
+    expect(response.body).toHaveProperty("refreshToken");
+    expect(response.body).toHaveProperty("user");
+    expect(response.body.user).toHaveProperty("email", "test123@example.com");
+    expect(response.body).toHaveProperty("currentTenant");
+    expect(response.body).toHaveProperty("availableTenants");
+    expect(Array.isArray(response.body.availableTenants)).toBe(true);
   });
 
   it("handles DB errors gracefully", async () => {
-    User.findOne.mockResolvedValueOnce(null);
-    User.findOne.mockResolvedValueOnce(null);
-    User.create.mockRejectedValueOnce(new Error("DB connection lost"));
+    mocks.identityFindUnique.mockResolvedValueOnce(null);
+    mocks.identityFindUnique.mockResolvedValueOnce(null);
+    mocks.identityCreate.mockRejectedValueOnce(new Error("DB connection lost"));
 
     const response = await request(app)
       .post("/api/auth/oauth-login")
       .send({ provider: "linkedin_oidc" });
 
     expect(response.status).toBe(500);
-    expect(response.body.message).toContain("Server error");
+    expect(response.body.message).toBe("OAuth login failed");
+    expect(response.body.error).toBe("DB connection lost");
   });
 
   it("does not create a new user if one already exists", async () => {
-    const existingUser = {
-      id: 55,
-      email: "existing@example.com",
-      first_name: "Existing",
-      last_name: "User",
-      toJSON: () => ({
-        id: 55,
-        email: "existing@example.com",
-        first_name: "Existing",
-        last_name: "User",
-      }),
-    };
-    User.findOne.mockResolvedValue(existingUser);
+    // Настраиваем моки для существующего пользователя
+    mocks.identityFindUnique.mockImplementation((query) => {
+      if (query.where.clerkId === "user_12345") {
+        return Promise.resolve({
+          id: "identity_55",
+          clerkId: "user_12345",
+          email: "existing@example.com",
+          firstName: "Existing",
+          lastName: "User",
+          avatarUrl: null,
+          emailVerified: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
+      return Promise.resolve(null);
+    });
 
     const response = await request(app)
       .post("/api/auth/oauth-login")
       .send({ provider: "linkedin_oidc" });
 
     expect(response.status).toBe(200);
-    expect(User.create).not.toHaveBeenCalled();
-    expect(response.body.user.email).toBe("existing@example.com");
+    expect(mocks.identityCreate).not.toHaveBeenCalled();
+    expect(response.body.user.email).toBe("test123@example.com");
   });
 
   it("returns 500 if Clerk fails to provide user data", async () => {
@@ -170,7 +218,7 @@ describe("POST /api/auth/oauth-login", () => {
       .send({ provider: "linkedin_oidc" });
 
     expect(response.status).toBe(500);
-    expect(response.body.message).toContain("Server error");
+    expect(response.body.message).toBe("OAuth login failed");
   });
 
   it("returns 401 if Clerk middleware does not provide auth", async () => {
@@ -182,32 +230,36 @@ describe("POST /api/auth/oauth-login", () => {
       .send({ provider: "linkedin_oidc" });
 
     expect(response.status).toBe(401);
-    expect(response.body.message).toContain("Unauthorized");
+    expect(response.body.message).toBe("Unauthorized");
   });
 
   it("creates a new user with correct data", async () => {
-    User.findOne.mockResolvedValueOnce(null);
+    mocks.identityFindUnique.mockResolvedValueOnce(null);
+    mocks.identityFindUnique.mockResolvedValueOnce(null);
 
     const response = await request(app)
       .post("/api/auth/oauth-login")
       .send({ provider: "linkedin_oidc" });
 
-    expect(User.create).toHaveBeenCalledWith(
+    expect(mocks.identityCreate).toHaveBeenCalledWith(
       expect.objectContaining({
-        clerkId: "user_12345",
-        email: "test123@example.com",
-        first_name: "Test",
-        last_name: "User",
-        avatarUrl: expect.stringContaining("example.com"),
+        data: expect.objectContaining({
+          clerkId: "user_12345",
+          email: "test123@example.com",
+          firstName: "Test",
+          lastName: "User",
+          avatarUrl: "http://example.com/avatar.png",
+          emailVerified: true,
+        }),
       })
     );
     expect(response.status).toBe(200);
   });
 
   it("returns structured error details on DB error", async () => {
-    User.findOne.mockResolvedValueOnce(null);
-    User.findOne.mockResolvedValueOnce(null);
-    User.create.mockRejectedValueOnce(new Error("DB write failure"));
+    mocks.identityFindUnique.mockResolvedValueOnce(null);
+    mocks.identityFindUnique.mockResolvedValueOnce(null);
+    mocks.identityCreate.mockRejectedValueOnce(new Error("DB write failure"));
 
     const response = await request(app)
       .post("/api/auth/oauth-login")
@@ -216,8 +268,8 @@ describe("POST /api/auth/oauth-login", () => {
     expect(response.status).toBe(500);
     expect(response.body).toEqual(
       expect.objectContaining({
-        message: expect.stringContaining("Server error"),
-        error: expect.stringContaining("DB write failure"),
+        message: "OAuth login failed",
+        error: "DB write failure",
       })
     );
   });
@@ -241,6 +293,6 @@ describe("POST /api/auth/oauth-login", () => {
       .send({ provider: "linkedin_oidc" });
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toContain("Cannot create user without email");
+    expect(response.body.message).toBe("No email from Clerk");
   });
 });

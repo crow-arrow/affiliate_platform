@@ -7,18 +7,35 @@ import {
   deleteFieldMapping,
 } from "../fieldMappings.js";
 
-const mockPrisma = {
-  tenantFieldMapping: {
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  },
+// Создаем объект для хранения моков
+const mocks = {
+  findMany: vi.fn(),
+  findUnique: vi.fn(),
+  create: vi.fn(),
+  update: vi.fn(),
+  delete: vi.fn(),
 };
 
 vi.mock("../../../prisma/client.js", () => ({
-  default: mockPrisma,
+  default: {
+    tenantFieldMapping: {
+      get findMany() {
+        return mocks.findMany;
+      },
+      get findUnique() {
+        return mocks.findUnique;
+      },
+      get create() {
+        return mocks.create;
+      },
+      get update() {
+        return mocks.update;
+      },
+      get delete() {
+        return mocks.delete;
+      },
+    },
+  },
 }));
 
 describe("Field Mappings Controllers", () => {
@@ -51,7 +68,7 @@ describe("Field Mappings Controllers", () => {
         },
       ];
 
-      mockPrisma.tenantFieldMapping.findMany.mockResolvedValue(mockMappings);
+      mocks.findMany.mockResolvedValue(mockMappings);
 
       await getFieldMappings(mockReq, mockRes);
 
@@ -90,12 +107,12 @@ describe("Field Mappings Controllers", () => {
         isActive: true,
       };
 
-      mockPrisma.tenantFieldMapping.findUnique.mockResolvedValue(null);
-      mockPrisma.tenantFieldMapping.create.mockResolvedValue(mockMapping);
+      mocks.findUnique.mockResolvedValue(null);
+      mocks.create.mockResolvedValue(mockMapping);
 
       await createFieldMapping(mockReq, mockRes);
 
-      expect(mockPrisma.tenantFieldMapping.create).toHaveBeenCalled();
+      expect(mocks.create).toHaveBeenCalled();
       expect(mockRes.status).toHaveBeenCalledWith(201);
       expect(mockRes.json).toHaveBeenCalledWith({
         message: "Field mapping created successfully",
@@ -109,7 +126,7 @@ describe("Field Mappings Controllers", () => {
         targetField: "travelDate",
       };
 
-      mockPrisma.tenantFieldMapping.findUnique.mockResolvedValue({
+      mocks.findUnique.mockResolvedValue({
         id: "existing_id",
       });
 
@@ -153,14 +170,14 @@ describe("Field Mappings Controllers", () => {
         ...mockReq.body,
       };
 
-      mockPrisma.tenantFieldMapping.findUnique
+      mocks.findUnique
         .mockResolvedValueOnce(existing)
         .mockResolvedValueOnce(null);
-      mockPrisma.tenantFieldMapping.update.mockResolvedValue(updated);
+      mocks.update.mockResolvedValue(updated);
 
       await updateFieldMapping(mockReq, mockRes);
 
-      expect(mockPrisma.tenantFieldMapping.update).toHaveBeenCalled();
+      expect(mocks.update).toHaveBeenCalled();
       expect(mockRes.json).toHaveBeenCalledWith({
         message: "Field mapping updated successfully",
         mapping: updated,
@@ -177,12 +194,12 @@ describe("Field Mappings Controllers", () => {
         tenantId: "tenant_id",
       };
 
-      mockPrisma.tenantFieldMapping.findUnique.mockResolvedValue(existing);
-      mockPrisma.tenantFieldMapping.delete.mockResolvedValue(existing);
+      mocks.findUnique.mockResolvedValue(existing);
+      mocks.delete.mockResolvedValue(existing);
 
       await deleteFieldMapping(mockReq, mockRes);
 
-      expect(mockPrisma.tenantFieldMapping.delete).toHaveBeenCalledWith({
+      expect(mocks.delete).toHaveBeenCalledWith({
         where: { id: "mapping_id" },
       });
       expect(mockRes.json).toHaveBeenCalledWith({

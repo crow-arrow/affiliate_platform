@@ -426,71 +426,109 @@ export const oauthLogin = async (req, res) => {
 // ✅ Get current user
 export const getMe = async (req, res) => {
   try {
-    const tenantId = req.user.tenantId;
-    // Сначала пробуем как Identity (вариант A токен)
+    const identityId = req.user.id;
+
+    // Получаем Identity
     const identity = await prisma.identity.findUnique({
-      where: { id: req.user.id },
+      where: { id: identityId },
     });
-    if (identity) {
-      const membership = await prisma.membership.findUnique({
-        where: { identityId_tenantId: { identityId: identity.id, tenantId } },
-        include: { profile: true },
-      });
 
-      // Если membership не существует, создаем его
-      let finalMembership = membership;
-      if (!membership) {
-        finalMembership = await prisma.membership.create({
-          data: {
-            identityId: identity.id,
-            tenantId: tenantId,
-            role: "PARTNER",
-          },
-          include: { profile: true },
-        });
-      }
+    if (!identity) {
+      return res.status(404).json({ message: "User does not exist" });
+    }
 
-      // Если profile не существует, создаем его
-      let profile = finalMembership?.profile;
-      if (!profile && finalMembership) {
-        const affiliateId = `${(
-          identity.firstName || "user"
-        ).toLowerCase()}_${Math.floor(Math.random() * 90000 + 10000)}`;
-        profile = await prisma.partnerProfile.create({
-          data: {
-            membershipId: finalMembership.id,
-            affiliateId: affiliateId,
-            level: "BRONZE",
-          },
-        });
-      }
+    // Резолвим и валидируем tenant (используем функцию из middleware)
+    const { resolveAndValidateTenant } = await import(
+      "../middleware/resolveTenantFromHeader.js"
+    );
+    const tenantResult = await resolveAndValidateTenant({
+      identityId,
+      tenantSlug: req.headers["x-tenant-slug"],
+      tenantIdFromToken: req.user.tenantId,
+    });
 
+    // Если tenant не найден, возвращаем пользователя без tenant
+    if (!tenantResult) {
       const safeUser = {
         id: identity.id,
         email: identity.email,
-        phone: profile?.phone || null,
+        phone: null,
         first_name: identity.firstName || "",
         last_name: identity.lastName || "",
-        role: finalMembership?.role || "PARTNER",
+        role: "PARTNER",
         emailVerified: identity.emailVerified || false,
-        tenantId: tenantId || null,
-        affiliateId: profile?.affiliateId || null,
+        tenantId: null,
+        affiliateId: null,
         avatarUrl: identity.avatarUrl || null,
-        level: profile?.level || "BRONZE",
-        current_year_travellers: profile?.currentYearTravellers || 0,
-        total_commission: profile?.totalCommission || 0,
-        booked_trips_count: profile?.bookedTripsCount || 0,
+        level: "BRONZE",
+        current_year_travellers: 0,
+        total_commission: 0,
+        booked_trips_count: 0,
         createdAt: identity.createdAt,
         updatedAt: identity.updatedAt,
       };
       return res.status(200).json({ user: safeUser });
     }
 
-    // Identity не найден
-    return res.status(404).json({ message: "User does not exist" });
+    const { tenantId, tenant } = tenantResult;
+
+    // Теперь tenantId гарантированно валиден
+    const membership = await prisma.membership.findUnique({
+      where: { identityId_tenantId: { identityId, tenantId } },
+      include: { profile: true },
+    });
+
+    // Если membership не существует, создаем его
+    let finalMembership = membership;
+    if (!membership) {
+      finalMembership = await prisma.membership.create({
+        data: {
+          identityId,
+          tenantId,
+          role: "PARTNER",
+        },
+        include: { profile: true },
+      });
+    }
+
+    // Если profile не существует, создаем его
+    let profile = finalMembership?.profile;
+    if (!profile && finalMembership) {
+      const affiliateId = `${(
+        identity.firstName || "user"
+      ).toLowerCase()}_${Math.floor(Math.random() * 90000 + 10000)}`;
+      profile = await prisma.partnerProfile.create({
+        data: {
+          membershipId: finalMembership.id,
+          affiliateId,
+          level: "BRONZE",
+        },
+      });
+    }
+
+    const safeUser = {
+      id: identity.id,
+      email: identity.email,
+      phone: profile?.phone || null,
+      first_name: identity.firstName || "",
+      last_name: identity.lastName || "",
+      role: finalMembership?.role || "PARTNER",
+      emailVerified: identity.emailVerified || false,
+      tenantId,
+      affiliateId: profile?.affiliateId || null,
+      avatarUrl: identity.avatarUrl || null,
+      level: profile?.level || "BRONZE",
+      current_year_travellers: profile?.currentYearTravellers || 0,
+      total_commission: profile?.totalCommission || 0,
+      booked_trips_count: profile?.bookedTripsCount || 0,
+      createdAt: identity.createdAt,
+      updatedAt: identity.updatedAt,
+    };
+
+    return res.status(200).json({ user: safeUser });
   } catch (error) {
     console.error("getMe error:", error);
-    res.status(403).json({ message: "Access denied" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 

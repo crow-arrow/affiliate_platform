@@ -6,18 +6,35 @@ import {
   deleteApiKey,
 } from "../apiKeys.js";
 
-const mockPrisma = {
-  tenantApiKey: {
-    findMany: vi.fn(),
-    findUnique: vi.fn(),
-    create: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-  },
+// Создаем объект для хранения моков
+const mocks = {
+  findMany: vi.fn(),
+  findUnique: vi.fn(),
+  create: vi.fn(),
+  update: vi.fn(),
+  delete: vi.fn(),
 };
 
 vi.mock("../../../prisma/client.js", () => ({
-  default: mockPrisma,
+  default: {
+    tenantApiKey: {
+      get findMany() {
+        return mocks.findMany;
+      },
+      get findUnique() {
+        return mocks.findUnique;
+      },
+      get create() {
+        return mocks.create;
+      },
+      get update() {
+        return mocks.update;
+      },
+      get delete() {
+        return mocks.delete;
+      },
+    },
+  },
 }));
 
 describe("API Keys Controllers", () => {
@@ -46,11 +63,11 @@ describe("API Keys Controllers", () => {
         { id: "2", apiKey: "ak_456", name: "Key 2", isActive: false },
       ];
 
-      mockPrisma.tenantApiKey.findMany.mockResolvedValue(mockKeys);
+      mocks.findMany.mockResolvedValue(mockKeys);
 
       await getApiKeys(mockReq, mockRes);
 
-      expect(mockPrisma.tenantApiKey.findMany).toHaveBeenCalledWith({
+      expect(mocks.findMany).toHaveBeenCalledWith({
         where: { tenantId: "tenant_id" },
         orderBy: { createdAt: "desc" },
       });
@@ -81,11 +98,11 @@ describe("API Keys Controllers", () => {
         tenantId: "tenant_id",
       };
 
-      mockPrisma.tenantApiKey.create.mockResolvedValue(mockKey);
+      mocks.create.mockResolvedValue(mockKey);
 
       await createApiKey(mockReq, mockRes);
 
-      expect(mockPrisma.tenantApiKey.create).toHaveBeenCalled();
+      expect(mocks.create).toHaveBeenCalled();
       expect(mockRes.status).toHaveBeenCalledWith(201);
       expect(mockRes.json).toHaveBeenCalledWith({
         message: "API key created successfully",
@@ -103,11 +120,11 @@ describe("API Keys Controllers", () => {
         isActive: true,
       };
 
-      mockPrisma.tenantApiKey.create.mockResolvedValue(mockKey);
+      mocks.create.mockResolvedValue(mockKey);
 
       await createApiKey(mockReq, mockRes);
 
-      expect(mockPrisma.tenantApiKey.create).toHaveBeenCalledWith({
+      expect(mocks.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
           name: "API Key",
         }),
@@ -131,12 +148,12 @@ describe("API Keys Controllers", () => {
         isActive: false,
       };
 
-      mockPrisma.tenantApiKey.findUnique.mockResolvedValue(existingKey);
-      mockPrisma.tenantApiKey.update.mockResolvedValue(updatedKey);
+      mocks.findUnique.mockResolvedValue(existingKey);
+      mocks.update.mockResolvedValue(updatedKey);
 
       await updateApiKey(mockReq, mockRes);
 
-      expect(mockPrisma.tenantApiKey.update).toHaveBeenCalledWith({
+      expect(mocks.update).toHaveBeenCalledWith({
         where: { id: "key_id" },
         data: { name: "Updated Name", isActive: false },
       });
@@ -148,7 +165,7 @@ describe("API Keys Controllers", () => {
 
     it("should return 404 if key not found", async () => {
       mockReq.params = { id: "key_id" };
-      mockPrisma.tenantApiKey.findUnique.mockResolvedValue(null);
+      mocks.findUnique.mockResolvedValue(null);
 
       await updateApiKey(mockReq, mockRes);
 
@@ -168,12 +185,12 @@ describe("API Keys Controllers", () => {
         tenantId: "tenant_id",
       };
 
-      mockPrisma.tenantApiKey.findUnique.mockResolvedValue(existingKey);
-      mockPrisma.tenantApiKey.delete.mockResolvedValue(existingKey);
+      mocks.findUnique.mockResolvedValue(existingKey);
+      mocks.delete.mockResolvedValue(existingKey);
 
       await deleteApiKey(mockReq, mockRes);
 
-      expect(mockPrisma.tenantApiKey.delete).toHaveBeenCalledWith({
+      expect(mocks.delete).toHaveBeenCalledWith({
         where: { id: "key_id" },
       });
       expect(mockRes.json).toHaveBeenCalledWith({

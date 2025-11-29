@@ -1,14 +1,19 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { checkApiKey } from "../checkApiKey.js";
 
-const mockPrisma = {
-  tenantApiKey: {
-    findUnique: vi.fn(),
-  },
+// Создаем объект для хранения моков
+const mocks = {
+  findUnique: vi.fn(),
 };
 
 vi.mock("../../prisma/client.js", () => ({
-  default: mockPrisma,
+  default: {
+    tenantApiKey: {
+      get findUnique() {
+        return mocks.findUnique;
+      },
+    },
+  },
 }));
 
 describe("checkApiKey middleware", () => {
@@ -40,7 +45,7 @@ describe("checkApiKey middleware", () => {
 
   it("should return 401 if API key is invalid", async () => {
     mockReq.headers["x-api-key"] = "invalid_key";
-    mockPrisma.tenantApiKey.findUnique.mockResolvedValue(null);
+    mocks.findUnique.mockResolvedValue(null);
 
     await checkApiKey(mockReq, mockRes, mockNext);
 
@@ -64,7 +69,7 @@ describe("checkApiKey middleware", () => {
     };
 
     mockReq.headers["x-api-key"] = "valid_key";
-    mockPrisma.tenantApiKey.findUnique.mockResolvedValue(mockApiKey);
+    mocks.findUnique.mockResolvedValue(mockApiKey);
 
     await checkApiKey(mockReq, mockRes, mockNext);
 
@@ -88,7 +93,7 @@ describe("checkApiKey middleware", () => {
     };
 
     mockReq.headers.authorization = "Bearer valid_key";
-    mockPrisma.tenantApiKey.findUnique.mockResolvedValue(mockApiKey);
+    mocks.findUnique.mockResolvedValue(mockApiKey);
 
     await checkApiKey(mockReq, mockRes, mockNext);
 

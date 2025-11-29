@@ -1,19 +1,45 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { getUserClicks } from "../getClicks.js";
 
-// Mock Prisma client
-const mockPrisma = {
-  clicksData: {
-    findMany: vi.fn(),
-  },
+// Создаем объект для хранения моков
+const mocks = {
+  identityFindUnique: vi.fn(),
+  membershipFindUnique: vi.fn(),
+  membershipCreate: vi.fn(),
+  profileUpsert: vi.fn(),
+  clicksFindMany: vi.fn(),
 };
 
 vi.mock("../../prisma/client.js", () => ({
-  default: mockPrisma,
+  default: {
+    identity: {
+      get findUnique() {
+        return mocks.identityFindUnique;
+      },
+    },
+    membership: {
+      get findUnique() {
+        return mocks.membershipFindUnique;
+      },
+      get create() {
+        return mocks.membershipCreate;
+      },
+    },
+    partnerProfile: {
+      get upsert() {
+        return mocks.profileUpsert;
+      },
+    },
+    clicksData: {
+      get findMany() {
+        return mocks.clicksFindMany;
+      },
+    },
+  },
 }));
 
 describe("getUserClicks", () => {
-  const mockReq = { user: { id: 1 } };
+  const mockReq = { user: { id: "identity_id", tenantId: "tenant_id" } };
   const mockRes = {
     status: vi.fn().mockReturnThis(),
     json: vi.fn(),
@@ -21,36 +47,51 @@ describe("getUserClicks", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // Настройка моков для успешного сценария
+    mocks.identityFindUnique.mockResolvedValue({
+      email: "test@test.com",
+      firstName: "Test",
+      lastName: "User",
+    });
+    mocks.membershipFindUnique.mockResolvedValue({
+      id: "membership_id",
+      profile: { affiliateId: "aff123" },
+    });
+    mocks.profileUpsert.mockResolvedValue({ affiliateId: "aff123" });
   });
 
   it("should return clicks for a valid user", async () => {
-    const mockClicks = [{ id: 101 }, { id: 102 }];
+    const mockClicks = [{ id: BigInt(101), referralProfileId: "profile_id" }, { id: BigInt(102), referralProfileId: "profile_id" }];
 
-    mockPrisma.clicksData.findMany.mockResolvedValue(mockClicks);
+    mocks.profileUpsert.mockResolvedValue({ id: "profile_id", affiliateId: "aff123" });
+    mocks.clicksFindMany.mockResolvedValue(mockClicks);
 
     await getUserClicks(mockReq, mockRes);
 
-    expect(mockPrisma.clicksData.findMany).toHaveBeenCalledWith({
-      where: { referral_user_id: 1 },
-    });
+    expect(mocks.clicksFindMany).toHaveBeenCalled();
     expect(mockRes.json).toHaveBeenCalledWith({
-      clicks: mockClicks,
+      clicks: [
+        { id: "101", referralProfileId: "profile_id" },
+        { id: "102", referralProfileId: "profile_id" },
+      ],
     });
   });
 
-  it("should return 400 if user ID is missing", async () => {
-    const mockReqNoUser = {};
+  it("should return 400 if identity or tenant is missing", async () => {
+    const mockReqNoUser = { user: {} };
 
     await getUserClicks(mockReqNoUser, mockRes);
 
     expect(mockRes.status).toHaveBeenCalledWith(400);
-    expect(mockRes.json).toHaveBeenCalledWith({ message: "Missing user in request" });
+    expect(mockRes.json).toHaveBeenCalledWith({
+      message: "Missing identity or tenant in request",
+    });
   });
 
   it("should return 500 on error", async () => {
     const error = new Error("DB error");
 
-    mockPrisma.clicksData.findMany.mockRejectedValue(error);
+    mocks.identityFindUnique.mockRejectedValue(error);
 
     await getUserClicks(mockReq, mockRes);
 
