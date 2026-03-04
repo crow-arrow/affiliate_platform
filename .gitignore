@@ -1,0 +1,55 @@
+# Node.js dependencies
+/node_modules/
+server/node_modules/
+client/node_modules/
+
+# dotenv environment variables files
+.env*
+.DS_Store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# npm package-lock files
+package-lock.json
+yarn.lock
+
+# IDE and editor settings
+.idea/
+.vscode/
+
+# Build output
+/dist
+/build
+
+# Coverage directory used by testing tools
+/coverage
+
+# Timestamps
+*.swp
+
+# React
+/build
+
+# Gitignore
+.gitignore
+
+# lints
+.stylelintrc.json
+.eslintrc.json
+eslint.config.js
+
+# uploads
+/uploads/*
+!/uploads/.gitkeep
+
+# config
+client/src/config.js
