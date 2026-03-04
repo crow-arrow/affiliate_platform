@@ -1,0 +1,47 @@
+import express from "express";
+import {
+  signUp,
+  login,
+  oauthLogin,
+  getMe,
+  getUserTenants,
+  getMyTenants,
+} from "../controllers/auth.js";
+import { businessSignUp } from "../controllers/tenant/businessSignUp.js";
+import { passwordResetLimiter } from "../middleware/rateLimiter.js";
+import { sendOTPCode, verifyOTPCode } from "../controllers/emailController.js";
+import { checkAuth } from "../middleware/checkAuth.js";
+import { resolveTenantFromHeader } from "../middleware/resolveTenantFromHeader.js";
+import { clerkMiddleware } from "@clerk/express";
+
+const router = express.Router();
+
+//Register
+// http://localhost:3002/api/auth/sign-up
+router.post("/sign-up", signUp);
+
+// OTP верификация email
+// http://localhost:3002/api/auth/send-otp
+router.post("/send-otp", passwordResetLimiter, sendOTPCode);
+
+// http://localhost:3002/api/auth/verify-otp
+router.post("/verify-otp", verifyOTPCode);
+
+// Login
+// http://localhost:3002/api/auth/sign-in
+router.post("/sign-in", login);
+
+// OAuth Login with Clerk
+// http://localhost:3002/api/auth/oauth-login
+router.post("/oauth-login", clerkMiddleware(), oauthLogin);
+
+// Вернуть все компании, где у пользователя с таким email есть аккаунт
+router.get("/user/tenants", getUserTenants);
+
+// Вернуть компании текущего пользователя (по JWT)
+router.get("/my-tenants", checkAuth, getMyTenants);
+
+// Get Me - требует аутентификации и резолвит tenant из заголовка
+router.get("/me", checkAuth, resolveTenantFromHeader, getMe);
+
+export default router;

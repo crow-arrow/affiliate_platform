@@ -1,0 +1,354 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // В Prisma 7.0 можно использовать prisma-client, но prisma-client-js все еще работает
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tenant {
+  id            String               @id @default(cuid())
+  name          String
+  domain        String?              @unique
+  branding      Json? // логотипы, цвета и т.п.
+  createdAt     DateTime             @default(now()) @map("created_at")
+  memberships   Membership[]
+  levelSettings LevelSetting[]
+  appSettings   AppSetting[]
+  apiKeys       TenantApiKey[]
+  fieldMappings TenantFieldMapping[]
+  trips         Trips[]
+  updatedAt     DateTime             @updatedAt @map("updated_at")
+
+  @@map("tenants")
+}
+
+// Глобальная сущность пользователя (единожды на email)
+model Identity {
+  id            String   @id @default(cuid())
+  email         String   @unique @db.VarChar(255)
+  clerkId       String?  @unique @map("clerk_id")
+  firstName     String?  @map("first_name") @db.VarChar(100)
+  lastName      String?  @map("last_name") @db.VarChar(100)
+  avatarUrl     String?  @map("avatar_url")
+  passwordHash  String?  @map("password_hash")
+  emailVerified Boolean  @default(false) @map("email_verified")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  memberships       Membership[]
+  verificationCodes VerificationCode[]
+
+  @@map("identities")
+}
+
+// Коды верификации для OTP
+model VerificationCode {
+  id         String   @id @default(cuid())
+  identityId String   @map("identity_id")
+  identity   Identity @relation(fields: [identityId], references: [id], onDelete: Cascade)
+  code       String   @db.VarChar(6)
+  type       String   @default("EMAIL_VERIFICATION") @db.VarChar(50)
+  expiresAt  DateTime @map("expires_at")
+  used       Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([identityId, type, used])
+  @@index([code, identityId])
+  @@map("verification_codes")
+}
+
+// Членство глобальной Identity в конкретном Tenant с ролью
+model Membership {
+  id         String   @id @default(cuid())
+  identityId String   @map("identity_id")
+  tenantId   String   @map("tenant_id")
+  role       UserRole @default(PARTNER)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  identity Identity        @relation(fields: [identityId], references: [id])
+  tenant   Tenant          @relation(fields: [tenantId], references: [id])
+  profile  PartnerProfile? // Связь с профилем партнера (tenant-specific данные)
+
+  @@unique([identityId, tenantId])
+  @@map("memberships")
+}
+
+// Tenant-specific профиль партнера (affiliate данные)
+model PartnerProfile {
+  id           String     @id @default(cuid())
+  membershipId String     @unique @map("membership_id")
+  membership   Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+
+  // Контактные данные (tenant-specific)
+  phone String? @db.VarChar(20)
+
+  // Affiliate данные
+  affiliateId String? @unique @map("affiliate_id") @db.VarChar(50)
+  couponCode  String? @map("coupon_code") @db.VarChar(50)
+
+  // Level данные
+  level          Level     @default(BRONZE)
+  levelChangedAt DateTime? @map("level_changed_at")
+
+  // Статистика
+  bookedTripsCount      Int     @default(0) @map("booked_trips_count")
+  currentYearTravellers Int?    @default(0) @map("current_year_travellers")
+  numberOfTravellers    Int?    @default(0) @map("number_of_travellers")
+  earnings              Decimal @default(0) @db.Decimal(19, 2)
+  canceledEarnings      Decimal @default(0) @map("canceled_earnings") @db.Decimal(19, 2)
+  totalCommission       Decimal @default(0) @map("total_commission") @db.Decimal(19, 2)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  trips         Trips[]        @relation("PartnerAffiliateTrips")
+  clicksData    ClicksData[]   @relation("PartnerReferralClicks")
+  referralLinks ReferralLink[] @relation("PartnerReferralLinks")
+  levelHistory  LevelHistory[] @relation("PartnerLevelHistory")
+
+  @@map("partner_profiles")
+}
+
+model Trips {
+  id              BigInt       @id @default(autoincrement())
+  travellerAmount Int          @map("traveller_amount")
+  bookingDate     DateTime     @map("booking_date")
+  travelDate      DateTime     @map("travel_date")
+  orderStatus     OrderStatus? @default(PENDING) @map("order_status")
+  totalPrice      Decimal      @map("total_price") @db.Decimal(19, 2)
+  currency        String?      @db.VarChar(10)
+  couponCode      String?      @map("coupon_code") @db.VarChar(50)
+  affiliateId     String?      @map("affiliate_id") @db.VarChar(50)
+
+  // Данные клиента, который забронировал тур
+  customerFirstName String? @map("customer_first_name") @db.VarChar(100)
+  customerLastName  String? @map("customer_last_name") @db.VarChar(100)
+  customerEmail     String? @map("customer_email") @db.VarChar(255)
+
+  // Связь с тенантом
+  tenantId String? @map("tenant_id")
+  tenant   Tenant? @relation(fields: [tenantId], references: [id])
+
+  // relations
+  affiliateProfile PartnerProfile? @relation("PartnerAffiliateTrips", fields: [affiliateId], references: [affiliateId])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([travelDate])
+  @@index([bookingDate])
+  @@index([orderStatus])
+  @@index([affiliateId])
+  @@index([tenantId])
+  @@index([customerEmail, bookingDate])
+  @@map("trips") // Переименовано из wp_tourmaster_order
+}
+
+model ClicksData {
+  id                BigInt   @id @default(autoincrement())
+  affiliateId       String   @map("affiliate_id") @db.VarChar(50)
+  referer           String?
+  ipAddress         String?  @map("ip_address") @db.VarChar(45)
+  userAgent         String?  @map("user_agent")
+  timestamp         DateTime @default(now())
+  referralProfileId String?  @map("referral_profile_id")
+
+  // relations
+  profile PartnerProfile? @relation("PartnerReferralClicks", fields: [referralProfileId], references: [id])
+
+  type       ClickType?  @default(CLICK)
+  deviceType DeviceType? @map("device_type")
+
+  @@index([affiliateId])
+  @@index([ipAddress])
+  @@index([timestamp])
+  @@index([referralProfileId])
+  @@map("clicks_data") // Переименовано из wp_affiliate_analytics
+}
+
+model LevelHistory {
+  id        Int      @id @default(autoincrement())
+  profileId String   @map("profile_id")
+  level     Level
+  changedAt DateTime @default(now()) @map("changed_at")
+
+  // relations
+  profile PartnerProfile @relation("PartnerLevelHistory", fields: [profileId], references: [id])
+
+  @@index([profileId])
+  @@index([changedAt])
+  @@map("level_history")
+}
+
+model ConversionEvent {
+  id         Int      @id @default(autoincrement())
+  referralId String   @db.VarChar(255)
+  event      String   @db.VarChar(50)
+  amount     Decimal? @db.Decimal(19, 2)
+  currency   String?  @db.VarChar(10)
+  orderId    String?  @map("order_id") @db.VarChar(100)
+  email      String?  @db.VarChar(255)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  referralLink ReferralLink? @relation(fields: [referralId], references: [slug])
+
+  @@index([referralId])
+  @@index([createdAt])
+  @@map("conversion_events")
+}
+
+model ReferralLink {
+  id        String @id @default(cuid()) // внутренний ID
+  slug      String @unique @db.VarChar(255) // то, что вставляется в ссылку (например, amal_666)
+  profileId String @map("profile_id")
+
+  // relations
+  profile PartnerProfile @relation("PartnerReferralLinks", fields: [profileId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  status ConversionStatus @default(PENDING)
+
+  destinationUrl String?   @map("destination_url") // если нужно редиректить на кастомную ссылку
+  utmSource      String?   @map("utm_source") @db.VarChar(50) // например: "telegram"
+  utmCampaign    String?   @map("utm_campaign") @db.VarChar(100) // например: "summer_launch"
+  utmMedium      String?   @map("utm_medium") @db.VarChar(50) // "email", "social", "cpc"
+  expiresAt      DateTime? @map("expires_at") // чтобы можно было задать срок действия
+
+  conversions ConversionEvent[] // связь с ConversionEvent
+
+  @@index([profileId])
+  @@index([slug])
+  @@map("referral_links")
+}
+
+model LevelSetting {
+  id             Int      @id @default(autoincrement())
+  tenantId       String?  @map("tenant_id")
+  tenant         Tenant?  @relation(fields: [tenantId], references: [id])
+  levelName      String   @map("level_name") @db.VarChar(50)
+  levelOrder     Int      @map("level_order")
+  requiredAmount Int      @map("required_amount")
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@unique([tenantId, levelOrder])
+  @@unique([tenantId, levelName])
+  @@map("level_settings")
+}
+
+model AppSetting {
+  id        Int      @id @default(autoincrement())
+  tenantId  String?  @map("tenant_id")
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
+  key       String   @db.VarChar(100)
+  value     String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([tenantId, key])
+  @@map("app_settings")
+}
+
+enum UserRole {
+  ADMIN
+  PARTNER
+  MANAGER
+}
+
+enum OrderStatus {
+  APPROVED
+  PENDING
+  CONFIRMED
+  CANCEL
+  COMPLETED
+  WAIT_FOR_APPROVAL
+  REJECTED
+  DEPOSIT_PAID
+}
+
+enum ClickType {
+  CLICK
+  BOOKING
+  BOUNCE
+}
+
+enum DeviceType {
+  MOBILE
+  DESKTOP
+  TABLET
+  UNKNOWN
+}
+
+enum Level {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum ConversionStatus {
+  PENDING
+  APPROVED
+  DECLINED
+}
+
+// Поля модели Trips, которые можно использовать для маппинга
+enum TripField {
+  travelDate
+  bookingDate
+  customerFirstName
+  customerLastName
+  customerEmail
+  affiliateId
+  couponCode
+  travellerAmount
+  totalPrice
+  orderStatus
+  currency
+}
+
+// API ключи для интеграции с внешними системами
+model TenantApiKey {
+  id        String   @id @default(cuid())
+  tenantId  String   @map("tenant_id")
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  apiKey    String   @unique @map("api_key") @db.VarChar(255)
+  name      String?  @db.VarChar(100) // Название ключа (например, "Production API")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([tenantId])
+  @@index([apiKey])
+  @@map("tenant_api_keys")
+}
+
+// Маппинг полей для конвертации входящих данных от турфирм
+model TenantFieldMapping {
+  id            String    @id @default(cuid())
+  tenantId      String    @map("tenant_id")
+  tenant        Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  incomingField String    @map("incoming_field") @db.VarChar(100) // Что приходит от турфирмы
+  targetField   TripField @map("target_field") // Наше поле (enum для безопасности)
+  description   String?   @db.VarChar(255) // Описание для пользователя
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@unique([tenantId, incomingField])
+  @@index([tenantId])
+  @@map("tenant_field_mappings")
+}
