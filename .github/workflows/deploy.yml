@@ -107,13 +107,23 @@ jobs:
             cd "/opt/partner.jinn-travel.com"
             npm install --production --legacy-peer-deps
 
+      - name: 🗄️ Run Prisma migrations
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd "/opt/partner.jinn-travel.com"
+            npx prisma migrate deploy
+
       - name: 🔁 Restart PM2 backend process
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: sudo pm2 restart affiliate_server --update-env
+          script: pm2 restart affiliate_server --update-env
 
       # ========================
       # TELEGRAM NOTIFICATION
