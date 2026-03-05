@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { businessSignUp } from "@/redux/features/tenant/tenantSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -112,19 +113,14 @@ export function BusinessSignupForm() {
         </Field>
         <Field className="grid gap-2">
           <FieldLabel htmlFor="password">Password</FieldLabel>
-          <Input id="password" type="password" {...register("password")} disabled={loading} />
+          <PasswordInput id="password" {...register("password")} disabled={loading} />
           {errors.password && (
             <span className="text-sm text-destructive">{errors.password.message}</span>
           )}
         </Field>
         <Field className="grid gap-2">
           <FieldLabel htmlFor="confirmPassword">Confirm Password</FieldLabel>
-          <Input
-            id="confirmPassword"
-            type="password"
-            {...register("confirmPassword")}
-            disabled={loading}
-          />
+          <PasswordInput id="confirmPassword" {...register("confirmPassword")} disabled={loading} />
           {errors.confirmPassword && (
             <span className="text-sm text-destructive">{errors.confirmPassword.message}</span>
           )}

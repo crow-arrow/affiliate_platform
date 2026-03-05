@@ -15,6 +15,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Field,
   FieldGroup,
@@ -26,6 +27,7 @@ import { toast } from "sonner";
 import { Typography } from "@/theme";
 
 import { useSignIn } from "@clerk/clerk-react";
+import { Loader2Icon } from "lucide-react";
 
 export function SignupForm({ ...props }: React.ComponentProps<"form">) {
   const {
@@ -220,14 +222,15 @@ export function SignupForm({ ...props }: React.ComponentProps<"form">) {
           return null;
         }
 
-        // Render other fields normally
+        // Render other fields normally (use PasswordInput for password fields)
+        const InputComponent = field.type === "password" ? PasswordInput : Input;
         return (
           <Field key={field.id} className="grid gap-2">
             <FieldLabel htmlFor={field.id}>{field.label}</FieldLabel>
-            <Input
+            <InputComponent
               {...register(field.id as keyof SignupFormData)}
               id={field.id}
-              type={field.type}
+              type={field.type === "password" ? undefined : field.type}
               placeholder={field.placeholder}
               autoComplete={field.autoComplete}
               className={getInputErrorClass(field.id as keyof SignupFormData, errors)}
@@ -237,8 +240,15 @@ export function SignupForm({ ...props }: React.ComponentProps<"form">) {
         );
       })}
 
-      <Button type="submit" loading={loading} loadingText="Creating account..." className="w-full">
-        Sign up
+      <Button type="submit" disabled={loading} className="w-full">
+        {loading ? (
+          <>
+            Creating account
+            <Loader2Icon className="animate-spin" />
+          </>
+        ) : (
+          "Sign up"
+        )}
       </Button>
 
       <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">

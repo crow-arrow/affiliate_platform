@@ -2,10 +2,11 @@ import { FieldErrors } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { changePassword } from "@/redux/features/password/resetPasswordSlice";
+import { setPassword, clearErrors } from "@/redux/features/password/resetPasswordSlice";
+import { getMe } from "@/redux/features/auth/authSlice";
 import {
-  changePasswordSchema,
-  ChangePasswordFormData,
+  setPasswordSchema,
+  SetPasswordFormData,
   getInputErrorClass,
   showErrorsInOrder,
 } from "@/components/validation/formSchema";
@@ -15,17 +16,13 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { Loader2Icon } from "lucide-react";
 
-interface ChangePasswordFormProps {
+interface SetPasswordFormProps {
   onSuccess?: () => void;
 }
 
-const orderedFields: (keyof ChangePasswordFormData)[] = [
-  "currentPassword",
-  "newPassword",
-  "confirmPassword",
-];
+const orderedFields: (keyof SetPasswordFormData)[] = ["newPassword", "confirmPassword"];
 
-export const ChangePasswordForm = ({ onSuccess }: ChangePasswordFormProps) => {
+export const SetPasswordForm = ({ onSuccess }: SetPasswordFormProps) => {
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((s: any) => s.password || { status: "idle" });
   const loading = status === "loading";
@@ -35,44 +32,31 @@ export const ChangePasswordForm = ({ onSuccess }: ChangePasswordFormProps) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ChangePasswordFormData>({
-    resolver: zodResolver(changePasswordSchema),
+  } = useForm<SetPasswordFormData>({
+    resolver: zodResolver(setPasswordSchema),
   });
 
-  const onSubmit = async (data: ChangePasswordFormData) => {
-    const res = await dispatch(
-      changePassword({
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
-      })
-    );
-    if ((changePassword as any).fulfilled.match(res)) {
-      toast.success((res as any).payload?.message || "Password changed");
+  const onSubmit = async (data: SetPasswordFormData) => {
+    const res = await dispatch(setPassword({ newPassword: data.newPassword }));
+    if ((setPassword as any).fulfilled.match(res)) {
+      toast.success((res as any).payload?.message || "Password set successfully");
       reset();
+      dispatch(clearErrors());
+      await dispatch(getMe());
       onSuccess?.();
     } else {
-      const msg = (res as any).payload || "Failed to change password";
+      const msg = (res as any).payload || "Failed to set password";
       toast.error(msg);
     }
   };
 
-  const onError = (errors: FieldErrors<ChangePasswordFormData>) => {
+  const onError = (errors: FieldErrors<SetPasswordFormData>) => {
     showErrorsInOrder(errors, orderedFields);
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit, onError)} className="w-full" noValidate>
       <FieldGroup className="grid gap-4">
-        <Field className="grid gap-2">
-          <FieldLabel htmlFor="current-password">Current password</FieldLabel>
-          <PasswordInput
-            id="current-password"
-            autoComplete="current-password"
-            placeholder="******"
-            {...register("currentPassword")}
-            className={getInputErrorClass("currentPassword", errors)}
-          />
-        </Field>
         <Field className="grid gap-2">
           <FieldLabel htmlFor="new-password">New password</FieldLabel>
           <PasswordInput
@@ -84,9 +68,9 @@ export const ChangePasswordForm = ({ onSuccess }: ChangePasswordFormProps) => {
           />
         </Field>
         <Field className="grid gap-2">
-          <FieldLabel htmlFor="confirm-new-password">Confirm new password</FieldLabel>
+          <FieldLabel htmlFor="confirm-password">Confirm password</FieldLabel>
           <PasswordInput
-            id="confirm-new-password"
+            id="confirm-password"
             autoComplete="new-password"
             placeholder="*********"
             {...register("confirmPassword")}
@@ -95,7 +79,7 @@ export const ChangePasswordForm = ({ onSuccess }: ChangePasswordFormProps) => {
         </Field>
         <div className="flex justify-end">
           <Button type="submit" disabled={loading} className="w-full sm:w-auto">
-            {loading ? <Loader2Icon className="animate-spin" /> : "Change password"}
+            {loading ? <Loader2Icon className="animate-spin" /> : "Add password"}
           </Button>
         </div>
       </FieldGroup>

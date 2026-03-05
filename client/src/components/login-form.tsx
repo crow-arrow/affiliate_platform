@@ -17,6 +17,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Loader2Icon } from "lucide-react";
 import {
   Field,
@@ -28,10 +29,11 @@ import {
 import { toast } from "sonner";
 import { Typography } from "@/theme";
 
-import { useSignIn } from "@clerk/clerk-react";
+import { useAuth, useSignIn } from "@clerk/clerk-react";
 
 export function LoginForm({ ...props }: React.ComponentProps<"form">) {
   const [resetOpen, setResetOpen] = useState(false);
+  const [oauthLoading, setOauthLoading] = useState<"google" | "linkedin" | "facebook" | null>(null);
   const {
     register,
     handleSubmit,
@@ -44,7 +46,16 @@ export function LoginForm({ ...props }: React.ComponentProps<"form">) {
   const isAuth = useAppSelector(checkIsAuth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const { isLoaded, isSignedIn } = useAuth();
   const { signIn } = useSignIn();
+
+  // Если Clerk сессия есть, но JWT нет — редирект на oauth-done для синхронизации
+  useEffect(() => {
+    const token = window.localStorage.getItem("token");
+    if (isLoaded && isSignedIn && !token) {
+      navigate("/oauth-done", { replace: true });
+    }
+  }, [isLoaded, isSignedIn, navigate]);
 
   const orderedFields: (keyof LoginFormData)[] = ["password", "email"];
 
@@ -62,44 +73,32 @@ export function LoginForm({ ...props }: React.ComponentProps<"form">) {
   }, [signIn?.firstFactorVerification?.error]);
 
   useEffect(() => {
-    // Показываем тост только один раз при успешном логине
-    // И только если email верифицирован (для неверифицированных редирект уже произошел в onSubmit)
     if (status === "succeeded" && isAuth && user && !hasShownSuccessToast.current) {
-      // ВАЖНО: Проверяем emailVerified из обновленного state после логина
-      // Убеждаемся, что emailVerified - это boolean (может быть undefined)
       const isEmailVerified = user.emailVerified === true;
 
-      // Если email верифицирован, показываем успешное сообщение и редиректим на главную
       if (isEmailVerified) {
         hasShownSuccessToast.current = true;
         toast.success(message || "You are signed in!");
         navigate("/");
       }
-      // Если email не верифицирован, редирект уже был сделан в onSubmit, ничего не делаем
     }
 
-    // Сбрасываем флаг, если статус изменился на другой (например, после нового логина)
     if (status !== "succeeded") {
       hasShownSuccessToast.current = false;
     }
   }, [status, isAuth, user, user?.emailVerified, navigate, message]);
 
-  const loading = status === "loading";
+  const emailLoading = status === "loading";
+  const isAnyLoading = emailLoading || oauthLoading !== null;
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      // Результат loginUser содержит обновленные данные пользователя с emailVerified
       const result = await dispatch(loginUser(data)).unwrap();
 
-      // Проверяем emailVerified из результата напрямую
-      // Если email не верифицирован, редиректим сразу (до обновления state)
       if (result.user && !result.user.emailVerified) {
         navigate(`/verify-otp?email=${encodeURIComponent(data.email)}`, { replace: true });
         return;
       }
-
-      // Если email верифицирован, useEffect обработает редирект на главную
-      // после обновления state
     } catch (errors) {
       if (Array.isArray(errors)) {
         toast.error(errors[0]?.message || "Signin failed. Please try again.");
@@ -114,20 +113,20 @@ export function LoginForm({ ...props }: React.ComponentProps<"form">) {
     showErrorsInOrder(errors, orderedFields);
   };
 
-  enum OAuthStrategy {
-    Google = "oauth_google",
-    LinkedIn = "oauth_linkedin_oidc",
-    Facebook = "oauth_facebook",
-  }
-
-  const handleOAuth = (strategy: OAuthStrategy) => {
+  const handleOAuth = (strategy: "google" | "linkedin" | "facebook") => {
     if (!signIn) {
       toast.error("Not loaded yet, please try again.");
       return;
     }
+    setOauthLoading(strategy);
     return signIn
       .authenticateWithRedirect({
-        strategy,
+        strategy:
+          strategy === "google"
+            ? "oauth_google"
+            : strategy === "linkedin"
+              ? "oauth_linkedin_oidc"
+              : "oauth_facebook",
         redirectUrl: "/sso-callback",
         redirectUrlComplete: "/oauth-done",
       })
@@ -135,6 +134,7 @@ export function LoginForm({ ...props }: React.ComponentProps<"form">) {
         console.log(res);
       })
       .catch((err) => {
+        setOauthLoading(null);
         console.error(err, null, 2);
         toast.error("OAuth signin failed. Please try again.");
       });
@@ -174,9 +174,8 @@ export function LoginForm({ ...props }: React.ComponentProps<"form">) {
                 Forgot your password?
               </button>
             </div>
-            <Input
+            <PasswordInput
               id="password"
-              type="password"
               placeholder="*********"
               autoComplete="current-password"
               {...register("password")}
@@ -185,10 +184,10 @@ export function LoginForm({ ...props }: React.ComponentProps<"form">) {
           </Field>
           <Button
             type="submit"
-            disabled={loading}
+            disabled={isAnyLoading}
             className="w-full active:scale-95 transition-all disabled:scale-100 disabled:shadow-inset-2 disabled:animate-pulse disabled:cursor-progress"
           >
-            {loading ? (
+            {emailLoading ? (
               <>
                 Loading
                 <Loader2Icon className="animate-spin" />
@@ -205,13 +204,11 @@ export function LoginForm({ ...props }: React.ComponentProps<"form">) {
               type="button"
               variant="outline"
               className="w-full"
-              disabled={loading}
-              onClick={() => handleOAuth(OAuthStrategy.LinkedIn)}
+              disabled={isAnyLoading}
+              onClick={() => handleOAuth("linkedin")}
             >
-              {loading ? (
-                <>
-                  <Loader2Icon className="animate-spin" />
-                </>
+              {oauthLoading === "linkedin" ? (
+                <Loader2Icon className="animate-spin w-5 h-5" />
               ) : (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -228,13 +225,11 @@ export function LoginForm({ ...props }: React.ComponentProps<"form">) {
               type="button"
               variant="outline"
               className="w-full"
-              disabled={loading}
-              onClick={() => handleOAuth(OAuthStrategy.Google)}
+              disabled={isAnyLoading}
+              onClick={() => handleOAuth("google")}
             >
-              {loading ? (
-                <>
-                  <Loader2Icon className="animate-spin" />
-                </>
+              {oauthLoading === "google" ? (
+                <Loader2Icon className="animate-spin w-5 h-5" />
               ) : (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -254,13 +249,11 @@ export function LoginForm({ ...props }: React.ComponentProps<"form">) {
               type="button"
               variant="outline"
               className="w-full"
-              disabled={loading}
-              onClick={() => handleOAuth(OAuthStrategy.Facebook)}
+              disabled={isAnyLoading}
+              onClick={() => handleOAuth("facebook")}
             >
-              {loading ? (
-                <>
-                  <Loader2Icon className="animate-spin" />
-                </>
+              {oauthLoading === "facebook" ? (
+                <Loader2Icon className="animate-spin w-5 h-5" />
               ) : (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

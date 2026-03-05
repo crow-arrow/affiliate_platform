@@ -1,7 +1,14 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { requestPasswordReset, clearErrors } from "@/redux/features/password/resetPasswordSlice";
+import { FieldErrors, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  emailFormSchema,
+  EmailFormData,
+  showErrorsInOrder,
+  getInputErrorClass,
+} from "@/components/validation/formSchema";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -13,7 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { applyTypography } from "@/theme";
+import { Loader2Icon } from "lucide-react";
 
 export function RequestPasswordResetDialog({
   open,
@@ -25,23 +32,23 @@ export function RequestPasswordResetDialog({
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { status, requestResetError } = useAppSelector((s: any) => s.password);
-  const [email, setEmail] = useState("");
   const loading = status === "loading";
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    (e as unknown as Event).stopPropagation();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<EmailFormData>({
+    resolver: zodResolver(emailFormSchema),
+  });
 
-    if (!email) {
-      toast.error("Please enter your email");
-      return;
-    }
+  const onSubmit = async (data: EmailFormData) => {
     try {
-      const res = await dispatch(requestPasswordReset(email));
+      const res = await dispatch(requestPasswordReset(data.email));
       if ((requestPasswordReset as any).fulfilled.match(res)) {
         toast.success("We sent a 6‑digit code to your email.");
         // Сначала делаем навигацию синхронно с replace: true
-        navigate(`/verify-otp?email=${encodeURIComponent(email)}&type=password-reset`, {
+        navigate(`/verify-otp?email=${encodeURIComponent(data.email)}&type=password-reset`, {
           replace: true,
         });
         requestAnimationFrame(() => {
@@ -56,6 +63,10 @@ export function RequestPasswordResetDialog({
     }
   };
 
+  const onError = (errors: FieldErrors<EmailFormData>) => {
+    showErrorsInOrder(errors, ["email"]);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -64,7 +75,7 @@ export function RequestPasswordResetDialog({
           <DialogDescription>Enter your email and we’ll send a 6‑digit code.</DialogDescription>
         </DialogHeader>
         <form
-          onSubmit={onSubmit}
+          onSubmit={handleSubmit(onSubmit, onError)}
           className="mt-4"
           onKeyDownCapture={(e) => {
             if (e.key === "Enter") e.stopPropagation();
@@ -77,8 +88,8 @@ export function RequestPasswordResetDialog({
                 id="reset-email"
                 type="email"
                 autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                {...register("email")}
+                className={getInputErrorClass("email", errors)}
                 autoFocus
               />
             </Field>
@@ -86,8 +97,15 @@ export function RequestPasswordResetDialog({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit" loading={loading} loadingText="Sending...">
-                Send code
+              <Button type="submit" disabled={loading}>
+                {loading ? (
+                  <>
+                    Sending
+                    <Loader2Icon className="animate-spin" />
+                  </>
+                ) : (
+                  "Send code"
+                )}
               </Button>
             </div>
           </FieldGroup>

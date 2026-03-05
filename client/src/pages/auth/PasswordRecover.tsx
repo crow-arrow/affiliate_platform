@@ -1,21 +1,38 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { resetPassword, clearErrors } from "@/redux/features/password/resetPasswordSlice";
+import { FieldErrors, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  setPasswordSchema,
+  SetPasswordFormData,
+  getInputErrorClass,
+  showErrorsInOrder,
+} from "@/components/validation/formSchema";
 import { toast } from "sonner";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { Loader2Icon } from "lucide-react";
 import { Typography } from "@/theme";
 import placeholder from "@/assets/placeholder.svg";
 
+const orderedFields: (keyof SetPasswordFormData)[] = ["newPassword", "confirmPassword"];
+
 export const PasswordRecover = () => {
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const { status, message, errors, resetToken, resetCompleted } = useAppSelector(
+  const { status, message, resetToken, resetCompleted } = useAppSelector(
     (state: any) => state.password
   );
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<SetPasswordFormData>({
+    resolver: zodResolver(setPasswordSchema),
+  });
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -53,39 +70,32 @@ export const PasswordRecover = () => {
     navigate("/sign-in", { replace: true });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match!");
-      return;
-    }
-
+  const onSubmit = async (data: SetPasswordFormData) => {
     const token = resetToken || localStorage.getItem("passwordResetToken");
     if (!token) {
       toast.error("Reset token not found");
       return;
     }
-
     try {
       await dispatch(
         resetPassword({
           token,
-          newPassword,
-          confirmPassword,
+          newPassword: data.newPassword,
+          confirmPassword: data.confirmPassword,
         })
       ).unwrap();
       localStorage.removeItem("passwordResetToken");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (err: any) {
-      if (err && Array.isArray(err) && err.length > 0) {
-        toast.error(err[0].message || "Unknown error");
+      reset();
+    } catch (errors) {
+      if (Array.isArray(errors) && errors.length > 0) {
+        toast.error(errors[0].message || "Server error");
         dispatch(clearErrors());
       }
-      setNewPassword("");
-      setConfirmPassword("");
     }
+  };
+
+  const onError = (errors: FieldErrors<SetPasswordFormData>) => {
+    showErrorsInOrder(errors, orderedFields);
   };
 
   return (
@@ -98,32 +108,28 @@ export const PasswordRecover = () => {
               Enter your new password and confirm it below.
             </Typography.bodySm>
           </div>
-          <form noValidate onSubmit={handleSubmit} className="space-y-lg">
+          <form noValidate onSubmit={handleSubmit(onSubmit, onError)} className="space-y-lg">
             <FieldGroup className="grid gap-6">
               <Field className="grid gap-2">
                 <FieldLabel htmlFor="new-password">New password</FieldLabel>
-                <Input
+                <PasswordInput
                   id="new-password"
-                  name="password"
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Enter new password"
                   autoComplete="new-password"
+                  {...register("newPassword")}
+                  className={getInputErrorClass("newPassword", errors)}
+                  placeholder="Enter new password"
                   disabled={loading}
                   required
                 />
               </Field>
               <Field className="grid gap-2">
                 <FieldLabel htmlFor="confirm-new-password">Confirm new password</FieldLabel>
-                <Input
+                <PasswordInput
                   id="confirm-new-password"
-                  name="confirm-password"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
                   autoComplete="new-password"
+                  {...register("confirmPassword")}
+                  className={getInputErrorClass("confirmPassword", errors)}
+                  placeholder="Confirm new password"
                   disabled={loading}
                   required
                 />
@@ -138,13 +144,15 @@ export const PasswordRecover = () => {
                 >
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  loading={loading}
-                  loadingText="Resetting..."
-                  className="w-1/2"
-                >
-                  Reset password
+                <Button type="submit" disabled={loading} className="w-1/2">
+                  {loading ? (
+                    <>
+                      Resetting
+                      <Loader2Icon className="animate-spin" />
+                    </>
+                  ) : (
+                    "Reset password"
+                  )}
                 </Button>
               </div>
             </FieldGroup>

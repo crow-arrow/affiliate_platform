@@ -106,6 +106,7 @@ jobs:
           script: |
             cd "/opt/partner.jinn-travel.com"
             npm install --production --legacy-peer-deps
+            npx prisma generate
 
       - name: 🗄️ Run Prisma migrations
         uses: appleboy/ssh-action@v0.1.10

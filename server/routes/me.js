@@ -8,6 +8,7 @@ import { getUserClicks } from "../controllers/getClicks.js";
 import { updateUserProfile } from "../controllers/me/updateProfile.js";
 import { uploadAvatar, deleteAvatar } from "../controllers/uploadFiles.js";
 import { changePassword } from "../controllers/me/changePassword.js";
+import { setPassword } from "../controllers/me/setPassword.js";
 
 const router = express.Router();
 
@@ -26,6 +27,9 @@ router.patch("/update-profile", updateUserProfile);
 
 // Change password for authenticated user
 router.patch("/change-password", changePassword);
+
+// Set password for OAuth users (no password yet)
+router.patch("/set-password", setPassword);
 
 // router.post("/upload-avatar", upload.single("avatar"), updateUserAvatar);
 router.patch("/upload-avatar", multer.single("avatar"), uploadAvatar);

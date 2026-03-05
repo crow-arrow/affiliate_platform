@@ -20,6 +20,7 @@ import {
   requestPasswordReset,
 } from "@/redux/features/password/resetPasswordSlice";
 import { AppDispatch } from "@/redux/store";
+import { Loader2Icon } from "lucide-react";
 
 export function OTPForm({ ...props }: React.ComponentProps<"div">) {
   const [value, setValue] = useState("");
@@ -246,13 +247,15 @@ export function OTPForm({ ...props }: React.ComponentProps<"div">) {
               Enter the 6-digit code sent to your email.
             </FieldDescription>
           </Field>
-          <Button
-            type="submit"
-            loading={isLoading && !resendLoading}
-            loadingText="Verifying..."
-            disabled={value.length !== 6}
-          >
-            Verify
+          <Button type="submit" disabled={isLoading || resendLoading || value.length !== 6}>
+            {isLoading || resendLoading ? (
+              <>
+                Verifying
+                <Loader2Icon className="animate-spin" />
+              </>
+            ) : (
+              "Verify"
+            )}
           </Button>
           <FieldDescription className="text-center">
             Didn&apos;t receive the code?{" "}
@@ -260,7 +263,7 @@ export function OTPForm({ ...props }: React.ComponentProps<"div">) {
               type="button"
               onClick={handleResend}
               disabled={isLoading || resendLoading || countdown > 0}
-              className="text-primary underline-offset-4 hover:underline focus-ring focus-visible:outline-none"
+              className="text-primary underline-offset-4 hover:underline disabled:pointer-events-none disabled:opacity-50 focus-ring focus-visible:outline-none"
             >
               {resendLoading ? "Sending..." : "Resend"}
             </button>

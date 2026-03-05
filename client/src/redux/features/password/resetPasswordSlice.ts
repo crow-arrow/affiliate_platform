@@ -36,6 +36,21 @@ export const changePassword = createAsyncThunk<
   }
 });
 
+export const setPassword = createAsyncThunk<
+  ResetPasswordResponse,
+  { newPassword: string },
+  { rejectValue: string }
+>("password/setPassword", async ({ newPassword }, { rejectWithValue }) => {
+  try {
+    const { data } = await axios.patch<ResetPasswordResponse>("/me/set-password", {
+      newPassword,
+    });
+    return data;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || "Failed to set password");
+  }
+});
+
 export interface PasswordState {
   user: any | null;
   token: string | null;
@@ -195,6 +210,18 @@ const resetPasswordSlice = createSlice({
         state.message = action.payload.message;
       })
       .addCase(changePassword.rejected, (state, action) => {
+        state.status = "failed";
+        state.message = action.payload as string;
+      })
+      .addCase(setPassword.pending, (state) => {
+        state.status = "loading";
+        state.message = null;
+      })
+      .addCase(setPassword.fulfilled, (state, action: PayloadAction<ResetPasswordResponse>) => {
+        state.status = "succeeded";
+        state.message = action.payload.message;
+      })
+      .addCase(setPassword.rejected, (state, action) => {
         state.status = "failed";
         state.message = action.payload as string;
       });

@@ -265,6 +265,7 @@ export const login = async (req, res) => {
       booked_trips_count: membership?.profile?.bookedTripsCount || 0,
       createdAt: identity.createdAt,
       updatedAt: identity.updatedAt,
+      hasPassword: !!identity.passwordHash,
     };
 
     console.log("LOGIN:", {
@@ -399,6 +400,7 @@ export const oauthLogin = async (req, res) => {
       booked_trips_count: membership?.profile?.bookedTripsCount || 0,
       createdAt: identity.createdAt,
       updatedAt: identity.updatedAt,
+      hasPassword: !!identity.passwordHash,
     };
 
     console.log("OAUTH LOGIN:", {
@@ -466,6 +468,7 @@ export const getMe = async (req, res) => {
         booked_trips_count: 0,
         createdAt: identity.createdAt,
         updatedAt: identity.updatedAt,
+        hasPassword: !!identity.passwordHash,
       };
       return res.status(200).json({ user: safeUser });
     }
@@ -523,6 +526,7 @@ export const getMe = async (req, res) => {
       booked_trips_count: profile?.bookedTripsCount || 0,
       createdAt: identity.createdAt,
       updatedAt: identity.updatedAt,
+      hasPassword: !!identity.passwordHash,
     };
 
     return res.status(200).json({ user: safeUser });

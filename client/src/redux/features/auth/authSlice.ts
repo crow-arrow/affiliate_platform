@@ -25,6 +25,7 @@ export interface User {
   level?: "BRONZE" | "SILVER" | "GOLD" | "PLATINUM";
   createdAt?: string;
   updatedAt?: string;
+  hasPassword?: boolean;
 }
 
 export interface AuthResponse {

@@ -5,11 +5,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ChangePasswordForm } from "./ChangePasswordForm";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { SetPasswordForm } from "./SetPasswordForm";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { InfoIcon } from "lucide-react";
 
-export function ChangePasswordDialog({
+export function SetPasswordDialog({
   open,
   onOpenChange,
 }: {
@@ -18,10 +18,12 @@ export function ChangePasswordDialog({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-w-[calc(100vw-2rem)]">
+      <DialogContent className="sm:max-w-sm max-w-[calc(100vw-2rem)]">
         <DialogHeader className="flex-shrink-0 gap-2 mb-2">
-          <DialogTitle>Change password</DialogTitle>
-          <DialogDescription>Enter your current password and choose a new one.</DialogDescription>
+          <DialogTitle>Add password</DialogTitle>
+          <DialogDescription>
+            You signed in with SSO. Add a password to also sign in with email and password.
+          </DialogDescription>
           <Alert variant="info">
             <InfoIcon className="size-4" />
             <AlertDescription>
@@ -30,7 +32,7 @@ export function ChangePasswordDialog({
             </AlertDescription>
           </Alert>
         </DialogHeader>
-        <ChangePasswordForm onSuccess={() => onOpenChange(false)} />
+        <SetPasswordForm onSuccess={() => onOpenChange(false)} />
       </DialogContent>
     </Dialog>
   );
