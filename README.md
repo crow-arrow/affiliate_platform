@@ -1,124 +1,129 @@
 # Affiliate Platform
 
-The **Affiliate Platform** is designed to empower users to drive sales through unique referral links and promo codes. It offers a comprehensive, intuitive interface and a performance-based tier system (Bronze, Silver, Gold), making it a powerful tool for affiliate marketing in the travel industry.
+Multi-tenant affiliate marketing platform for the travel industry. Partners earn commissions through referral links and promo codes; admins manage teams, orders, and integrations with external booking systems.
 
-## 🚀 Features
-
-- ✅ **User Roles**: ADMIN and Affiliate ("PARTNER") with dynamic status levels: Bronze, Silver, Gold
-- 🎯 **Referral Tracking**: Real-time analytics on clicks, bookings, commissions
-- 🛡️ **Secure Registration**: Email verification and data protection
-- 📊 **Advanced Analytics**: Track user performance, bookings, referral traffic
-- 📱 **Responsive Design**: Mobile-optimized for seamless experience across devices
-- 🔐 **Password Recovery**: Step-by-step recovery flow with secure email verification
-- 💼 **ADMIN Dashboard**: Overview of all team members, orders, and performance metrics
-
----
-
-## 🔐 Authentication
-
-- **Sign Up & Login** with email and password
-- **Email verification** upon registration
-- **Password recovery** flow with reset link via email
+## UI Preview
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/e3f5ec21-355b-4017-88a4-259b4cccd3f9" width="600" />
-  <img src="https://github.com/user-attachments/assets/b9b3574c-4415-4433-9edd-9892f2e3728b" width="600" />
+  <img src="docs/screenshots/login.png" width="45%" alt="Login" />
+  <img src="docs/screenshots/4-step-organisation-signup.png" width="45%" alt="4-step organisation signup" />
+</p>
+<p align="center">
+  <img src="docs/screenshots/dashboard.avif" width="45%" alt="Dashboard (light)" />
+  <img src="docs/screenshots/dashbord-dark.png" width="45%" alt="Dashboard (dark)" />
+</p>
+<p align="center">
+  <img src="docs/screenshots/data-table.gif" width="90%" alt="Data table with filtering" />
 </p>
 
 ---
 
-## 📈 Dashboard Overview
+## Features
 
-Track your referral performance in one place:
+### Authentication
+- **Email/password** — classic sign-up and login
+- **SSO via Clerk** — Google, LinkedIn, Facebook
+- **Email verification** — OTP code
+- **Password recovery** — reset link via email
+- **Set password** — for users who signed up via OAuth
 
-- Clicks on referral links
-- Number of bookings
-- Revenue generated
-- Earned commissions
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/e8e47c70-e296-4c0a-80b8-3d04ab28c963" width="800" />
-</p>
-
----
-
-## ⚙️ Settings
-
-Manage your profile and referral tools:
-
-1. Copy your referral link and share it on social media or ad platforms
-2. Update your personal data
-3. Upload/change your avatar
+### Email & Notifications
+- **OTP verification** — one-time codes sent to email for sign-up verification
+- **Password reset** — secure reset links via email
+- **Notifications** — transactional emails and system alerts
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/68776f10-2825-4ba3-b9b0-492ede002943" width="800" />
+  <img src="docs/screenshots/opt-email.png" width="50%" alt="OTP email verification" />
 </p>
 
----
+### Partner (Affiliate)
+- **Dashboard** — clicks, bookings, commissions, level progress
+- **Referral links** — unique links and promo codes
+- **Trips** — bookings made through referral links
+- **Clicks list** — referral link analytics
+- **Documents** — invoices and statements
+- **Settings** — profile, avatar, security (change/add password)
+- **Workspace switcher** — switch between tenants
+- **Level system** — Bronze → Silver → Gold → Platinum (commission tiers)
 
-## 🧾 Bookings Overview
+### Admin
+- **Team** — manage partners and their data
+- **Orders** — all bookings across partners
+- **Calendar** — booking calendar view
+- **Invoices** — billing overview
+- **Level settings** — configure tier thresholds per tenant
+- **API keys** — manage keys for external integrations
+- **Field mappings** — map incoming API fields to internal schema (for different booking system formats)
 
-Detailed view of bookings made through your link:
+### API Integration
+- **POST** `/api/integration/trips` — receive bookings from external systems (tour operators, CRMs)
+- **Field mapping** — flexible mapping of incoming fields (`travel_date`, `client_name`, etc.) to internal schema
+- **API key auth** — `X-API-Key` or `Authorization: Bearer`
+- **Tenant isolation** — each API key is tied to a tenant
 
-- **Traveler count** affects your level (10 for Silver, 25 for Gold)
-- **Booking date** determines commission payout timing
-- **Order status** shows if a trip is confirmed, canceled, or completed
-- **Total price** lets you track your potential income
-- **Commission** is calculated automatically based on your level
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/d9656aaf-4426-447c-9a45-18ffa8434197" width="800" />
-</p>
-
----
-
-## 👥 ADMIN: Team Overview
-
-ADMINs have access to full data insights of all PARTNERs:
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/3e9ec730-a9b6-4764-9081-9954761d4116" width="800" />
-</p>
-
----
-
-## 📋 ADMIN: All Orders
-
-Complete list of all bookings for management and tracking purposes:
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/fee9af5c-8ed0-473e-aafa-67849c800d3f" width="800" />
-</p>
+### Multi-Tenant
+- **Path-based routing** — `/:tenantSlug/overview`, `/:tenantSlug/admin/...`
+- **Workspace per tenant** — each company (travel agency) has its own workspace
+- **Business sign-up** — create workspace and admin account
+- **Data isolation** — tenants see only their own data
 
 ---
 
-## 🔁 Password Recovery
+## Tech Stack
 
-1. Request a reset link via email
-2. Confirm by clicking the email link
-3. Set a new secure password
-
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/531466c7-6387-40b1-8b0b-dae6a41dc57d" width="400" />
-  <img src="https://github.com/user-attachments/assets/e28b4dda-7e2c-4041-9986-14cc19ff78a6" width="400" />
-  <img src="https://github.com/user-attachments/assets/5c86867a-66fa-4041-b635-1af4268da9d9" width="600" />
-</p>
+| Layer      | Stack                                      |
+| ---------- | ------------------------------------------ |
+| Frontend   | React 19, Vite, TypeScript, Tailwind, Radix UI, Redux Toolkit, React Query |
+| Auth       | JWT, bcrypt, **Clerk** (OAuth), nodemailer  |
+| Backend    | Node.js, Express                           |
+| Database   | PostgreSQL, Prisma ORM                     |
+| Deployment | GitHub Actions, PM2, Nginx                  |
 
 ---
 
-## 🛠 Tech Stack
+## Project Structure
 
-- **Frontend**: React, Tailwind CSS
-- **Backend**: Node.js, Express
-- **Database**: MySQL
-- **Authentication**: JWT, bcrypt, Email verification
-- **Deployment**: _Coming soon_
+```
+affiliate_platform/
+├── client/          # React SPA (Vite)
+├── server/          # Express API
+│   ├── prisma/      # Schema, migrations
+│   ├── controllers/
+│   ├── routes/
+│   └── middleware/
+└── .github/         # CI/CD workflows
+```
 
 ---
 
-## 📬 Contact
+## Getting Started
 
-Feel free to reach out if you'd like to know more or see the source code!
+```bash
+# Install dependencies
+cd client && npm install
+cd ../server && npm install
+
+# Database
+cd server && npx prisma migrate dev
+
+# Run
+npm run dev   # client (port 5173)
+npm run dev   # server (port 3002)
+```
+
+**Environment:** Create `.env` files in `client/` and `server/` (see `.env.example` if available). Required: `DATABASE_URL`, `VITE_API_URL`, `VITE_CLERK_PUBLISHABLE_KEY` (for SSO).
+
+---
+
+## API Integration
+
+External systems send bookings to `POST /api/integration/trips` with `X-API-Key`. Configure field mappings in Admin → Settings → Field Mappings so incoming fields (e.g. `travel_date`, `client_name`) map to the internal schema. See [server/API_INTEGRATION_README.md](server/API_INTEGRATION_README.md) for details.
+
+---
+
+## Contact
+
+Feel free to reach out for questions or to see the source code.
 
 ---
 
