@@ -49,3 +49,9 @@ eslint.config.js
 
 # config
 client/src/config.js
+
+# md files
+MIGRATION_PLAN.md
+MULTI_TENANT_ARCHITECTURE.md
+RAW_SQL_GUIDE.md
+SCHEMA_REVIEW.md
