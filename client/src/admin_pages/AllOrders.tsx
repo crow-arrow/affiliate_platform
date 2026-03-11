@@ -9,8 +9,10 @@ import {
   Clock,
   AlertCircle,
   CreditCard,
+  Calendar,
 } from "lucide-react";
-import { DataTable } from "@/components/data/DataTable";
+import { DataTable, type TabItem } from "@/components/data/DataTable";
+import { getGroupedOrderTabs } from "@/theme/tokens/status";
 import { createDragColumn, createSelectColumn } from "@/components/data/data-table-columns";
 import { ColumnDef } from "@tanstack/react-table";
 import {
@@ -29,7 +31,7 @@ function getStatusIcon(status: string) {
     case "APPROVED":
     case "CONFIRMED":
       return <CheckCircle2 className="w-3 h-3 mr-1" />;
-    case "CANCEL":
+    case "CANCELLED":
       return <XCircle className="w-3 h-3 mr-1" />;
     case "REJECTED":
       return <XCircle className="w-3 h-3 mr-1" />;
@@ -38,6 +40,9 @@ function getStatusIcon(status: string) {
     case "WAIT_FOR_APPROVAL":
       return <AlertCircle className="w-3 h-3 mr-1" />;
     case "DEPOSIT_PAID":
+      return <CreditCard className="w-3 h-3 mr-1" />;
+    case "ONLINE_PAID":
+    case "RECEIPT_SUBMITTED":
       return <CreditCard className="w-3 h-3 mr-1" />;
     default:
       return <Clock className="w-3 h-3 mr-1" />;
@@ -52,40 +57,92 @@ export const AllOrders = () => {
     dispatch(getAllTrips());
   }, [dispatch]);
 
+  const tabs = useMemo<TabItem[]>(
+    () => getGroupedOrderTabs({ allLabel: "All", allValue: "outline" }),
+    []
+  );
+
   const columns: ColumnDef<Trip>[] = useMemo(
     () => [
       createDragColumn<Trip>(),
       createSelectColumn<Trip>(),
       {
-        accessorKey: "id",
+        accessorKey: "orderId",
         header: "Order ID",
+        cell: ({ row }) => {
+          return (
+            <div className="flex items-center justify-center">{row.original.orderId ?? "--"}</div>
+          );
+        },
         enableHiding: false,
       },
       {
-        accessorKey: "travel_date",
+        accessorKey: "travelDate",
         header: "Travel Date",
+        cell: ({ row }) => {
+          if (!row.original.travelDate) {
+            return (
+              <div className="flex items-center gap-2">
+                <Calendar className="size-4 text-muted-foreground" />
+                <span className="text-muted-foreground">-</span>
+              </div>
+            );
+          }
+          const date = new Date(row.original.travelDate);
+          if (isNaN(date.getTime())) {
+            return (
+              <div className="flex items-center gap-2">
+                <Calendar className="size-4 text-muted-foreground" />
+                <span className="text-muted-foreground">Invalid Date</span>
+              </div>
+            );
+          }
+          return (
+            <div className="flex items-center gap-2">
+              <Calendar className="size-4 text-muted-foreground" />
+              <span>
+                {date.toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
+            </div>
+          );
+        },
       },
       {
-        accessorKey: "traveller_amount",
+        accessorKey: "travellerAmount",
         header: "Traveller Number",
+        cell: ({ row }) => {
+          return (
+            <div className="flex items-center justify-center">{row.original.travellerAmount}</div>
+          );
+        },
       },
       {
-        accessorKey: "coupon_code",
+        accessorKey: "couponCode",
         header: "Coupon",
+        cell: ({ row }) => {
+          return <div className="flex items-center justify-center">{row.original.couponCode}</div>;
+        },
       },
       {
-        accessorKey: "affiliate_id",
+        accessorKey: "affiliateId",
         header: "Ref ID",
+        cell: ({ row }) => {
+          return <div className="flex items-center justify-center">{row.original.affiliateId}</div>;
+        },
       },
       {
-        accessorKey: "order_status",
+        accessorKey: "orderStatus",
         header: "Order Status",
         cell: ({ row }) => {
-          const orderStatus = (row.original as any).order_status || "PENDING";
+          const orderStatus = (row.original as any).orderStatus || "PENDING";
           let bgColor = "bg-muted dark:bg-secondary";
           let textColor = "text-foreground dark:text-foreground";
 
-          if (orderStatus === "CANCEL") {
+          if (orderStatus === "CANCELLED") {
             bgColor = "bg-red-100 dark:bg-red-900/30";
             textColor = "text-red-800 dark:text-red-300";
           } else if (orderStatus === "REJECTED") {
@@ -106,9 +163,13 @@ export const AllOrders = () => {
           } else if (orderStatus === "CONFIRMED") {
             bgColor = "bg-green-100 dark:bg-green-900/30";
             textColor = "text-green-800 dark:text-green-300";
-          } else if (orderStatus === "DEPOSIT_PAID") {
-            bgColor = "bg-blue-100 dark:bg-blue-900/30";
-            textColor = "text-blue-800 dark:text-blue-300";
+          } else if (
+            orderStatus === "DEPOSIT_PAID" ||
+            orderStatus === "ONLINE_PAID" ||
+            orderStatus === "RECEIPT_SUBMITTED"
+          ) {
+            bgColor = "bg-green-100 dark:bg-green-900/30";
+            textColor = "text-green-800 dark:text-green-300";
           }
 
           const displayStatus = orderStatus
@@ -116,21 +177,23 @@ export const AllOrders = () => {
             .replace(/\b\w/g, (c: string) => c.toUpperCase());
 
           return (
-            <span
-              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bgColor} ${textColor}`}
-            >
-              {getStatusIcon(orderStatus)}
-              {displayStatus}
-            </span>
+            <div className="flex items-center justify-center">
+              <span
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bgColor} ${textColor}`}
+              >
+                {getStatusIcon(orderStatus)}
+                {displayStatus}
+              </span>
+            </div>
           );
         },
       },
       {
-        accessorKey: "total_price",
-        header: () => <div className="w-full text-right">Total Price</div>,
+        accessorKey: "totalPrice",
+        header: "Total Price",
         cell: ({ row }) => {
-          const price = (row.original as any).total_price
-            ? parseFloat(String((row.original as any).total_price).replace(/[^0-9.]/g, ""))
+          const price = (row.original as any).totalPrice
+            ? parseFloat(String((row.original as any).totalPrice).replace(/[^0-9.]/g, ""))
             : 0;
           return <div className="text-right">{price.toFixed(2)}</div>;
         },
@@ -138,6 +201,9 @@ export const AllOrders = () => {
       {
         accessorKey: "currency",
         header: "Currency",
+        cell: ({ row }) => {
+          return <div className="flex items-center justify-center">{row.original.currency}</div>;
+        },
       },
       {
         id: "actions",
@@ -174,6 +240,8 @@ export const AllOrders = () => {
       getRowId={(row) => String(row.id)}
       emptyMessage="No orders found."
       isLoading={status === "loading" || status === "idle"}
+      statusColumnId="orderStatus"
+      tabs={tabs}
     />
   );
 };

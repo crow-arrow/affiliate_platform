@@ -31,7 +31,7 @@ describe("updateUserLevel", () => {
     const pastDate = new Date();
     pastDate.setDate(pastDate.getDate() - 10); // 10 дней назад
     const trips = Array(2).fill(
-      mockTrip(pastDate.toISOString(), 5, "COMPLETED")
+      mockTrip(pastDate.toISOString(), 5, "COMPLETED"),
     );
 
     const result = await updateUserLevel(user, trips);
@@ -45,7 +45,7 @@ describe("updateUserLevel", () => {
     const pastDate = new Date();
     pastDate.setDate(pastDate.getDate() - 10); // 10 дней назад
     const trips = Array(5).fill(
-      mockTrip(pastDate.toISOString(), 5, "COMPLETED")
+      mockTrip(pastDate.toISOString(), 5, "COMPLETED"),
     );
 
     const result = await updateUserLevel(user, trips);
@@ -114,7 +114,7 @@ describe("updateUserLevel", () => {
 
     const trips = [
       mockTrip(pastDate.toISOString(), 5, "COMPLETED"), // Состоялся
-      mockTrip(pastDate.toISOString(), 3, "CANCEL"), // Отменен - не должен учитываться
+      mockTrip(pastDate.toISOString(), 3, "CANCELLED"), // Отменен - не должен учитываться
       mockTrip(pastDate.toISOString(), 2, "REJECTED"), // Отклонен - не должен учитываться
     ];
 

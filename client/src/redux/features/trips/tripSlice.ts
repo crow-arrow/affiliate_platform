@@ -38,9 +38,10 @@ export const getAllTrips = createAsyncThunk<Trip[], void, { rejectValue: string 
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await axios.get<Trip[]>("/trips/get-all-trips");
+      console.log("data", data);
       return data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Ошибка при загрузке поездок");
+      return rejectWithValue(error.response?.data?.message || "Error loading trips");
     }
   }
 );

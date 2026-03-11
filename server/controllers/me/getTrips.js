@@ -193,7 +193,7 @@ export const getUserTrips = async (req, res) => {
       const travelDate = new Date(trip.travelDate);
       const isPast = travelDate <= now;
       const isCancelled =
-        trip.orderStatus === "REJECTED" || trip.orderStatus === "CANCEL";
+        trip.orderStatus === "REJECTED" || trip.orderStatus === "CANCELLED";
 
       // Найти уровень, который действовал на момент travelDate
       let applicableLevel = "BRONZE";
@@ -207,12 +207,13 @@ export const getUserTrips = async (req, res) => {
       }
 
       const commission = getCommission(applicableLevel, trip.totalPrice);
-      if (trip.orderStatus !== "REJECTED" && trip.orderStatus !== "CANCEL") {
+      if (trip.orderStatus !== "REJECTED" && trip.orderStatus !== "CANCELLED") {
         totalEarnedCommission += commission;
       }
 
       return {
         id: trip.id.toString(), // Конвертируем BigInt в строку
+        orderId: trip.orderId,
         travellerAmount: trip.travellerAmount,
         bookingDate: trip.bookingDate?.toISOString() || null,
         travelDate: trip.travelDate?.toISOString() || null,
@@ -239,7 +240,7 @@ export const getUserTrips = async (req, res) => {
     }, 0);
 
     const departedTrips = tripsWithCommission.filter(
-      (trip) => trip.isCompleted
+      (trip) => trip.isCompleted,
     );
 
     const travellerAmount = departedTrips.reduce((sum, trip) => {
@@ -248,7 +249,8 @@ export const getUserTrips = async (req, res) => {
 
     // Подсчитываем общее количество забронированных туров
     const bookedTripsCount = trips.filter(
-      (trip) => trip.orderStatus !== "REJECTED" && trip.orderStatus !== "CANCEL"
+      (trip) =>
+        trip.orderStatus !== "REJECTED" && trip.orderStatus !== "CANCELLED",
     ).length;
 
     // Обновляем PartnerProfile в базе данных

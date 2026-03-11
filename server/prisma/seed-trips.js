@@ -32,7 +32,7 @@ const OrderStatus = {
   APPROVED: "APPROVED",
   PENDING: "PENDING",
   CONFIRMED: "CONFIRMED",
-  CANCEL: "CANCEL",
+  CANCELLED: "CANCELLED",
   COMPLETED: "COMPLETED",
   WAIT_FOR_APPROVAL: "WAIT_FOR_APPROVAL",
   REJECTED: "REJECTED",
@@ -56,7 +56,7 @@ async function seedTrips() {
 
     if (!profile || !profile.affiliateId) {
       console.log(
-        "❌ No PartnerProfile with affiliateId found. Please create a user first."
+        "❌ No PartnerProfile with affiliateId found. Please create a user first.",
       );
       return;
     }
@@ -69,6 +69,7 @@ async function seedTrips() {
     // Генерируем тестовые trips
     const testTrips = [
       {
+        orderId: "159",
         travellerAmount: 2,
         bookingDate: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000), // 30 дней назад
         travelDate: new Date(now.getTime() + 15 * 24 * 60 * 60 * 1000), // через 15 дней
@@ -79,6 +80,7 @@ async function seedTrips() {
         affiliateId: profile.affiliateId,
       },
       {
+        orderId: "160",
         travellerAmount: 1,
         bookingDate: new Date(now.getTime() - 20 * 24 * 60 * 60 * 1000), // 20 дней назад
         travelDate: new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000), // через 10 дней
@@ -89,6 +91,7 @@ async function seedTrips() {
         affiliateId: profile.affiliateId,
       },
       {
+        orderId: "161",
         travellerAmount: 4,
         bookingDate: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000), // 10 дней назад
         travelDate: new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000), // через 25 дней
@@ -99,6 +102,7 @@ async function seedTrips() {
         affiliateId: profile.affiliateId,
       },
       {
+        orderId: "162",
         travellerAmount: 2,
         bookingDate: new Date(now.getTime() - 45 * 24 * 60 * 60 * 1000), // 45 дней назад
         travelDate: new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 дней назад (прошедшая)
@@ -109,6 +113,7 @@ async function seedTrips() {
         affiliateId: profile.affiliateId,
       },
       {
+        orderId: "163",
         travellerAmount: 3,
         bookingDate: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), // 7 дней назад
         travelDate: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // через 30 дней
@@ -118,16 +123,18 @@ async function seedTrips() {
         affiliateId: profile.affiliateId,
       },
       {
+        orderId: "164",
         travellerAmount: 1,
         bookingDate: new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000), // 60 дней назад
         travelDate: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000), // 30 дней назад
-        orderStatus: OrderStatus.CANCEL,
+        orderStatus: OrderStatus.CANCELLED,
         totalPrice: 1500.0,
         currency: "EUR",
         couponCode: profile.couponCode,
         affiliateId: profile.affiliateId,
       },
       {
+        orderId: "165",
         travellerAmount: 5,
         bookingDate: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 дня назад
         travelDate: new Date(now.getTime() + 45 * 24 * 60 * 60 * 1000), // через 45 дней
@@ -137,6 +144,7 @@ async function seedTrips() {
         affiliateId: profile.affiliateId,
       },
       {
+        orderId: "166",
         travellerAmount: 2,
         bookingDate: new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000), // 15 дней назад
         travelDate: new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000), // через 20 дней
@@ -147,6 +155,7 @@ async function seedTrips() {
         affiliateId: profile.affiliateId,
       },
       {
+        orderId: "167",
         travellerAmount: 1,
         bookingDate: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000), // 90 дней назад
         travelDate: new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000), // 60 дней назад
@@ -156,6 +165,7 @@ async function seedTrips() {
         affiliateId: profile.affiliateId,
       },
       {
+        orderId: "168",
         travellerAmount: 3,
         bookingDate: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000), // вчера
         travelDate: new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000), // через 60 дней

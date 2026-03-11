@@ -12,14 +12,14 @@ export const updateUserLevel = (user, trips) => {
     const year = new Date(trip.travelDate).getFullYear();
     const travelDate = new Date(trip.travelDate);
     const isCancelled =
-      trip.orderStatus === "REJECTED" || trip.orderStatus === "CANCEL";
+      trip.orderStatus === "REJECTED" || trip.orderStatus === "CANCELLED";
 
     return travelDate <= now && year === currentYear && !isCancelled;
   });
 
   const currentYearTravellers = currentYearDepartedTrips.reduce(
     (sum, t) => sum + (Number(t.travellerAmount) || 0),
-    0
+    0,
   );
 
   // Фильтруем туры прошлого года, которые не отменены
@@ -27,13 +27,13 @@ export const updateUserLevel = (user, trips) => {
     if (!trip.travelDate) return false;
     const year = new Date(trip.travelDate).getFullYear();
     const isCancelled =
-      trip.orderStatus === "REJECTED" || trip.orderStatus === "CANCEL";
+      trip.orderStatus === "REJECTED" || trip.orderStatus === "CANCELLED";
 
     return year === lastYear && !isCancelled;
   });
   const lastYearTravellers = lastYearDepartedTrips.reduce(
     (sum, t) => sum + (Number(t.travellerAmount) || 0),
-    0
+    0,
   );
 
   let newLevel = user.level;
@@ -41,7 +41,7 @@ export const updateUserLevel = (user, trips) => {
 
   const lastChangedDate = Array.isArray(user.levelHistory)
     ? [...user.levelHistory].sort(
-        (a, b) => new Date(b.changedAt) - new Date(a.changedAt)
+        (a, b) => new Date(b.changedAt) - new Date(a.changedAt),
       )[0]?.changedAt
     : null;
 
