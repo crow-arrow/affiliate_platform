@@ -151,8 +151,16 @@ async function main() {
 
   await prisma.levelSetting.createMany({
     data: [
-      ...levelSettings.map((s) => ({ ...s, tenantId: tenant1.id, isActive: true })),
-      ...levelSettings.map((s) => ({ ...s, tenantId: tenant2.id, isActive: true })),
+      ...levelSettings.map((s) => ({
+        ...s,
+        tenantId: tenant1.id,
+        isActive: true,
+      })),
+      ...levelSettings.map((s) => ({
+        ...s,
+        tenantId: tenant2.id,
+        isActive: true,
+      })),
     ],
     skipDuplicates: true,
   });
@@ -191,7 +199,16 @@ async function main() {
   // 9. Создаём 10 туров для первого тенанта (Jinn Travel)
   const trips1 = [];
   const baseDate1 = new Date("2025-11-01");
-  const statuses = ["COMPLETED", "CONFIRMED", "PENDING", "WAIT_FOR_APPROVAL", "CANCEL", "DEPOSIT_PAID", "APPROVED", "REJECTED"];
+  const statuses = [
+    "COMPLETED",
+    "CONFIRMED",
+    "PENDING",
+    "WAIT_FOR_APPROVAL",
+    "CANCELLED",
+    "DEPOSIT_PAID",
+    "APPROVED",
+    "REJECTED",
+  ];
 
   for (let i = 0; i < 10; i++) {
     const travelDate = new Date(baseDate1);

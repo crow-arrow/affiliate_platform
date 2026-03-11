@@ -28,30 +28,21 @@ export const receiveTrips = async (req, res) => {
         // Преобразуем входящие данные по маппингу
         const mappedData = await FieldMappingService.mapFields(
           rawTrip,
-          tenantId
+          tenantId,
         );
 
-        // Проверяем обязательные поля для определения дубликата
-        const customerFirstName = mappedData.customerFirstName;
-        const customerLastName = mappedData.customerLastName;
-        const customerEmail = mappedData.customerEmail;
-        const bookingDate = mappedData.bookingDate;
+        const orderId = mappedData.orderId?.trim() || null;
 
-        if (
-          !customerFirstName ||
-          !customerLastName ||
-          !customerEmail ||
-          !bookingDate
-        ) {
+        if (!orderId) {
           results.errors.push({
             trip: rawTrip,
-            error:
-              "Missing required fields: customerFirstName, customerLastName, customerEmail, bookingDate",
+            error: "orderId is required",
           });
           continue;
         }
 
         // Нормализуем дату для поиска (начало дня)
+        const bookingDate = mappedData.bookingDate;
         const normalizedBookingDate = bookingDate
           ? new Date(bookingDate)
           : null;
@@ -59,27 +50,27 @@ export const receiveTrips = async (req, res) => {
           normalizedBookingDate.setHours(0, 0, 0, 0);
         }
 
-        // Ищем дубликат по customerFirstName + customerLastName + customerEmail + bookingDate
+        // Ищем дубликат только по orderId
         const duplicate = await prisma.trips.findFirst({
           where: {
             tenantId: tenantId,
-            customerFirstName: customerFirstName?.trim(),
-            customerLastName: customerLastName?.trim(),
-            customerEmail: customerEmail?.trim().toLowerCase(),
-            bookingDate: normalizedBookingDate,
+            orderId: orderId,
           },
         });
 
         // Валидация orderStatus
         const validStatuses = [
-          "APPROVED",
           "PENDING",
+          "APPROVED",
           "CONFIRMED",
-          "CANCEL",
           "COMPLETED",
-          "WAIT_FOR_APPROVAL",
-          "REJECTED",
+          "ONLINE_PAID",
           "DEPOSIT_PAID",
+          "DEPARTED",
+          "REJECTED",
+          "CANCELLED",
+          "WAIT_FOR_APPROVAL",
+          "RECEIPT_SUBMITTED",
         ];
         const orderStatus = validStatuses.includes(mappedData.orderStatus)
           ? mappedData.orderStatus
@@ -91,19 +82,33 @@ export const receiveTrips = async (req, res) => {
           normalizedTravelDate.setHours(0, 0, 0, 0);
         }
 
+        let affiliateIdToUse = mappedData.affiliateId?.trim() || null;
+        if (affiliateIdToUse) {
+          const profileInTenant = await prisma.partnerProfile.findFirst({
+            where: {
+              affiliateId: affiliateIdToUse,
+              membership: { tenantId: tenantId },
+            },
+          });
+          if (!profileInTenant) {
+            affiliateIdToUse = null;
+          }
+        }
+
         // Подготавливаем данные для сохранения
         const tripData = {
           tenantId: tenantId,
-          customerFirstName: customerFirstName?.trim(),
-          customerLastName: customerLastName?.trim(),
-          customerEmail: customerEmail?.trim().toLowerCase(),
+          orderId: orderId,
+          customerFirstName: mappedData.customerFirstName?.trim(),
+          customerLastName: mappedData.customerLastName?.trim(),
+          customerEmail: mappedData.customerEmail?.trim().toLowerCase(),
           bookingDate: normalizedBookingDate,
           travelDate: normalizedTravelDate || null,
           travellerAmount: mappedData.travellerAmount || 1,
           totalPrice: mappedData.totalPrice || 0,
           currency: mappedData.currency || "EUR",
           orderStatus: orderStatus,
-          affiliateId: mappedData.affiliateId?.trim() || null,
+          affiliateId: affiliateIdToUse,
           couponCode: mappedData.couponCode?.trim() || null,
         };
 

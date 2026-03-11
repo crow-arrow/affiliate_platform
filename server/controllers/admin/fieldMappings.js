@@ -35,6 +35,7 @@ export const getFieldMappings = async (req, res) => {
 export const getAvailableFields = async (req, res) => {
   try {
     const fields = [
+      { value: "orderId", label: "Order ID", type: "string" },
       { value: "travelDate", label: "Travel Date", type: "date" },
       { value: "bookingDate", label: "Booking Date", type: "date" },
       { value: "customerFirstName", label: "Customer First Name", type: "string" },
