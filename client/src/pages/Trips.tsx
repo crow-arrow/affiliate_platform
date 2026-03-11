@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchTrips } from "../redux/features/users/userSlice";
-import { DataTable, getTabsFromStatusConfig, type TabItem } from "@/components/data/DataTable";
+import { DataTable, type TabItem } from "@/components/data/DataTable";
+import { getGroupedOrderTabs } from "@/theme/tokens/status";
 import { createDragColumn, createSelectColumn } from "@/components/data/data-table-columns";
 import { ColumnDef } from "@tanstack/react-table";
 import { Loader2, User, Calendar, Euro, MoreVertical, Plus } from "lucide-react";
@@ -37,7 +38,8 @@ import {
 import { statusConfig, type TripStatus } from "@/theme/tokens/status";
 
 interface TripData {
-  id: string;
+  id: string | number;
+  orderId: string;
   travellerAmount: number;
   bookingDate: string | null;
   travelDate: string | null;
@@ -59,19 +61,19 @@ function TripCellViewer({ item }: { item: TripData }) {
     <Drawer direction={isMobile ? "bottom" : "right"}>
       <DrawerTrigger asChild>
         <Button variant="link" className="text-foreground w-fit px-0 text-left">
-          {item.id}
+          {item.orderId}
         </Button>
       </DrawerTrigger>
       <DrawerContent direction={isMobile ? "bottom" : "right"}>
         <DrawerHeader className="gap-1">
-          <DrawerTitle>Trip {item.id}</DrawerTitle>
+          <DrawerTitle>Trip {item.orderId}</DrawerTitle>
           <DrawerDescription>Trip details and commission information</DrawerDescription>
         </DrawerHeader>
         <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
           <form className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               <Label htmlFor="trip-id">Trip ID</Label>
-              <Input id="trip-id" defaultValue={item.id.toString()} disabled />
+              <Input id="trip-id" defaultValue={item.orderId.toString()} disabled />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-3">
@@ -150,7 +152,7 @@ export const Trips = () => {
       createDragColumn<TripData>(),
       createSelectColumn<TripData>(),
       {
-        accessorKey: "id",
+        accessorKey: "orderId",
         header: "Order ID",
         cell: ({ row }) => {
           return (
@@ -317,13 +319,14 @@ export const Trips = () => {
   );
 
   const tabs = useMemo<TabItem[]>(
-    () => getTabsFromStatusConfig(statusConfig, { allLabel: "All", allValue: "outline" }),
+    () => getGroupedOrderTabs({ allLabel: "All", allValue: "outline" }),
     []
   );
 
   // Transform data to match the table format
   const transformedTrips: TripData[] = trips.map((trip) => ({
     id: trip.id,
+    orderId: trip.orderId ?? "--", // Внешний ID заказа, не внутренний id
     travellerAmount: Number(trip.travellerAmount) || 0,
     bookingDate: trip.bookingDate || null,
     travelDate: trip.travelDate || null,
@@ -338,7 +341,7 @@ export const Trips = () => {
     <DataTable
       data={transformedTrips}
       columns={columns}
-      getRowId={(row) => row.id}
+      getRowId={(row) => String(row.id)}
       emptyMessage="No trips found."
       isLoading={tripsStatus === "loading"}
       statusColumnId="orderStatus"

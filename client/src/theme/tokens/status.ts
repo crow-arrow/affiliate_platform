@@ -9,11 +9,13 @@ export type TripStatus =
   | "COMPLETED"
   | "APPROVED"
   | "CONFIRMED"
-  | "CANCEL"
+  | "CANCELLED"
   | "REJECTED"
   | "PENDING"
   | "WAIT_FOR_APPROVAL"
-  | "DEPOSIT_PAID";
+  | "DEPOSIT_PAID"
+  | "ONLINE_PAID"
+  | "RECEIPT_SUBMITTED";
 
 /**
  * Конфигурация статусов с улучшенным контрастом для темной темы
@@ -69,7 +71,7 @@ export const statusConfig: Record<
     },
     label: "Confirmed",
   },
-  CANCEL: {
+  CANCELLED: {
     icon: XCircle,
     bg: {
       light: "bg-red-100",
@@ -117,17 +119,41 @@ export const statusConfig: Record<
     },
     label: "Wait for Approval",
   },
+  ONLINE_PAID: {
+    icon: CreditCard,
+    bg: {
+      light: "bg-green-100",
+      dark: "dark:bg-green-900/30",
+    },
+    text: {
+      light: "text-green-800",
+      dark: "dark:text-green-300",
+    },
+    label: "Online Paid",
+  },
   DEPOSIT_PAID: {
     icon: CreditCard,
     bg: {
-      light: "bg-blue-100",
-      dark: "dark:bg-blue-900/30",
+      light: "bg-green-100",
+      dark: "dark:bg-green-900/30",
     },
     text: {
-      light: "text-blue-800",
-      dark: "dark:text-blue-300",
+      light: "text-green-800",
+      dark: "dark:text-green-300",
     },
     label: "Deposit Paid",
+  },
+  RECEIPT_SUBMITTED: {
+    icon: CreditCard,
+    bg: {
+      light: "bg-green-100",
+      dark: "dark:bg-green-900/30",
+    },
+    text: {
+      light: "text-green-800",
+      dark: "dark:text-green-300",
+    },
+    label: "Receipt Submitted",
   },
   default: {
     icon: Clock,
@@ -161,3 +187,42 @@ export const getStatusClasses = (status: string) => {
     icon: "w-3 h-3 mr-1",
   };
 };
+
+/** Вкладка для фильтра: value, label, status (или массив статусов для группировки). */
+export type OrderTabItem = {
+  value: string;
+  label: string;
+  status: string | string[] | null;
+};
+
+/** Группированные вкладки: Approved (APPROVED, CONFIRMED), Pending (PENDING, WAIT_FOR_APPROVAL), Paid, Rejected/Cancelled. */
+export function getGroupedOrderTabs(options?: {
+  allLabel?: string;
+  allValue?: string;
+}): OrderTabItem[] {
+  const { allLabel = "All", allValue = "outline" } = options ?? {};
+  return [
+    { value: allValue, label: allLabel, status: null },
+    { value: "COMPLETED", label: "Completed", status: "COMPLETED" },
+    {
+      value: "approved",
+      label: "Approved",
+      status: ["APPROVED", "CONFIRMED"],
+    },
+    {
+      value: "pending",
+      label: "Pending",
+      status: ["PENDING", "WAIT_FOR_APPROVAL"],
+    },
+    {
+      value: "paid",
+      label: "Paid",
+      status: ["ONLINE_PAID", "DEPOSIT_PAID", "RECEIPT_SUBMITTED"],
+    },
+    {
+      value: "rejected",
+      label: "Rejected / Cancelled",
+      status: ["REJECTED", "CANCELLED"],
+    },
+  ];
+}

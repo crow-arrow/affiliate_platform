@@ -1,5 +1,28 @@
 import prisma from "../../prisma/client.js";
 
+// Поля Trips (должен совпадать с TripField enum)
+const KNOWN_FIELDS = [
+  "orderId",
+  "travelDate",
+  "bookingDate",
+  "customerFirstName",
+  "customerLastName",
+  "customerEmail",
+  "affiliateId",
+  "couponCode",
+  "travellerAmount",
+  "totalPrice",
+  "orderStatus",
+  "currency",
+];
+
+/**
+ * snake_case → camelCase
+ */
+function snakeToCamel(str) {
+  return str.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+}
+
 /**
  * Утилиты для маппинга полей входящих данных
  */
@@ -25,19 +48,38 @@ export class FieldMappingService {
   }
 
   /**
-   * Преобразует входящие данные по маппингу
+   * Преобразует входящие данные по маппингу.
+   * Приоритет: 1) маппинг из настроек, 2) авто snake_case→camelCase, 3) pass-through для точного совпадения.
    */
   static async mapFields(incomingData, tenantId) {
     const mappingMap = await this.getMappings(tenantId);
     const mappedData = {};
 
     for (const [incomingKey, incomingValue] of Object.entries(incomingData)) {
-      const targetField = mappingMap[incomingKey];
-      if (targetField && incomingValue !== null && incomingValue !== undefined) {
-        // Преобразуем значение в зависимости от типа поля
-        mappedData[targetField] = this.transformValue(targetField, incomingValue);
+      if (incomingValue === null || incomingValue === undefined) continue;
+
+      // 1. Маппинг из настроек (приоритет)
+      let targetField = mappingMap[incomingKey];
+
+      // 2. Авто snake_case → camelCase для известных полей
+      if (!targetField) {
+        const camelKey = snakeToCamel(incomingKey);
+        if (KNOWN_FIELDS.includes(camelKey)) {
+          targetField = camelKey;
+        }
       }
-      // Если поле не в маппинге - игнорируем
+
+      // 3. Pass-through: ключ уже совпадает с целевым полем
+      if (!targetField && KNOWN_FIELDS.includes(incomingKey)) {
+        targetField = incomingKey;
+      }
+
+      if (targetField) {
+        mappedData[targetField] = this.transformValue(
+          targetField,
+          incomingValue,
+        );
+      }
     }
 
     return mappedData;
@@ -71,4 +113,3 @@ export class FieldMappingService {
     return value;
   }
 }
-

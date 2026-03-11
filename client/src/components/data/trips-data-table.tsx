@@ -127,7 +127,7 @@ function getStatusIcon(status: string) {
     case "APPROVED":
     case "CONFIRMED":
       return <CheckCircle2 className="w-3 h-3 mr-1" />;
-    case "CANCEL":
+    case "CANCELLED":
       return <XCircle className="w-3 h-3 mr-1" />;
     case "REJECTED":
       return <XCircle className="w-3 h-3 mr-1" />;
@@ -258,7 +258,7 @@ const columns: ColumnDef<z.infer<typeof tripsSchema>>[] = [
       let bgColor = "bg-muted";
       let textColor = "text-foreground";
 
-      if (status === "CANCEL") {
+      if (status === "CANCELLED") {
         bgColor = "bg-red-100";
         textColor = "text-red-800";
       } else if (status === "REJECTED") {
@@ -739,7 +739,7 @@ function TripCellViewer({ item }: { item: z.infer<typeof tripsSchema> }) {
                     <SelectItem value="completed">Completed</SelectItem>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="wait-for-approval">Wait for Approval</SelectItem>
-                    <SelectItem value="cancel">Cancelled</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
                     <SelectItem value="rejected">Rejected</SelectItem>
                   </SelectContent>
                 </Select>

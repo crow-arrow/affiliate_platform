@@ -87,14 +87,14 @@ const FIXED_COLUMN_CLASS: Record<string, string> = {
   actions: "w-12 min-w-12 max-w-12 shrink-0",
 };
 
-/** Маппинг вкладки → статус для фильтра (null = без фильтра). Колонка задаётся через statusColumnId. */
-export type TabStatusFilter = Record<string, string | null>;
+/** Маппинг вкладки → статус(ы) для фильтра (null = без фильтра, string[] = любое из значений). */
+export type TabStatusFilter = Record<string, string | string[] | null>;
 
-/** Элемент вкладки: value — id вкладки, status — значение для фильтра по колонке (null = все). */
+/** Элемент вкладки: value — id вкладки, status — значение или массив для фильтра (null = все). */
 export type TabItem = {
   value: string;
   label: string;
-  status: string | null;
+  status: string | string[] | null;
   badge?: number;
 };
 
@@ -314,7 +314,11 @@ export function DataTable<TData extends Record<string, any>>({
     if (!hasTabs || !statusColumnId) return data;
     const statusValue = tabStatusFilter[activeTab] ?? null;
     if (statusValue === null) return data;
-    return data.filter((row) => (row as Record<string, unknown>)[statusColumnId] === statusValue);
+    const rowStatus = (row: TData) => (row as Record<string, unknown>)[statusColumnId] as string;
+    if (Array.isArray(statusValue)) {
+      return data.filter((row) => statusValue.includes(rowStatus(row)));
+    }
+    return data.filter((row) => rowStatus(row) === statusValue);
   }, [data, activeTab, tabStatusFilter, statusColumnId, hasTabs]);
 
   // Сброс пагинации при смене вкладки, чтобы не оставаться на пустой странице

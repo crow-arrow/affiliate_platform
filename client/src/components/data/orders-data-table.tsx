@@ -98,7 +98,7 @@ function getStatusIcon(status: string) {
     case "APPROVED":
     case "CONFIRMED":
       return <CheckCircle2 className="w-3 h-3 mr-1" />;
-    case "CANCEL":
+    case "CANCELLED":
       return <XCircle className="w-3 h-3 mr-1" />;
     case "REJECTED":
       return <XCircle className="w-3 h-3 mr-1" />;
@@ -210,7 +210,7 @@ function OrdersDataTable({ data: initialData }: { data: z.infer<typeof ordersSch
         let bgColor = "bg-muted";
         let textColor = "text-foreground";
 
-        if (status === "CANCEL") {
+        if (status === "CANCELLED") {
           bgColor = "bg-red-100";
           textColor = "text-red-800";
         } else if (status === "REJECTED") {

@@ -121,9 +121,10 @@ model PartnerProfile {
 
 model Trips {
   id              BigInt       @id @default(autoincrement())
+  orderId         String?      @map("order_id") @db.VarChar(100)
   travellerAmount Int          @map("traveller_amount")
-  bookingDate     DateTime     @map("booking_date")
-  travelDate      DateTime     @map("travel_date")
+  bookingDate     DateTime?    @map("booking_date")
+  travelDate      DateTime?    @map("travel_date")
   orderStatus     OrderStatus? @default(PENDING) @map("order_status")
   totalPrice      Decimal      @map("total_price") @db.Decimal(19, 2)
   currency        String?      @db.VarChar(10)
@@ -145,6 +146,8 @@ model Trips {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  @@unique([tenantId, orderId])
+  @@index([orderId])
   @@index([travelDate])
   @@index([bookingDate])
   @@index([orderStatus])
@@ -269,14 +272,17 @@ enum UserRole {
 }
 
 enum OrderStatus {
-  APPROVED
   PENDING
+  APPROVED
   CONFIRMED
-  CANCEL
   COMPLETED
-  WAIT_FOR_APPROVAL
-  REJECTED
+  ONLINE_PAID
   DEPOSIT_PAID
+  DEPARTED
+  REJECTED
+  CANCELLED
+  WAIT_FOR_APPROVAL
+  RECEIPT_SUBMITTED
 }
 
 enum ClickType {
@@ -307,6 +313,7 @@ enum ConversionStatus {
 
 // Поля модели Trips, которые можно использовать для маппинга
 enum TripField {
+  orderId
   travelDate
   bookingDate
   customerFirstName

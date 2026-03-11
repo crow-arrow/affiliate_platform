@@ -1,6 +1,6 @@
 export const getOrderStatusClasses = (status: string) => {
   switch (status) {
-    case "cancel":
+    case "cancelled":
       return "bg-destructive/10 text-destructive";
     case "rejected":
       return "bg-destructive/10 text-destructive";
