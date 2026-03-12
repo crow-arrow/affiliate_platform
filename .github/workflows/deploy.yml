@@ -124,7 +124,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: pm2 restart affiliate_server --update-env
+          script: pm2 startOrRestart /opt/ecosystem.config.js --only affiliate_server --update-env
 
       # ========================
       # TELEGRAM NOTIFICATION

@@ -26,7 +26,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+import { cn, getAvatarUrl } from "@/lib/utils";
 
 export const CropAvatar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const dispatch = useAppDispatch();
@@ -38,7 +38,7 @@ export const CropAvatar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () =
     avatar: state.auth.user?.avatarUrl,
     user: state.auth.user,
   }));
-  const currentAvatarUrl = avatar ? `${import.meta.env.VITE_API_URL ?? ""}${avatar}` : null;
+  const currentAvatarUrl = avatar ? getAvatarUrl(avatar) : null;
   const fallbackInitials =
     [user?.first_name?.[0], user?.last_name?.[0]].filter(Boolean).join("").toUpperCase() || "JT";
   const [preview, setPreview] = useState<string | null>(null);

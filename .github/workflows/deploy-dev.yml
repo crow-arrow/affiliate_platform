@@ -75,6 +75,15 @@ jobs:
           target: "/var/www/dev.jinn-travel.com"
           strip_components: 2
 
+      - name: 🔄 Reload nginx
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            sudo nginx -t && sudo systemctl reload nginx
+
       # ========================
       # DEPLOY BACKEND
       # ========================
@@ -98,14 +107,15 @@ jobs:
             cd "/opt/dev.jinn-travel.com"
             npm install --production --legacy-peer-deps
 
-      - name: 🔄 Reload nginx
+      - name: 🗄️ Run Prisma migrations
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            sudo nginx -t && sudo systemctl reload nginx
+            cd "/opt/dev.jinn-travel.com"
+            npx prisma migrate deploy
 
       - name: 🔁 Restart PM2 backend process (dev)
         uses: appleboy/ssh-action@v0.1.10
@@ -113,7 +123,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          script: pm2 restart dev-affiliate --update-env
+          script: pm2 startOrRestart /opt/ecosystem.config.js --only affiliate_server_dev --update-env
 
       # ========================
       # TELEGRAM NOTIFICATION
