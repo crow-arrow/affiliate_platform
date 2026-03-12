@@ -40,12 +40,13 @@ import {} from "lucide-react";
 import { WorkspaceSwitcher } from "../profile/WorkspaceSwitcher";
 import { useMemo } from "react";
 import { extractTenantSlugFromPath, addTenantSlugToPath } from "@/constants/routes";
+import { getAvatarUrl } from "@/lib/utils";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isMobile } = useSidebar();
 
   const { user } = useAppSelector((state) => state.auth);
-  const avatar = user?.avatarUrl ? `${import.meta.env.VITE_API_URL}${user.avatarUrl}` : "";
+  const avatar = getAvatarUrl(user?.avatarUrl);
   const userName =
     user?.first_name && user?.last_name
       ? `${user.first_name} ${user.last_name}`
