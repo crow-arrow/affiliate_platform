@@ -8,13 +8,21 @@ updates:
   # client
   - package-ecosystem: "npm"
     directory: "/client"
-    target-branch: "dev" # Теперь PR будут приходить в dev
+    target-branch: "dev"
     schedule:
       interval: "daily"
+    groups:
+      frontend-deps:
+        patterns:
+          - "*"
 
   # server
   - package-ecosystem: "npm"
     directory: "/server"
-    target-branch: "dev" # И здесь тоже в dev
+    target-branch: "dev"
     schedule:
       interval: "daily"
+    groups:
+      backend-deps:
+        patterns:
+          - "*"
