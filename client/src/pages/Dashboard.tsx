@@ -350,10 +350,12 @@ export const Dashboard: React.FC = () => {
             ) : (
               <Table className="border border-border rounded-lg overflow-hidden">
                 <TableHeader className="bg-secondary sticky top-0 z-10">
-                  <TableHead>ID</TableHead>
-                  <TableHead>Booking Date</TableHead>
-                  <TableHead className="text-center">Amount</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Booking Date</TableHead>
+                    <TableHead className="text-center">Amount</TableHead>
+                    <TableHead className="text-center">Status</TableHead>
+                  </TableRow>
                 </TableHeader>
                 <TableBody>
                   {lastThreeTrips?.map((trip) => {

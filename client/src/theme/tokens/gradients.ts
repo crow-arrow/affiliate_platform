@@ -4,130 +4,44 @@
  */
 
 /**
- * Градиенты для карточек статистики
+ * Карточки статистики Dashboard: цвета в global.css (--stat-*), здесь только структура Tailwind.
  */
-export const statCardGradients = {
+const STAT_CARD_CLASSES = {
   orders: {
-    light: "bg-gradient-to-br from-blue-50 to-indigo-100",
-    dark: "dark:from-blue-950 dark:to-indigo-900",
-    border: {
-      light: "border-blue-200",
-      dark: "dark:border-blue-800",
-    },
-    text: {
-      title: {
-        light: "text-blue-700",
-        dark: "dark:text-blue-300",
-      },
-      value: {
-        light: "text-blue-900",
-        dark: "dark:text-blue-100",
-      },
-      description: {
-        light: "text-blue-600",
-        dark: "dark:text-blue-400",
-      },
-    },
-    icon: {
-      light: "text-blue-600",
-      dark: "dark:text-blue-400",
-    },
-    accent: {
-      light: "bg-blue-200",
-      dark: "dark:bg-blue-800",
-    },
+    card: "bg-gradient-to-br from-(--stat-orders-g-from) to-(--stat-orders-g-to) border border-(--stat-orders-border)",
+    title: "text-(--stat-orders-title)",
+    value: "text-(--stat-orders-value)",
+    description: "text-(--stat-orders-description)",
+    icon: "text-(--stat-orders-icon)",
+    accent: "bg-(--stat-orders-accent)",
   },
   sales: {
-    light: "bg-gradient-to-br from-green-50 to-emerald-100",
-    dark: "dark:from-green-950 dark:to-emerald-900",
-    border: {
-      light: "border-green-200",
-      dark: "dark:border-green-800",
-    },
-    text: {
-      title: {
-        light: "text-green-700",
-        dark: "dark:text-green-300",
-      },
-      value: {
-        light: "text-green-900",
-        dark: "dark:text-green-100",
-      },
-      description: {
-        light: "text-green-600",
-        dark: "dark:text-green-400",
-      },
-    },
-    icon: {
-      light: "text-green-600",
-      dark: "dark:text-green-400",
-    },
-    accent: {
-      light: "bg-green-200",
-      dark: "dark:bg-green-800",
-    },
+    card: "bg-gradient-to-br from-(--stat-sales-g-from) to-(--stat-sales-g-to) border border-(--stat-sales-border)",
+    title: "text-(--stat-sales-title)",
+    value: "text-(--stat-sales-value)",
+    description: "text-(--stat-sales-description)",
+    icon: "text-(--stat-sales-icon)",
+    accent: "bg-(--stat-sales-accent)",
   },
   commission: {
-    light: "bg-gradient-to-br from-purple-50 to-violet-100",
-    dark: "dark:from-purple-950 dark:to-violet-900",
-    border: {
-      light: "border-purple-200",
-      dark: "dark:border-purple-800",
-    },
-    text: {
-      title: {
-        light: "text-purple-700",
-        dark: "dark:text-purple-300",
-      },
-      value: {
-        light: "text-purple-900",
-        dark: "dark:text-purple-100",
-      },
-      description: {
-        light: "text-purple-600",
-        dark: "dark:text-purple-400",
-      },
-    },
-    icon: {
-      light: "text-purple-600",
-      dark: "dark:text-purple-400",
-    },
-    accent: {
-      light: "bg-purple-200",
-      dark: "dark:bg-purple-800",
-    },
+    card: "bg-gradient-to-br from-(--stat-commission-g-from) to-(--stat-commission-g-to) border border-(--stat-commission-border)",
+    title: "text-(--stat-commission-title)",
+    value: "text-(--stat-commission-value)",
+    description: "text-(--stat-commission-description)",
+    icon: "text-(--stat-commission-icon)",
+    accent: "bg-(--stat-commission-accent)",
   },
   clicks: {
-    light: "bg-gradient-to-br from-orange-50 to-amber-100",
-    dark: "dark:from-orange-950 dark:to-amber-900",
-    border: {
-      light: "border-orange-200",
-      dark: "dark:border-orange-800",
-    },
-    text: {
-      title: {
-        light: "text-orange-700",
-        dark: "dark:text-orange-300",
-      },
-      value: {
-        light: "text-orange-900",
-        dark: "dark:text-orange-100",
-      },
-      description: {
-        light: "text-orange-600",
-        dark: "dark:text-orange-400",
-      },
-    },
-    icon: {
-      light: "text-orange-600",
-      dark: "dark:text-orange-400",
-    },
-    accent: {
-      light: "bg-orange-200",
-      dark: "dark:bg-orange-800",
-    },
+    card: "bg-gradient-to-br from-(--stat-clicks-g-from) to-(--stat-clicks-g-to) border border-(--stat-clicks-border)",
+    title: "text-(--stat-clicks-title)",
+    value: "text-(--stat-clicks-value)",
+    description: "text-(--stat-clicks-description)",
+    icon: "text-(--stat-clicks-icon)",
+    accent: "bg-(--stat-clicks-accent)",
   },
 } as const;
+
+export type StatCardType = keyof typeof STAT_CARD_CLASSES;
 
 /**
  * Градиенты для уровней партнеров
@@ -242,17 +156,7 @@ export const levelGradients = {
 /**
  * Утилиты для получения полных классов градиентов
  */
-export const getStatCardClasses = (type: keyof typeof statCardGradients) => {
-  const gradient = statCardGradients[type];
-  return {
-    card: `${gradient.light} ${gradient.dark} ${gradient.border.light} ${gradient.border.dark}`,
-    title: `${gradient.text.title.light} ${gradient.text.title.dark}`,
-    value: `${gradient.text.value.light} ${gradient.text.value.dark}`,
-    description: `${gradient.text.description.light} ${gradient.text.description.dark}`,
-    icon: `${gradient.icon.light} ${gradient.icon.dark}`,
-    accent: `${gradient.accent.light} ${gradient.accent.dark}`,
-  };
-};
+export const getStatCardClasses = (type: StatCardType) => STAT_CARD_CLASSES[type];
 
 export const getLevelCardClasses = (level: keyof typeof levelGradients) => {
   const gradient = levelGradients[level];

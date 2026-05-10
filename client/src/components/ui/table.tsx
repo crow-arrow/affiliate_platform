@@ -51,7 +51,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
     <tr
       ref={ref}
       className={cn(
-        "justify-space-between border-b border-tableBorder group transition-colors hover:border-border hover:bg-secondary data-[state=selected]:bg-secondary data-[state=selected]:border-border",
+        "justify-space-between border-b border-table-border group transition-colors hover:border-border hover:bg-secondary data-[state=selected]:bg-secondary data-[state=selected]:border-border",
         className
       )}
       {...props}
@@ -84,7 +84,7 @@ const TableCell = React.forwardRef<
     ref={ref}
     className={cn(
       applyTypography("body-sm"),
-      "border-r border-tableBorder transition-colors group-hover:border-border group-data-[state=selected]:border-border p-2 align-middle whitespace-nowrap",
+      "border-r border-table-border transition-colors group-hover:border-border group-data-[state=selected]:border-border p-2 align-middle whitespace-nowrap",
       className
     )}
     {...props}
