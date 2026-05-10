@@ -34,10 +34,10 @@ export { shadows, semanticShadows } from "./tokens/shadows";
 export { borderRadius, semanticBorders, borderWidth } from "./tokens/borders";
 export { duration, easing, keyframes, semanticAnimations, delay } from "./tokens/animations";
 export {
-  statCardGradients,
   levelGradients,
   getStatCardClasses,
   getLevelCardClasses,
+  type StatCardType,
 } from "./tokens/gradients";
 export { statusConfig, getStatusConfig, getStatusClasses, type TripStatus } from "./tokens/status";
 export { semanticColors, colorClasses } from "./semantic/colors";
