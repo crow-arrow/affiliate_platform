@@ -24,7 +24,7 @@ export const ThemeSwitcher = () => {
   };
 
   return (
-    <div className="relative flex items-center bg-background shadow-inset-2 dark:bg-secondary rounded-lg">
+    <div className="relative flex items-center rounded-lg bg-background shadow-inset-2">
       <div
         className={`absolute inset-0 w-8 h-8 border border-border bg-secondary rounded-lg transition-transform duration-300 ${getPosition()}`}
       />
