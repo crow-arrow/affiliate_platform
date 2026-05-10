@@ -77,6 +77,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getAvatarUrl } from "@/lib/utils";
 import avatarLogo from "@/assets/avatar.webp";
 
 export const teamSchema = z.object({
@@ -180,11 +181,7 @@ function TeamDataTable({ data: initialData }: { data: z.infer<typeof teamSchema>
         <div className="flex justify-center items-center">
           <Avatar>
             <AvatarImage
-              src={
-                row.original.avatarUrl
-                  ? `${import.meta.env.VITE_API_URL}${row.original.avatarUrl}`
-                  : avatarLogo
-              }
+              src={getAvatarUrl(row.original.avatarUrl) || avatarLogo}
               alt={row.original.first_name}
             />
             <AvatarFallback>{row.original.first_name?.[0]?.toUpperCase() || "U"}</AvatarFallback>

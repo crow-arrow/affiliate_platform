@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
-// import DarkModeIcon from "@mui/icons-material/DarkMode";
-// import LightModeIcon from "@mui/icons-material/LightMode";
 import AutoModeIcon from "@mui/icons-material/AutoMode";
 
 import { useTheme } from "@/components/theme-provider";
@@ -24,7 +22,7 @@ export const ThemeSwitcher = () => {
   };
 
   return (
-    <div className="relative flex items-center bg-background shadow-inset-2 dark:bg-secondary rounded-lg">
+    <div className="relative flex items-center rounded-lg bg-background dark:bg-card shadow-inset-2">
       <div
         className={`absolute inset-0 w-8 h-8 border border-border bg-secondary rounded-lg transition-transform duration-300 ${getPosition()}`}
       />

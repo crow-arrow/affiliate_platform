@@ -30,7 +30,10 @@ export const uploadAvatar = async (req, res) => {
       ? path.join(UPLOAD_DIR, path.basename(identity.avatarUrl))
       : null;
 
-    const newAvatarUrl = `uploads/${req.file.filename}`;
+    const baseUrl = process.env.API_BASE_URL?.replace(/\/$/, "") || "";
+    const newAvatarUrl = baseUrl
+      ? `${baseUrl}/uploads/${req.file.filename}`
+      : `uploads/${req.file.filename}`;
 
     const updatedIdentity = await prisma.identity.update({
       where: { id: identityId },

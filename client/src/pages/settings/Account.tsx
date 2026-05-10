@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage, AvatarBadge } from "@/components/ui/avatar";
 import { CropAvatar } from "@/components/profile/Avatar";
+import { getAvatarUrl } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
   User,
@@ -52,7 +53,7 @@ export const Account = () => {
     level: user?.level || "BRONZE",
     avatar: user?.avatarUrl || "",
   });
-  const avatar = user?.avatarUrl ? `${import.meta.env.VITE_API_URL}${user.avatarUrl}` : "";
+  const avatar = getAvatarUrl(user?.avatarUrl);
 
   useEffect(() => {
     if (user) {
