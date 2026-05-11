@@ -144,10 +144,11 @@ describe("POST /api/auth/oauth-login", () => {
     vi.clearAllMocks();
   });
 
-  it("should print environment variables (debug)", () => {
-    console.log("JWT_SECRET:", process.env.JWT_SECRET);
-    console.log("CLERK_SECRET_KEY:", process.env.CLERK_SECRET_KEY);
+  it("should validate required environment variables (debug)", () => {
+    console.log("JWT_SECRET is set:", Boolean(process.env.JWT_SECRET));
+    console.log("CLERK_SECRET_KEY is set:", Boolean(process.env.CLERK_SECRET_KEY));
     expect(process.env.JWT_SECRET).toBeDefined();
+    expect(process.env.CLERK_SECRET_KEY).toBeDefined();
   });
 
   it("returns success response when Clerk middleware passes", async () => {
