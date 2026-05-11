@@ -1,4 +1,4 @@
-// Создаем моки для Prisma
+// create mocks for Prisma
 const mocks = {
   identityFindUnique: vi.fn(),
   identityUpdate: vi.fn(),
@@ -58,7 +58,7 @@ vi.mock("../../../utils/generateTokens.js", () => ({
   })),
 }));
 
-// resolveTenantIdFromRequest определен в auth.js, не нужно мокать отдельно
+// resolveTenantIdFromRequest is defined in auth.js, no need to mock it separately
 
 import request from "supertest";
 import express from "express";
@@ -78,17 +78,17 @@ describe("POST /api/auth/oauth-login", () => {
 
     clerkClient = (await import("@clerk/express")).clerkClient;
 
-    // Настройка моков по умолчанию для успешного сценария
+    // setup default mocks for successful scenario
     mocks.identityFindUnique.mockImplementation((query) => {
-      // Если ищем по clerkId
+      // if we are looking for a user by clerkId
       if (query.where.clerkId === "user_12345") {
-        return Promise.resolve(null); // Новый пользователь
+        return Promise.resolve(null);
       }
-      // Если ищем по email
+      // if we are looking for a user by email
       if (query.where.email === "test123@example.com") {
-        return Promise.resolve(null); // Новый пользователь
+        return Promise.resolve(null);
       }
-      // Если ищем существующего пользователя
+      // if we are looking for an existing user
       if (query.where.email === "existing@example.com") {
         return Promise.resolve({
           id: "identity_55",
@@ -146,7 +146,10 @@ describe("POST /api/auth/oauth-login", () => {
 
   it("should validate required environment variables (debug)", () => {
     console.log("JWT_SECRET is set:", Boolean(process.env.JWT_SECRET));
-    console.log("CLERK_SECRET_KEY is set:", Boolean(process.env.CLERK_SECRET_KEY));
+    console.log(
+      "CLERK_SECRET_KEY is set:",
+      Boolean(process.env.CLERK_SECRET_KEY),
+    );
     expect(process.env.JWT_SECRET).toBeDefined();
     expect(process.env.CLERK_SECRET_KEY).toBeDefined();
   });
@@ -182,7 +185,7 @@ describe("POST /api/auth/oauth-login", () => {
   });
 
   it("does not create a new user if one already exists", async () => {
-    // Настраиваем моки для существующего пользователя
+    // setup mocks for an existing user
     mocks.identityFindUnique.mockImplementation((query) => {
       if (query.where.clerkId === "user_12345") {
         return Promise.resolve({
@@ -211,7 +214,7 @@ describe("POST /api/auth/oauth-login", () => {
 
   it("returns 500 if Clerk fails to provide user data", async () => {
     clerkClient.users.getUser.mockRejectedValueOnce(
-      new Error("Clerk API down")
+      new Error("Clerk API down"),
     );
 
     const response = await request(app)
@@ -252,7 +255,7 @@ describe("POST /api/auth/oauth-login", () => {
           avatarUrl: "http://example.com/avatar.png",
           emailVerified: true,
         }),
-      })
+      }),
     );
     expect(response.status).toBe(200);
   });
@@ -271,14 +274,14 @@ describe("POST /api/auth/oauth-login", () => {
       expect.objectContaining({
         message: "OAuth login failed",
         error: "DB write failure",
-      })
+      }),
     );
   });
 
   it("returns 400 if Clerk user has no email", async () => {
     const { clerkClient } = await import("@clerk/express");
 
-    // имитируем пользователя без email
+    // import user without email
     clerkClient.users.getUser.mockResolvedValueOnce({
       id: "user_no_email",
       firstName: "NoEmail",

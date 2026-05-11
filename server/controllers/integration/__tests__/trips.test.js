@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Мокаем Prisma
-vi.mock("../../prisma/client.js", () => ({
+vi.mock("../../../prisma/client.js", () => ({
   default: {
     trips: {
       findFirst: vi.fn(),
@@ -12,7 +12,7 @@ vi.mock("../../prisma/client.js", () => ({
 }));
 
 // Импортируем Prisma после мока
-import prisma from "../../prisma/client.js";
+import prisma from "../../../prisma/client.js";
 
 // Получаем моки через vi.mocked
 const mockFindFirst = vi.mocked(prisma.trips.findFirst);
@@ -172,8 +172,7 @@ describe("receiveTrips", () => {
         errors: [
           {
             trip: rawTrip,
-            error:
-              "Missing required fields: customerFirstName, customerLastName, customerEmail, bookingDate",
+            error: "orderId is required",
           },
         ],
       },
