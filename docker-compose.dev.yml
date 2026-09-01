@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  server-dev:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/partner-server-dev:latest
+    container_name: partner-server-dev
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3003:3002"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+    volumes:
+      - ./uploads:/app/uploads
+
+  client-dev:
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER}/partner-client-dev:latest
+    container_name: partner-client-dev
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:80"
