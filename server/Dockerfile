@@ -12,7 +12,6 @@ RUN npm ci --legacy-peer-deps
 COPY . .
 
 RUN npx prisma generate
-RUN npm run build
 
 RUN npm prune --production
 
@@ -29,8 +28,8 @@ USER node
 COPY --chown=node:node package*.json ./
 COPY --chown=node:node prisma ./prisma/
 COPY --chown=node:node --from=builder /app/node_modules ./node_modules
-COPY --chown=node:node --from=builder /app/dist ./dist
+COPY --chown=node:node --from=builder /app ./
 
 EXPOSE 3002
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node index.js"]
