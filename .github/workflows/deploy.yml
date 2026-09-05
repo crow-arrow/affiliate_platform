@@ -9,13 +9,23 @@ permissions:
   contents: read
 
 jobs:
-  build-and-deploy:
+  # ==========================================
+  # JOB 1: Build & Push Docker Images
+  # ==========================================
+  build-and-push:
+    name: 📦 Build & Push Docker Images (Prod)
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: 🔄 Checkout repository
         uses: actions/checkout@v4
+
+      - name: 🛠 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: 🔐 Log in to GHCR
         uses: docker/login-action@v3
@@ -24,77 +34,143 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # ========================
-      # BUILD & PUSH DOCKER IMAGES
-      # ========================
-      - name: 📦 Build and push Server image (Prod)
-        uses: docker/build-push-action@v5
+      - name: 📦 Build & Push Server
+        uses: docker/build-push-action@v6
         with:
           context: ./server
           file: ./server/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/partner-server-prod:latest
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/partner-server-prod:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/partner-server-prod:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: 📦 Build and push Client image (Prod)
-        uses: docker/build-push-action@v5
+      - name: 📦 Build & Push Client
+        uses: docker/build-push-action@v6
         with:
           context: ./client
           file: ./client/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/partner-client-prod:latest
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/partner-client-prod:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/partner-client-prod:latest
           build-args: |
             VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
             VITE_API_URL=${{ vars.VITE_API_URL }}
             VITE_SHOW_DEV_BANNER=${{ vars.VITE_SHOW_DEV_BANNER }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      # ========================
-      # DEPLOY TO VPS (DOCKER COMPOSE)
-      # ========================
+  # ==========================================
+  # JOB 2: Deploy to VPS via SSH
+  # ==========================================
+  deploy:
+    name: 🚀 Deploy to VPS (Prod)
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: 🔄 Checkout repository
+        uses: actions/checkout@v4
+
       - name: 🚛 Upload docker-compose.yml to server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
           source: "docker-compose.yml"
           target: "/opt/partner.jinn-travel.com"
 
-      - name: 🚀 Deploy via Docker Compose (Prod)
+      - name: 🚀 Execute remote deployment
         uses: appleboy/ssh-action@v0.1.10
+        env:
+          GHCR_READ_TOKEN: ${{ secrets.GHCR_READ_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          IMAGE_TAG: ${{ github.sha }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          PORT: ${{ vars.PORT || '3001' }}
+          CLIENT_URL: ${{ vars.CLIENT_URL }}
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+          ROOT_DOMAIN: ${{ vars.ROOT_DOMAIN }}
+          UPLOAD_DIR: ${{ vars.UPLOAD_DIR || './uploads' }}
+          EMAIL_HOST: ${{ vars.EMAIL_HOST }}
+          EMAIL_PORT: ${{ vars.EMAIL_PORT || '465' }}
+          EMAIL: ${{ vars.EMAIL }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          envs: |
+            GHCR_READ_TOKEN,GITHUB_REPOSITORY_OWNER,GITHUB_ACTOR,IMAGE_TAG,
+            DATABASE_URL,JWT_SECRET,JWT_REFRESH_SECRET,EMAIL_PASSWORD,
+            CLERK_SECRET_KEY,CLERK_PUBLISHABLE_KEY,
+            PORT,CLIENT_URL,API_BASE_URL,ROOT_DOMAIN,UPLOAD_DIR,EMAIL_HOST,EMAIL_PORT,EMAIL
           script: |
+            set -e
             cd /opt/partner.jinn-travel.com
 
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            echo "$GHCR_READ_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
-            export GITHUB_REPOSITORY_OWNER="${{ github.repository_owner }}"
-            export DATABASE_URL="${{ secrets.DATABASE_URL }}"
+            {
+              echo "PORT=$PORT"
+              echo "DATABASE_URL=$DATABASE_URL"
+              echo "JWT_SECRET=$JWT_SECRET"
+              echo "JWT_REFRESH_SECRET=$JWT_REFRESH_SECRET"
+              echo "CLERK_SECRET_KEY=$CLERK_SECRET_KEY"
+              echo "CLERK_PUBLISHABLE_KEY=$CLERK_PUBLISHABLE_KEY"
+              echo "CLIENT_URL=$CLIENT_URL"
+              echo "API_BASE_URL=$API_BASE_URL"
+              echo "ROOT_DOMAIN=$ROOT_DOMAIN"
+              echo "UPLOAD_DIR=$UPLOAD_DIR"
+              echo "EMAIL_HOST=$EMAIL_HOST"
+              echo "EMAIL_PORT=$EMAIL_PORT"
+              echo "EMAIL=$EMAIL"
+              echo "EMAIL_PASSWORD=$EMAIL_PASSWORD"
+            } > .env
+
+            export GITHUB_REPOSITORY_OWNER="$GITHUB_REPOSITORY_OWNER"
+            export IMAGE_TAG="$IMAGE_TAG"
 
             docker compose pull
             docker compose up -d --remove-orphans
 
-            docker image prune -f
+            docker image prune -af --filter until=72h
 
-      # ========================
-      # TELEGRAM NOTIFICATION
-      # ========================
+  # ==========================================
+  # JOB 3: Notification in Telegram
+  # ==========================================
+  notify:
+    name: 📩 Send Notification
+    needs: [build-and-push, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
       - name: 📩 Notify in Telegram
-        if: always()
         run: |
-          STATUS="${{ job.status }}"
-          if [ "$STATUS" = "success" ]; then
-            MESSAGE="🎉 *Prod deploy successful!* 🚀%0A🌍 [Production](https://partner.jinn-travel.com)%0A👤 Author: ${{ github.actor }}%0A💬 Commit: ${{ github.event.head_commit.message }}"
+          BUILD_STATUS="${{ needs.build-and-push.result }}"
+          DEPLOY_STATUS="${{ needs.deploy.result }}"
+
+          if [ "$BUILD_STATUS" = "success" ] && [ "$DEPLOY_STATUS" = "success" ]; then
+            TEXT="🎉 *Prod deploy successful!* 🚀%0A🌍 https://partner.jinn-travel.com%0A👤 Author: ${{ github.actor }}%0A🔖 Commit: \`${{ github.sha }}\`"
           else
-            MESSAGE="🚨 *Prod deploy failed!*%0A👤 Author: ${{ github.actor }}%0A💬 Commit: ${{ github.event.head_commit.message }}"
+            TEXT="🚨 *Prod deploy failed!*%0A👤 Author: ${{ github.actor }}%0A⚙️ Build: $BUILD_STATUS | Deploy: $DEPLOY_STATUS"
           fi
 
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"chat_id\": \"${{ secrets.TELEGRAM_CHAT_ID }}\",
-              \"text\": \"$MESSAGE\",
-              \"parse_mode\": \"Markdown\"
-            }"
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d "text=$TEXT" \
+            -d "parse_mode=Markdown"

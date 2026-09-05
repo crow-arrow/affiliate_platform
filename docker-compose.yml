@@ -6,9 +6,12 @@ services:
     container_name: partner-server-prod
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3002:3002"
+      - "127.0.0.1:3002:3001"
     environment:
+      - PORT=3001
       - DATABASE_URL=${DATABASE_URL}
+    env_file:
+      - .env
     volumes:
       - ./uploads:/app/uploads
 
