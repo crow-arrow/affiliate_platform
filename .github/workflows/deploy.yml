@@ -1,140 +1,176 @@
-name: Build and Deploy Affiliate Platform
+name: Build and Deploy Affiliate Platform (prod)
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
-  build-and-deploy:
+  # ==========================================
+  # JOB 1: Build & Push Docker Images
+  # ==========================================
+  build-and-push:
+    name: 📦 Build & Push Docker Images (Prod)
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      contents: read
+      packages: write
 
     steps:
-      # ========================
-      # GIT + NODE SETUP
-      # ========================
       - name: 🔄 Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: 🧩 Setup Node.js
-        uses: actions/setup-node@v3
+      - name: 🛠 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔐 Log in to GHCR
+        uses: docker/login-action@v3
         with:
-          node-version: "22"
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: ♻️ Cache node_modules
-        uses: actions/cache@v3
+      - name: 📦 Build & Push Server
+        uses: docker/build-push-action@v6
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('client/package-lock.json', 'server/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          context: ./server
+          file: ./server/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/partner-server-prod:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/partner-server-prod:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      # ========================
-      # FRONTEND BUILD
-      # ========================
-      - name: 📦 Install frontend dependencies
-        working-directory: client
-        run: npm install --legacy-peer-deps
-
-      - name: ⚙️ Build frontend
-        working-directory: client
-        env:
-          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-          VITE_SHOW_DEV_BANNER: ${{ vars.VITE_SHOW_DEV_BANNER }}
-        run: npm run build
-
-      # ========================
-      # BACKEND TESTS
-      # ========================
-      - name: 📦 Install backend dependencies
-        working-directory: server
-        run: npm install --legacy-peer-deps
-
-      # ========================
-      # DEPLOY FRONTEND
-      # ========================
-      - name: 🧹 Clean target directory on server
-        uses: appleboy/ssh-action@v0.1.10
+      - name: 📦 Build & Push Client
+        uses: docker/build-push-action@v6
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            find /var/www/partner.jinn-travel.com/ -type f \( -name '*.js' -o -name '*.css' -o -name '*.html' -o -name '*.map' \) -delete
-            rm -rf /var/www/partner.jinn-travel.com/assets
+          context: ./client
+          file: ./client/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/partner-client-prod:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/partner-client-prod:latest
+          build-args: |
+            VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+            VITE_API_URL=${{ vars.VITE_API_URL }}
+            VITE_SHOW_DEV_BANNER=${{ vars.VITE_SHOW_DEV_BANNER }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-      - name: 🚀 Deploy builded frontend
+  # ==========================================
+  # JOB 2: Deploy to VPS via SSH
+  # ==========================================
+  deploy:
+    name: 🚀 Deploy to VPS (Prod)
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: 🔄 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🚛 Upload docker-compose.yml to server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "client/dist"
-          target: "/var/www/partner.jinn-travel.com"
-          strip_components: 2
-
-      - name: 🔄 Reload Nginx
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            sudo nginx -t && sudo systemctl reload nginx
-
-      # ========================
-      # DEPLOY BACKEND
-      # ========================
-      - name: 🚛 Upload backend code
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          source: "server"
+          port: ${{ secrets.SSH_PORT || 22 }}
+          source: "docker-compose.yml"
           target: "/opt/partner.jinn-travel.com"
-          strip_components: 1
 
-      - name: 📦 Install backend dependencies on server
+      - name: 🚀 Execute remote deployment
         uses: appleboy/ssh-action@v0.1.10
+        env:
+          GHCR_READ_TOKEN: ${{ secrets.GHCR_READ_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          IMAGE_TAG: ${{ github.sha }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
+          CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          PORT: ${{ vars.PORT || '3001' }}
+          CLIENT_URL: ${{ vars.CLIENT_URL }}
+          API_BASE_URL: ${{ vars.API_BASE_URL }}
+          ROOT_DOMAIN: ${{ vars.ROOT_DOMAIN }}
+          UPLOAD_DIR: ${{ vars.UPLOAD_DIR || './uploads' }}
+          EMAIL_HOST: ${{ vars.EMAIL_HOST }}
+          EMAIL_PORT: ${{ vars.EMAIL_PORT || '465' }}
+          EMAIL: ${{ vars.EMAIL }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          envs: |
+            GHCR_READ_TOKEN,GITHUB_REPOSITORY_OWNER,GITHUB_ACTOR,IMAGE_TAG,
+            DATABASE_URL,JWT_SECRET,JWT_REFRESH_SECRET,EMAIL_PASSWORD,
+            CLERK_SECRET_KEY,CLERK_PUBLISHABLE_KEY,
+            PORT,CLIENT_URL,API_BASE_URL,ROOT_DOMAIN,UPLOAD_DIR,EMAIL_HOST,EMAIL_PORT,EMAIL
           script: |
-            cd "/opt/partner.jinn-travel.com"
-            npm install --production --legacy-peer-deps
-            npx prisma generate
+            set -e
+            cd /opt/partner.jinn-travel.com
 
-      - name: 🗄️ Run Prisma migrations
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd "/opt/partner.jinn-travel.com"
-            npx prisma migrate deploy
+            echo "$GHCR_READ_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
 
-      - name: 🔁 Restart PM2 backend process
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          script: pm2 startOrRestart /opt/ecosystem.config.js --only affiliate_server --update-env
+            {
+              echo "PORT=$PORT"
+              echo "DATABASE_URL=$DATABASE_URL"
+              echo "JWT_SECRET=$JWT_SECRET"
+              echo "JWT_REFRESH_SECRET=$JWT_REFRESH_SECRET"
+              echo "CLERK_SECRET_KEY=$CLERK_SECRET_KEY"
+              echo "CLERK_PUBLISHABLE_KEY=$CLERK_PUBLISHABLE_KEY"
+              echo "CLIENT_URL=$CLIENT_URL"
+              echo "API_BASE_URL=$API_BASE_URL"
+              echo "ROOT_DOMAIN=$ROOT_DOMAIN"
+              echo "UPLOAD_DIR=$UPLOAD_DIR"
+              echo "EMAIL_HOST=$EMAIL_HOST"
+              echo "EMAIL_PORT=$EMAIL_PORT"
+              echo "EMAIL=$EMAIL"
+              echo "EMAIL_PASSWORD=$EMAIL_PASSWORD"
+            } > .env
 
-      # ========================
-      # TELEGRAM NOTIFICATION
-      # ========================
+            export GITHUB_REPOSITORY_OWNER="$GITHUB_REPOSITORY_OWNER"
+            export IMAGE_TAG="$IMAGE_TAG"
+
+            docker compose pull
+            docker compose up -d --remove-orphans
+
+            docker image prune -af --filter until=72h
+
+  # ==========================================
+  # JOB 3: Notification in Telegram
+  # ==========================================
+  notify:
+    name: 📩 Send Notification
+    needs: [build-and-push, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
       - name: 📩 Notify in Telegram
         run: |
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-            -H "Content-Type: application/json" \
-            -d '{
-              "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}",
-              "text": "✅ *Main* deploy successful!\n🌍 [Production](https://partner.jinn-travel.com)\n👤 Author: ${{ github.actor }}\n💬 Commit: ${{ github.event.head_commit.message }}",
-              "parse_mode": "Markdown"
-            }'
+          BUILD_STATUS="${{ needs.build-and-push.result }}"
+          DEPLOY_STATUS="${{ needs.deploy.result }}"
+
+          if [ "$BUILD_STATUS" = "success" ] && [ "$DEPLOY_STATUS" = "success" ]; then
+            TEXT="🎉 *Prod deploy successful!* 🚀%0A🌍 https://partner.jinn-travel.com%0A👤 Author: ${{ github.actor }}%0A🔖 Commit: \`${{ github.sha }}\`"
+          else
+            TEXT="🚨 *Prod deploy failed!*%0A👤 Author: ${{ github.actor }}%0A⚙️ Build: $BUILD_STATUS | Deploy: $DEPLOY_STATUS"
+          fi
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            -d "text=$TEXT" \
+            -d "parse_mode=Markdown"

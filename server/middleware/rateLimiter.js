@@ -1,6 +1,5 @@
-import rateLimit from "express-rate-limit";
+import rateLimit, { ipKeyGenerator } from "express-rate-limit";
 
-// Унифицированный обработчик — не раскрываем детали причины блокировки
 const genericHandler = (_req, res) =>
   res
     .status(429)
@@ -11,32 +10,33 @@ const getEmail = (req) => {
   return typeof raw === "string" ? raw.trim().toLowerCase() : "";
 };
 
-// Персональный лимит по email (строже)
 export const passwordResetLimiterEmail = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 минут
-  max: 3, // на один email
+  windowMs: 10 * 60 * 1000,
+  max: 3,
   standardHeaders: true,
   legacyHeaders: false,
   handler: genericHandler,
+  validate: { keyGenerator: false }, // Отключает панику валидатора
   keyGenerator: (req) => {
     const email = getEmail(req);
-    return email
-      ? `pwd-reset:email:${email}`
-      : `pwd-reset:email:none:${req.ip}`;
+    const ip = req.ip ? ipKeyGenerator(req.ip) : "127.0.0.1";
+    return email ? `pwd-reset:email:${email}` : `pwd-reset:email:none:${ip}`;
   },
 });
 
-// Дополнительный общий лимит по IP (мягче)
 export const passwordResetLimiterIP = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 20,
   standardHeaders: true,
   legacyHeaders: false,
   handler: genericHandler,
-  keyGenerator: (req) => `pwd-reset:ip:${req.ip}`,
+  validate: { keyGenerator: false },
+  keyGenerator: (req) => {
+    const ip = req.ip ? ipKeyGenerator(req.ip) : "127.0.0.1";
+    return `pwd-reset:ip:${ip}`;
+  },
 });
 
-// Экспортируем составной лимитер — подключается как массив middleware
 export const passwordResetLimiter = [
   passwordResetLimiterEmail,
   passwordResetLimiterIP,
